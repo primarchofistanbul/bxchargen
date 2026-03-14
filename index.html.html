@@ -4,667 +4,563 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>B/X D&D — Character Generator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-/* ════════════════════════════════════════════
-   ROOT & RESET
-════════════════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --ink: #ffffff;         /* Main background */
-  --surface: #f9fafb;     /* Light neutral */
-  --card: #ffffff;        /* Panels */
-  --card2: #f3f4f6;       /* Secondary background */
-  --border-gold: #000000; /* Sharp black borders */
-  --border-dim: #e5e7eb;  /* Subtle dividers */
-  
-  --gold: #000000;        
-  --gold-bright: #dc2626; /* Primary Accent: Red */
-  --gold-dim: #6b7280;
-  
-  --parchment: #000000;
-  --parchment-dim: #6b7280;
-  
-  --text: #000000;        /* Main text */
-  --text-muted: #4b5563;
-  --text-dim: #9ca3af;
-  
-  --crimson: #b91c1c;
-  --crimson-bright: #dc2626;
-  --emerald: #15803d;
-  --emerald-bright: #22c55e;
-  --sapphire: #1d4ed8;
-  --sapphire-bright: #3b82f6;
-  
-  --r: 0px;               /* Sharp edges for minimalism */
-  --r-lg: 0px;
+  --ink:#111111;
+  --ink2:#333333;
+  --muted:#666666;
+  --rule:#cccccc;
+  --rule2:#e8e8e8;
+  --bg:#ffffff;
+  --bg2:#f7f7f7;
+  --bg3:#f0f0f0;
+  --red:#c0102a;
+  --red2:#e01030;
+  --red-bg:#fdf2f4;
+  --mono:'Share Tech Mono',monospace;
 }
-
 html{scroll-behavior:smooth}
 body{
-  background:var(--ink);
-  color:var(--text);
-  font-family: system-ui, -apple-system, sans-serif;
-  min-height:100vh;
-  padding:20px 16px 60px;
-  position:relative;
-  overflow-x:hidden;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Libre Baskerville',Georgia,serif;
+  font-size:15px;
+  line-height:1.65;
 }
 
-/* Remove vintage grain and vignette overlays */
-body::before, body::after {
-  display: none;
-}
+/* ── WRAPPER ── */
+.wrapper{max-width:960px;margin:0 auto;padding:0 20px 80px}
 
-.wrapper{position:relative;z-index:1;max-width:1080px;margin:0 auto}
-
-/* ════════════════════════════════════════════
-   TYPOGRAPHY UTILITIES
-════════════════════════════════════════════ */
-.heading{font-family: system-ui, -apple-system, sans-serif; font-weight:700; letter-spacing:0.02em}
-.heading-display{font-family: system-ui, -apple-system, sans-serif; font-weight:900; letter-spacing:0.02em; text-transform:uppercase}
-.label{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.65rem;
-  font-weight:600;
-  letter-spacing:0.15em;
-  text-transform:uppercase;
-  color:var(--parchment-dim);
-}
-
-/* ════════════════════════════════════════════
-   MINIMAL DIVIDER
-════════════════════════════════════════════ */
-.ornament{
-  text-align:center;
-  color:var(--gold-dim);
-  font-size:0.8rem;
-  letter-spacing:0.2em;
-  margin:28px 0;
-  position:relative;
-  text-transform:uppercase;
-}
-.ornament::before,.ornament::after{
-  content:'';
-  position:absolute;
-  top:50%;
-  width:calc(50% - 70px);
-  height:1px;
-  background: var(--border-dim);
-}
-.ornament::before{left:0}
-.ornament::after{right:0}
-
-/* ════════════════════════════════════════════
-   HEADER
-════════════════════════════════════════════ */
+/* ── HEADER ── */
 .site-header{
-  text-align:center;
-  padding:48px 20px 36px;
+  border-bottom:3px solid var(--ink);
+  padding:36px 0 24px;
+  margin-bottom:36px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
 }
-.site-header h1{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-weight: 900;
-  font-size:clamp(1.5rem,4vw,3rem);
-  color:var(--text);
+.header-left h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.5rem,4vw,2.4rem);
+  font-weight:900;
   letter-spacing:-0.02em;
-  line-height:1.2;
-  margin-bottom:10px;
-  text-transform:uppercase;
+  line-height:1.05;
+  color:var(--ink);
 }
-.site-header .subtitle{
-  font-family: system-ui, -apple-system, sans-serif;
-  color:var(--parchment-dim);
-  font-size:1rem;
-  font-weight:400;
-  letter-spacing:0.02em;
-}
-
-/* ════════════════════════════════════════════
-   GENERATE BUTTON
-════════════════════════════════════════════ */
-.btn-generate{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  margin:24px auto 0;
-  padding:14px 44px;
-  background:#000000;
-  color:#ffffff;
-  border:2px solid #000000;
-  border-radius:var(--r);
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.95rem;
-  font-weight:700;
-  letter-spacing:0.05em;
-  text-transform:uppercase;
-  cursor:pointer;
-  transition:all 0.2s ease;
-}
-.btn-generate:hover{
-  background:var(--crimson-bright);
-  border-color:var(--crimson-bright);
-  color:#ffffff;
-}
-.btn-generate:active{transform:translateY(1px)}
-.btn-generate:disabled{opacity:0.5; cursor:not-allowed; background:#e5e7eb; border-color:#e5e7eb; color:#9ca3af;}
-.btn-generate .dice-icon{font-size:1.1rem}
-
-/* ════════════════════════════════════════════
-   CHARACTER SHEET
-════════════════════════════════════════════ */
-#char-sheet{
-  display:none;
-  animation:sheetReveal 0.4s ease both;
-}
-@keyframes sheetReveal{
-  from{opacity:0;transform:translateY(10px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-/* ════════════════════════════════════════════
-   PANEL / CARD BASE
-════════════════════════════════════════════ */
-.panel{
-  background:var(--card);
-  border:2px solid var(--border-gold);
-  border-radius:var(--r-lg);
-  padding:24px;
-  position:relative;
-  margin-bottom: 20px;
-}
-
-.panel-title{
-  font-family: system-ui, -apple-system, sans-serif;
+.header-left .subtitle{
   font-size:0.75rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-top:5px;
+}
+.header-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:8px;
+}
+.btn{
+  font-family:'Playfair Display',serif;
+  font-size:0.82rem;
   font-weight:700;
+  letter-spacing:0.04em;
+  padding:10px 24px;
+  cursor:pointer;
+  border:2px solid var(--ink);
+  background:var(--ink);
+  color:var(--bg);
+  transition:background 0.15s,color 0.15s;
+  white-space:nowrap;
+}
+.btn:hover{background:var(--red);border-color:var(--red);}
+.btn:disabled{opacity:0.35;cursor:default;pointer-events:none;}
+.btn.outline{background:var(--bg);color:var(--ink);}
+.btn.outline:hover{background:var(--ink);color:var(--bg);}
+.btn.lang-btn{
+  font-size:0.7rem;
+  letter-spacing:0.2em;
+  padding:6px 14px;
+  border-color:var(--rule);
+  background:var(--bg);
+  color:var(--muted);
+}
+.btn.lang-btn:hover{background:var(--bg3);color:var(--ink);border-color:var(--ink);}
+.btn-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+
+/* ── ORNAMENT LINE ── */
+.orn{
+  display:flex;align-items:center;gap:12px;
+  margin:28px 0 20px;
+  font-family:'Playfair Display',serif;
+  font-size:0.65rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--red);
+  font-weight:700;
+}
+.orn::before,.orn::after{content:'';flex:1;height:1px;background:var(--rule);}
+
+/* ── SHEET ── */
+#char-sheet{display:none}
+#char-sheet.visible{display:block;animation:appear 0.35s ease}
+@keyframes appear{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ── IDENTITY BAND ── */
+.id-band{
+  border:2px solid var(--ink);
+  padding:18px 24px;
+  margin-bottom:24px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:16px;
+}
+.id-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.3rem,3vw,2rem);
+  font-weight:900;
+  line-height:1.1;
+}
+.id-sub{
+  font-size:0.8rem;
+  color:var(--muted);
+  margin-top:4px;
+  font-style:italic;
+}
+.id-align{
+  text-align:right;
+  font-family:'Playfair Display',serif;
+}
+.align-label{
+  font-size:0.65rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.align-val{
+  font-size:1.2rem;
+  font-weight:700;
+  color:var(--red);
+}
+
+/* ── TWO-COL LAYOUT ── */
+.sheet-cols{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  gap:24px;
+}
+@media(max-width:680px){.sheet-cols{grid-template-columns:1fr}}
+
+/* ── SECTION ── */
+.section{margin-bottom:22px}
+.sec-title{
+  font-family:'Playfair Display',serif;
+  font-size:0.65rem;
+  font-weight:700;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--red);
+  padding-bottom:6px;
+  border-bottom:2px solid var(--ink);
+  margin-bottom:12px;
+}
+
+/* ── ABILITY TABLE ── */
+.ability-table{width:100%;border-collapse:collapse}
+.ability-table tr{border-bottom:1px solid var(--rule2)}
+.ability-table tr:last-child{border-bottom:none}
+.ability-table td{padding:7px 6px;vertical-align:middle}
+.ab-abbr{
+  font-family:var(--mono);
+  font-size:0.72rem;
+  font-weight:bold;
+  color:var(--muted);
+  width:36px;
+}
+.ab-score{
+  font-family:var(--mono);
+  font-size:1.5rem;
+  font-weight:bold;
+  width:36px;
+  text-align:center;
+  line-height:1;
+}
+.ab-mod{
+  font-family:var(--mono);
+  font-size:0.9rem;
+  width:34px;
+  text-align:center;
+  font-weight:bold;
+}
+.mod-pos{color:var(--red)}
+.mod-neg{color:#1a6a3a}
+.mod-zero{color:var(--muted)}
+.ab-effect{font-size:0.75rem;color:var(--muted);font-style:italic;line-height:1.35}
+.ab-score.rolling{color:var(--red);animation:blink 0.1s infinite}
+@keyframes blink{50%{opacity:0.4}}
+
+/* ── COMBAT GRID ── */
+.combat-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.cstat{
+  border:1px solid var(--rule);
+  padding:10px 8px;
+  text-align:center;
+  background:var(--bg2);
+}
+.cstat-label{
+  font-size:0.6rem;
   letter-spacing:0.15em;
   text-transform:uppercase;
-  color:var(--text);
-  margin-bottom:20px;
-  padding-bottom:12px;
-  border-bottom:2px solid var(--border-gold);
-}
-
-/* ════════════════════════════════════════════
-   IDENTITY BLOCK
-════════════════════════════════════════════ */
-.identity{
-  display:flex;
-  flex-wrap:wrap;
-  gap:20px;
-  justify-content:space-between;
-  align-items:flex-start;
-  margin-bottom:20px;
-}
-.char-name{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-weight:900;
-  font-size:clamp(1.5rem,3.5vw,2.4rem);
-  color:var(--gold-bright);
-  line-height:1.1;
-  text-transform:uppercase;
-  letter-spacing:-0.02em;
-}
-.char-subline{
-  font-family: system-ui, -apple-system, sans-serif;
-  color:var(--parchment-dim);
-  font-size:0.95rem;
-  margin-top:6px;
-}
-.meta-cluster{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  align-items:flex-start;
-}
-.meta-badge{
-  background:var(--card);
-  border:1px solid var(--border-gold);
-  border-radius:var(--r);
-  padding:10px 16px;
-  text-align:center;
-  min-width:72px;
-}
-.meta-badge .val{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:1rem;
-  font-weight:700;
-  color:var(--text);
+  color:var(--muted);
   display:block;
-  line-height:1.2;
+  margin-bottom:4px;
 }
-.meta-badge .lbl{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.6rem;
-  font-weight:600;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--parchment-dim);
-  display:block;
-  margin-top:4px;
-}
-.align-lawful .val{color:var(--text)}
-.align-neutral .val{color:var(--text)}
-.align-chaotic .val{color:var(--gold-bright)}
-
-/* ════════════════════════════════════════════
-   COMBAT STATS ROW
-════════════════════════════════════════════ */
-.combat-row{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
-  gap:12px;
-  margin-bottom:20px;
-}
-.combat-tile{
-  background:var(--card);
-  border:2px solid var(--border-gold);
-  border-radius:var(--r);
-  padding:16px 12px;
-  text-align:center;
-}
-.combat-tile .val{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:2rem;
-  font-weight:800;
-  color:var(--text);
+.cstat-val{
+  font-family:var(--mono);
+  font-size:1.4rem;
+  font-weight:bold;
+  color:var(--ink);
   line-height:1;
   display:block;
 }
-.combat-tile .lbl{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.65rem;
-  font-weight:700;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--parchment-dim);
-  margin-top:8px;
-  display:block;
-}
-.combat-tile.hp .val{color:var(--gold-bright)}
-.combat-tile.gold-tile .val{color:var(--text)}
+.cstat-sub{font-size:0.7rem;color:var(--muted);display:block;margin-top:3px}
 
-/* ════════════════════════════════════════════
-   ABILITY SCORES GRID
-════════════════════════════════════════════ */
-.abilities-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:12px;
-  margin-bottom:20px;
-}
-.ability-card{
-  background:var(--card);
-  border:1px solid var(--border-gold);
-  border-radius:var(--r-lg);
-  padding:16px;
-  position:relative;
-}
-.ability-card.prime-req{
-  border:2px solid var(--gold-bright);
-}
-.ability-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
-}
-.ability-label{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.65rem;
-  font-weight:700;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--parchment-dim);
-}
-.ability-mod{
-  font-family: system-ui, -apple-system, sans-serif;
+/* ── SAVES ── */
+.save-row{
+  display:flex;justify-content:space-between;
+  padding:5px 0;
+  border-bottom:1px solid var(--rule2);
   font-size:0.85rem;
-  font-weight:700;
-  padding:4px 8px;
-  border-radius:var(--r);
-  background:var(--card2);
-  border:1px solid var(--border-dim);
 }
-.ability-mod.pos{color:var(--text); background:var(--border-dim)}
-.ability-mod.neg{color:var(--gold-bright); background:rgba(220,38,38,0.1); border-color:var(--gold-bright)}
-.ability-mod.zero{color:var(--parchment-dim)}
-.ability-score{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:2.8rem;
-  font-weight:800;
-  color:var(--text);
-  line-height:1;
-  margin-bottom:8px;
-}
-.ability-score.rolling{color:var(--gold-bright);animation:pulse 0.2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
-.prime-pip{
-  font-size:0.65rem;
-  color:var(--gold-bright);
-  font-weight:700;
-  margin-bottom:8px;
-  text-transform:uppercase;
-  letter-spacing:0.05em;
-}
-.ability-effects{
-  font-size:0.75rem;
-  color:var(--text-muted);
-  line-height:1.5;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-.ability-effects span{color:var(--text); font-weight:600}
+.save-row:last-child{border-bottom:none}
+.save-name{color:var(--ink2)}
+.save-val{font-family:var(--mono);font-weight:bold;color:var(--ink)}
 
-/* ════════════════════════════════════════════
-   TWO COLUMN
-════════════════════════════════════════════ */
-.two-col{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-  margin-bottom:16px;
-}
-@media(max-width:620px){.two-col{grid-template-columns:1fr}}
-
-/* ════════════════════════════════════════════
-   TABLES
-════════════════════════════════════════════ */
-.sheet-table{width:100%;border-collapse:collapse;font-family: system-ui, -apple-system, sans-serif}
-.sheet-table th{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.65rem;
+/* ── ABILITIES LIST ── */
+.ability-item{margin-bottom:10px}
+.ability-item:last-child{margin-bottom:0}
+.abil-name{
   font-weight:700;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--text);
-  padding:8px 12px;
-  border-bottom:2px solid var(--border-gold);
-  text-align:left;
+  font-size:0.85rem;
+  color:var(--ink);
+  margin-bottom:2px;
 }
-.sheet-table td{
-  padding:10px 12px;
-  border-bottom:1px solid var(--border-dim);
-  font-size:0.9rem;
-  color:var(--text);
-}
-.sheet-table .num{
-  text-align:right;
-  font-weight:700;
-  color:var(--text);
-}
-.sheet-table .muted{color:var(--text-muted)}
+.abil-desc{font-size:0.8rem;color:var(--muted);line-height:1.45}
 
-/* ════════════════════════════════════════════
-   TAGS / LANGUAGE PILLS
-════════════════════════════════════════════ */
-.tag{
+/* ── THIEF / CLERIC TABLE ── */
+.rules-table{width:100%;border-collapse:collapse;font-size:0.82rem;margin-top:4px}
+.rules-table th{
+  text-align:left;padding:5px 8px;
+  background:var(--ink);color:var(--bg);
+  font-family:'Playfair Display',serif;
+  font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;
+}
+.rules-table td{padding:5px 8px;border-bottom:1px solid var(--rule2)}
+.rules-table tr:last-child td{border-bottom:none}
+.rules-table td:last-child{font-family:var(--mono);text-align:right;color:var(--red)}
+
+/* ── SPELLS ── */
+.spell-tag{
   display:inline-block;
-  padding:4px 12px;
-  background:var(--card2);
-  border:1px solid var(--border-gold);
-  border-radius:999px;
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.8rem;
-  font-weight:600;
-  color:var(--text);
-  margin:4px 4px 4px 0;
-}
-.tag.base{background:var(--border-dim)}
-
-/* ════════════════════════════════════════════
-   ABILITY LIST (special abilities)
-════════════════════════════════════════════ */
-.ability-list{list-style:none; padding-left:0;}
-.ability-list li{
-  padding:10px 0 10px 24px;
-  border-bottom:1px solid var(--border-dim);
-  font-size:0.9rem;
-  font-family: system-ui, -apple-system, sans-serif;
-  color:var(--text);
-  position:relative;
-  line-height:1.6;
-}
-.ability-list li:last-child{border-bottom:none}
-.ability-list li::before{
-  content:'■';
-  position:absolute;left:0;top:12px;
-  color:var(--gold-bright);
-  font-size:0.6rem;
-}
-.ability-list strong{color:var(--text);font-weight:700}
-
-/* ════════════════════════════════════════════
-   SPELL CARDS
-════════════════════════════════════════════ */
-.spell-card{
-  background:var(--card);
-  border:1px solid var(--border-gold);
-  border-radius:var(--r);
-  padding:16px;
-  margin-bottom:12px;
-}
-.spell-badge{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.6rem;
-  font-weight:700;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--parchment-dim);
-  margin-bottom:6px;
-}
-.spell-name{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:1rem;
-  font-weight:700;
-  color:var(--text);
-  margin-bottom:6px;
-}
-.spell-desc{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.85rem;
-  color:var(--text-muted);
-  line-height:1.6;
-}
-.spell-card.highlight{
-  border-left:4px solid var(--gold-bright);
-}
-
-/* ════════════════════════════════════════════
-   THIEF SKILL ROWS
-════════════════════════════════════════════ */
-.skill-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px 0;
-  border-bottom:1px solid var(--border-dim);
-  font-family: system-ui, -apple-system, sans-serif;
-}
-.skill-row:last-child{border-bottom:none}
-.skill-name{font-size:0.9rem;color:var(--text); font-weight:500}
-.skill-val{
-  font-size:0.9rem;
-  font-weight:700;
-  color:var(--text);
-}
-
-/* ════════════════════════════════════════════
-   EQUIPMENT SHOP
-════════════════════════════════════════════ */
-.shop-header{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:space-between;
-  align-items:center;
-  gap:16px;
-  margin-bottom:20px;
-}
-.gold-tracker{
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-  align-items:center;
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.9rem;
-  font-weight:500;
-}
-.gold-tracker .start-gold{color:var(--parchment-dim)}
-.gold-tracker .spent{color:var(--crimson-bright)}
-.gold-tracker .remain{
-  font-size:1.2rem;
-  font-weight:800;
-  color:var(--text);
-}
-.gold-tracker .remain.overbudget{color:var(--crimson-bright);animation:shake 0.3s ease}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-
-.shop-tabs{
-  display:flex;
-  gap:0;
-  margin-bottom:-2px;
-  position:relative;
-  z-index:2;
-}
-.shop-tab{
-  padding:12px 24px;
-  background:var(--card2);
-  border:2px solid var(--border-gold);
-  border-bottom-color:var(--border-gold);
-  margin-right:-2px;
-  cursor:pointer;
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.7rem;
-  font-weight:700;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--parchment-dim);
-  transition:all 0.2s;
-}
-.shop-tab:hover{color:var(--text);background:var(--card)}
-.shop-tab.active{
-  background:var(--card);
-  color:var(--gold-bright);
-  border-bottom-color:var(--card);
-  z-index:3;
-}
-.shop-body{
-  background:var(--card);
-  border:2px solid var(--border-gold);
-  padding:20px;
-  position:relative;
-  z-index:1;
-}
-
-.shop-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:10px 8px;
-  border-bottom:1px solid var(--border-dim);
-  transition:background 0.15s;
-}
-.shop-item:hover{background:var(--card2)}
-.shop-item:last-child{border-bottom:none}
-.shop-item.restricted{opacity:0.4;pointer-events:none}
-.shop-check{
-  width:18px;height:18px;
-  accent-color:var(--gold-bright);
-  cursor:pointer;
-  flex-shrink:0;
-}
-.item-name{
-  flex:1;
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.9rem;
-  font-weight:500;
-  color:var(--text);
-}
-.item-note{
+  border:1px solid var(--ink);
   font-size:0.75rem;
-  color:var(--text-muted);
-  margin-left:8px;
+  padding:3px 10px;
+  margin:2px 3px 2px 0;
+  font-family:'Playfair Display',serif;
 }
-.item-dmg{
-  font-size:0.8rem;
-  font-weight:600;
-  color:var(--text-muted);
-  width:48px;
-  text-align:center;
-}
-.item-cost{
-  font-size:0.9rem;
-  font-weight:700;
-  color:var(--text);
-  width:56px;
-  text-align:right;
-}
-.restricted-note{
-  font-size:0.7rem;
-  color:var(--crimson-bright);
-  font-weight:600;
-  margin-left:8px;
-  text-transform:uppercase;
-}
+.spell-tag.always{border-color:var(--red);color:var(--red)}
+.spell-desc{font-size:0.8rem;color:var(--muted);margin-top:8px;font-style:italic;line-height:1.45}
 
-/* ════════════════════════════════════════════
-   FOOTNOTE
-════════════════════════════════════════════ */
-.footnote{
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size:0.8rem;
-  color:var(--text-muted);
-  line-height:1.6;
-  margin-top:16px;
+/* ── LANGUAGES ── */
+.lang-tag{
+  display:inline-block;
+  background:var(--bg2);
+  border:1px solid var(--rule);
+  font-size:0.75rem;
+  padding:2px 9px;
+  margin:2px 3px 2px 0;
 }
+.lang-tag.extra{border-color:var(--red);color:var(--red)}
 
-/* ════════════════════════════════════════════
-   UTILITY
-════════════════════════════════════════════ */
-.mb12{margin-bottom:12px}
-.mb16{margin-bottom:16px}
-.mb20{margin-bottom:20px}
-.col-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:480px){
-  .col-2{grid-template-columns:1fr}
-  .meta-cluster{justify-content:flex-start}
-  .combat-row{grid-template-columns:repeat(3,1fr)}
+/* ── SHOP ── */
+.gold-bar{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;
+  border:2px solid var(--ink);
+  margin-bottom:16px;
+  background:var(--bg2);
 }
-hr.rule{border:none;border-top:1px solid var(--border-dim);margin:20px 0}
+.gold-bar .gl{font-family:'Playfair Display',serif;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+.gold-bar .gv{font-family:var(--mono);font-size:1.5rem;font-weight:bold;margin-left:auto}
+.gold-bar .gv.over{color:var(--red)}
+
+.shop-tabs{display:flex;border-bottom:2px solid var(--ink);margin-bottom:14px}
+.shop-tab{
+  font-family:'Playfair Display',serif;
+  font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;
+  padding:8px 18px;cursor:pointer;
+  background:none;border:none;color:var(--muted);
+  border-bottom:2px solid transparent;margin-bottom:-2px;
+  transition:color 0.15s;
+}
+.shop-tab:hover{color:var(--ink)}
+.shop-tab.active{color:var(--red);border-bottom-color:var(--red);font-weight:700}
+
+.shop-grid{display:flex;flex-direction:column;gap:2px}
+.shop-item{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 10px;border:1px solid var(--rule2);
+  cursor:pointer;transition:background 0.1s;
+  font-size:0.83rem;
+}
+.shop-item:hover:not(.disabled){background:var(--bg2)}
+.shop-item.disabled{opacity:0.3;cursor:not-allowed}
+.shop-item.selected{background:var(--red-bg);border-color:var(--red)}
+.shop-item input[type=checkbox]{
+  accent-color:var(--red);
+  width:14px;height:14px;flex-shrink:0;cursor:pointer;
+}
+.item-name{flex:1;color:var(--ink)}
+.item-dmg{font-family:var(--mono);font-size:0.75rem;color:var(--muted);width:44px;text-align:center}
+.item-note{font-size:0.7rem;font-style:italic;color:var(--muted);margin-left:4px}
+.item-cost{font-family:var(--mono);font-size:0.8rem;font-weight:bold;width:50px;text-align:right}
+
+/* ── INVENTORY ── */
+.inv-list{margin-top:10px}
+.inv-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:4px 0;border-bottom:1px solid var(--rule2);
+  font-size:0.82rem;
+}
+.inv-row:last-child{border-bottom:none}
+.inv-name{color:var(--ink2)}
+.inv-cost{font-family:var(--mono);font-size:0.78rem;color:var(--muted)}
+
+/* ── MISC ── */
+.note{font-size:0.75rem;color:var(--muted);font-style:italic;margin-top:6px;line-height:1.4}
+hr.rule{border:none;border-top:1px solid var(--rule);margin:14px 0}
+.right-col > .section{margin-bottom:22px}
+
+/* ── PRINT ── */
+@media print{
+  .header-right,.shop-section{display:none!important}
+  .site-header{padding:20px 0 16px}
+  .sheet-cols{grid-template-columns:260px 1fr}
+  body{font-size:13px}
+}
 </style>
 </head>
 <body>
 <div class="wrapper">
 
-<!-- ══════════════════ HEADER ══════════════════ -->
 <header class="site-header">
-  <h1>B/X Dungeons &amp; Dragons</h1>
-  <div class="subtitle">Character Generator · Moldvay Basic / Old School Essentials Compatible</div>
-  <br>
-  <button class="btn-generate" onclick="generate()">
-    <span class="dice-icon">🎲</span> Roll New Character
-  </button>
-  &nbsp;
-  <button class="btn-generate" onclick="exportTXT()" style="font-size:0.75rem;padding:10px 22px;opacity:0.75;margin-top:8px" id="export-btn" disabled>
-    <span class="dice-icon">📄</span> Export as TXT
-  </button>
+  <div class="header-left">
+    <h1 id="h-title">B/X Dungeons &amp; Dragons</h1>
+    <div class="subtitle" id="h-subtitle">Character Generator · Moldvay Basic / Old School Essentials</div>
+  </div>
+  <div class="header-right">
+    <div class="btn-row">
+      <button class="btn lang-btn" onclick="toggleLang()" id="lang-btn">🇹🇷 Türkçe</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="generate()" id="btn-generate">🎲 Roll New Character</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn outline" onclick="exportTXT()" id="btn-export" disabled>📄 Export as TXT</button>
+      <button class="btn outline" onclick="window.print()" id="btn-print">🖨 Print</button>
+    </div>
+  </div>
 </header>
 
-<!-- ══════════════════ CHARACTER SHEET ══════════════════ -->
 <div id="char-sheet"></div>
 
-</div><!-- .wrapper -->
+</div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  DATA TABLES
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  LANGUAGE STRINGS
+// ═══════════════════════════════════════════════════
+const STRINGS={
+en:{
+  pageTitle:'B/X Dungeons & Dragons',
+  pageSubtitle:'Character Generator · Moldvay Basic / Old School Essentials',
+  btnGenerate:'🎲 Roll New Character',
+  btnExport:'📄 Export as TXT',
+  btnPrint:'🖨 Print',
+  btnLang:'🇹🇷 Türkçe',
+  ornIdentity:'Identity',
+  ornAbilities:'Ability Scores',
+  ornCombat:'Combat',
+  ornSaves:'Saving Throws',
+  ornLangs:'Languages',
+  ornClass:'Class Abilities',
+  ornSpells:'Spells',
+  ornShop:'Equipment & Outfitting',
+  ornInventory:'Inventory',
+  alignLabel:'Alignment',
+  level:'Level 1',
+  hp:'Hit Points',
+  xpBonus:'XP Bonus',
+  xpNext:'XP to Level 2',
+  thac0:'THAC0',
+  ac:'Armor Class',
+  move:'Movement',
+  meleeBonus:'Melee',
+  missileBonus:'Missile',
+  toHitDmg:'to-hit & dmg',
+  toHit:'to-hit',
+  acSub:'Armor Class',
+  moveSub:'per round',
+  goldRemain:'Gold Remaining',
+  goldSpent:'Spent',
+  goldStart:'Starting Gold',
+  startingGold:'Starting Gold (3d6 × 10)',
+  tabWeapons:'Weapons',
+  tabArmor:'Armor',
+  tabGear:'Gear',
+  noItems:'No items selected.',
+  armorNone:'No Armor',
+  shield:'Shield',
+  shieldNote:'−1 to AC',
+  readMagic:'Read Magic',
+  readMagicNote:'(always memorized)',
+  extraLangNote:'— extra language from INT',
+  savePoison:'Death Ray / Poison',
+  saveWands:'Magic Wands',
+  savePara:'Paralysis / Stone',
+  saveBreath:'Dragon Breath',
+  saveSpells:'Rods / Staves / Spells',
+  saveWisNote:'WIS modifier applies to saves vs. Spells',
+  thiefSkillsTitle:'Thief Skills — Level 1',
+  clericTurnTitle:'Turn Undead — Level 1',
+  clericTurnNote:'Roll 2d6. On success, 2d6 HD of undead are turned.',
+  openDoors:'Open Doors',
+  abilStr:'Strength',abilInt:'Intelligence',abilWis:'Wisdom',
+  abilDex:'Dexterity',abilCon:'Constitution',abilCha:'Charisma',
+  classes:{
+    'Fighter':'Fighter','Cleric':'Cleric','Magic-User':'Magic-User',
+    'Thief':'Thief','Dwarf':'Dwarf','Elf':'Elf','Halfling':'Halfling'
+  },
+  alignments:{Lawful:'Lawful',Neutral:'Neutral',Chaotic:'Chaotic'},
+  hdLabel:'HD',
+  illiterate:'Illiterate',
+  literate:'Literate',
+  npcReaction:'NPC Reaction',
+  maxRetainers:'Max Retainers',
+  retainerMorale:'Retainer Morale',
+  extraLangs:' extra language(s)',
+  spellsPerDay:'Spells per day: 1',
+  encTitle:'Encumbrance',
+  exportHeader:'B/X DUNGEONS & DRAGONS — CHARACTER RECORD',
+  exportSubHeader:'Moldvay Basic / Old School Essentials Compatible',
+  exportGenBy:'Generated by B/X Character Generator',
+  restrictFighter:'Weapons: Any. Armor: Any.',
+  restrictCleric:'Weapons: Blunt only (club, mace, hammer, staff, sling). Armor: Any.',
+  restrictMU:'Weapons: Dagger only. Armor: None.',
+  restrictThief:'Weapons: Limited (see class). Armor: Leather only, no shield.',
+  restrictDwarf:'Weapons: Any. Armor: Any.',
+  restrictElf:'Weapons: Any. Armor: Any (no spells while armored).',
+  restrictHalfling:'Weapons: Any (no two-handed/polearm). Armor: Any.',
+},
+tr:{
+  pageTitle:'B/X Zindanlar &amp; Ejderhalar',
+  pageSubtitle:'Karakter Üreteci · Moldvay Basic / Old School Essentials',
+  btnGenerate:'🎲 Yeni Karakter Yarat',
+  btnExport:'📄 TXT Olarak Kaydet',
+  btnPrint:'🖨 Yazdır',
+  btnLang:'🇬🇧 English',
+  ornIdentity:'Kimlik',
+  ornAbilities:'Temel Özellikler',
+  ornCombat:'Savaş Değerleri',
+  ornSaves:'Kurtulma',
+  ornLangs:'Diller',
+  ornClass:'Sınıf Yetenekleri',
+  ornSpells:'Büyüler',
+  ornShop:'Ekipman ve Donanım',
+  ornInventory:'Envanter',
+  alignLabel:'Taraf',
+  level:'1. Seviye',
+  hp:'Can Puanı',
+  xpBonus:'TP Bonusu',
+  xpNext:'2. Seviyeye TP',
+  thac0:'THAC0',
+  ac:'Zırh Sınıfı',
+  move:'Hareket',
+  meleeBonus:'Dövüş',
+  missileBonus:'Atış',
+  toHitDmg:'saldırı & hasar',
+  toHit:'saldırı',
+  acSub:'Zırh Sınıfı',
+  moveSub:'tur başı',
+  goldRemain:'Kalan Altın',
+  goldSpent:'Harcanan',
+  goldStart:'Başlangıç Altını',
+  startingGold:'Başlangıç Altını (3d6 × 10)',
+  tabWeapons:'Silahlar',
+  tabArmor:'Zırh',
+  tabGear:'Malzeme',
+  noItems:'Seçili ekipman yok.',
+  armorNone:'Zırhsız',
+  shield:'Kalkan',
+  shieldNote:'−1 ZS',
+  readMagic:'Büyü Okuma',
+  readMagicNote:'(her zaman hazır)',
+  extraLangNote:'— INT bonusu dil',
+  savePoison:'Ölüm  / Zehir',
+  saveWands:'Sihirli Asalar',
+  savePara:'Felç / Taşa Dönme',
+  saveBreath:'Ejderha Nefesi',
+  saveSpells:'Değnek / Asa / Büyü',
+  saveWisNote:'BİL eki Büyü kurtarma atışlarına uygulanır',
+  thiefSkillsTitle:'Hırsız Yetenekleri — 1. Seviye',
+  clericTurnTitle:'Hortlak Savma — 1. Seviye',
+  clericTurnNote:'2z6 at. Başarıda, 2z6 CZ dengi hortlak def edilir.',
+  openDoors:'Kapı Açma',
+  abilStr:'Kuvvet',abilInt:'Zeka',abilWis:'Bilgelik',
+  abilDex:'Çeviklik',abilCon:'Bünye',abilCha:'Karizma',
+  classes:{
+    'Fighter':'Savaşçı','Cleric':'Ruhban','Magic-User':'Büyücü',
+    'Thief':'Hırsız','Dwarf':'Cüce','Elf':'Elf','Halfling':'Buçukluk'
+  },
+  alignments:{Lawful:'Düzen',Neutral:'Tarafsız',Chaotic:'Kaos'},
+  hdLabel:'CZ',
+  illiterate:'Okuma yazma bilmez',
+  literate:'Okuryazar',
+  npcReaction:'Figüran Tepkisi',
+  maxRetainers:'Azami yaver',
+  retainerMorale:'Yaver Morali',
+  extraLangs:'Ek dil',
+  spellsPerDay:'Günlük büyü: 1',
+  encTitle:'Yük',
+  exportHeader:'B/X ZİNDANLAR & EJDERHALAR — KARAKTER KAĞIDI',
+  exportSubHeader:'Moldvay Basic / Old School Essentials Uyumlu',
+  exportGenBy:'B/X Karakter Üreteci tarafından oluşturuldu',
+  restrictFighter:'Silahlar: Herhangi. Zırh: Herhangi.',
+  restrictCleric:'Silahlar: Sadece ezici (sopa, gürz, çekiç, asa, sapan). Zırh: Herhangi.',
+  restrictMU:'Silahlar: Sadece hançer. Zırh: Yok.',
+  restrictThief:'Silahlar: Sınırlı. Zırh: Sadece deri, kalkan yok.',
+  restrictDwarf:'Silahlar: Herhangi. Zırh: Herhangi.',
+  restrictElf:'Silahlar: Herhangi. Zırh: Herhangi (zırhlıyken büyü yapamaz).',
+  restrictHalfling:'Silahlar: Herhangi (çift el/mızrak hariç). Zırh: Herhangi.',
+},
+};
 
+// ═══════════════════════════════════════════════════
+//  GAME DATA
+// ═══════════════════════════════════════════════════
 const MOD_TABLE=[[3,3,-3],[4,5,-2],[6,8,-1],[9,12,0],[13,15,1],[16,17,2],[18,18,3]];
 function getMod(s){for(const[lo,hi,m]of MOD_TABLE)if(s>=lo&&s<=hi)return m;return 0;}
 function fmtMod(s){const m=getMod(s);return m>0?`+${m}`:String(m);}
-function modClass(s){const m=getMod(s);return m>0?'pos':m<0?'neg':'zero';}
 
 const SAVES={
   'Fighter':   [12,13,14,15,16],
@@ -675,799 +571,912 @@ const SAVES={
   'Elf':       [12,13,13,15,15],
   'Halfling':  [8,9,10,13,12],
 };
-const SAVE_NAMES=['Death Ray/Poison','Magic Wands','Paralysis/Stone','Dragon Breath','Rods/Staves/Spells'];
-const SAVE_NOTES=['CON save','—','—','—','WIS mod applies'];
-
 const HD={'Fighter':8,'Cleric':6,'Magic-User':4,'Thief':4,'Dwarf':8,'Elf':6,'Halfling':6};
-
 const XP2={'Fighter':2000,'Cleric':1500,'Magic-User':2500,'Thief':1200,'Dwarf':2200,'Elf':4000,'Halfling':2000};
-
 const PRIME={'Fighter':'STR','Cleric':'WIS','Magic-User':'INT','Thief':'DEX','Dwarf':'STR','Elf':'INT','Halfling':'DEX'};
 
 const CLASS_ARMOR={
-  'Fighter':   ['leather','chain','plate','shield'],
-  'Cleric':    ['leather','chain','plate','shield'],
+  'Fighter':['leather','chain','plate','shield'],
+  'Cleric':['leather','chain','plate','shield'],
   'Magic-User':[],
-  'Thief':     ['leather'],
-  'Dwarf':     ['leather','chain','plate','shield'],
-  'Elf':       ['leather','chain','plate','shield'],
-  'Halfling':  ['leather','chain','plate','shield'],
+  'Thief':['leather'],
+  'Dwarf':['leather','chain','plate','shield'],
+  'Elf':['leather','chain','plate','shield'],
+  'Halfling':['leather','chain','plate','shield'],
 };
 
-// Weapon list: allowed = 'all' or array of class names
-const WEAPONS=[
-  {name:'Battle Axe',    cost:7,  dmg:'1d8', allowed:['Fighter','Dwarf','Elf','Halfling']},
-  {name:'Club',          cost:3,  dmg:'1d4', allowed:'all'},
-  {name:'Crossbow',      cost:30, dmg:'1d6', note:'ranged', allowed:['Fighter','Dwarf','Elf','Halfling','Thief']},
-  {name:'Dagger',        cost:3,  dmg:'1d4', allowed:['Fighter','Cleric','Magic-User','Dwarf','Elf','Halfling','Thief']},
-  {name:'Hand Axe',      cost:4,  dmg:'1d6', allowed:['Fighter','Dwarf','Elf','Halfling','Thief']},
-  {name:'Javelin',       cost:1,  dmg:'1d6', note:'thrown ×6', allowed:['Fighter','Dwarf','Elf','Halfling']},
-  {name:'Lance',         cost:5,  dmg:'1d6', note:'mounted', allowed:['Fighter','Elf']},
-  {name:'Long Bow',      cost:40, dmg:'1d6', note:'ranged', allowed:['Fighter','Elf','Halfling']},
-  {name:'Mace',          cost:5,  dmg:'1d6', allowed:['Fighter','Cleric','Dwarf','Elf','Halfling']},
-  {name:'Pole Arm',      cost:7,  dmg:'1d10',note:'2-handed', allowed:['Fighter','Elf']},
-  {name:'Short Bow',     cost:25, dmg:'1d6', note:'ranged', allowed:['Fighter','Elf','Halfling','Thief']},
-  {name:'Short Sword',   cost:7,  dmg:'1d6', allowed:['Fighter','Dwarf','Elf','Halfling','Thief']},
-  {name:'Silver Dagger', cost:30, dmg:'1d4', note:'vs lycanthropes', allowed:['Fighter','Cleric','Magic-User','Dwarf','Elf','Halfling','Thief']},
-  {name:'Sling',         cost:2,  dmg:'1d4', note:'ranged', allowed:['Fighter','Cleric','Dwarf','Halfling','Thief','Elf']},
-  {name:'Spear',         cost:3,  dmg:'1d6', allowed:['Fighter','Elf','Halfling']},
-  {name:'Staff',         cost:2,  dmg:'1d6', note:'2-handed', allowed:['Magic-User','Cleric','Elf']},
-  {name:'Sword (Long)',  cost:10, dmg:'1d8', allowed:['Fighter','Elf','Halfling','Thief']},
-  {name:'Two-Handed Sword',cost:15,dmg:'1d10',note:'2-handed', allowed:['Fighter','Elf']},
-  {name:'War Hammer',    cost:5,  dmg:'1d6', allowed:['Fighter','Cleric','Dwarf','Elf','Halfling']},
-  {name:'Arrows (20)',   cost:5,  dmg:'—',   ammo:true, allowed:'all'},
-  {name:'Bolts (30)',    cost:10, dmg:'—',   ammo:true, allowed:'all'},
-  {name:'Sling Bullets (30)',cost:2,dmg:'—', ammo:true, allowed:'all'},
+const WEAPONS_DATA=[
+  {name:{en:'Battle Axe',tr:'Savaş Baltası'},      cost:7,  dmg:'1d8',  note:{en:'',tr:''},        allowed:['Fighter','Dwarf','Elf','Halfling']},
+  {name:{en:'Club',tr:'Sopa'},                       cost:3,  dmg:'1d4',  note:{en:'',tr:''},        allowed:'all'},
+  {name:{en:'Crossbow',tr:'Kurmalı yay'},                cost:30, dmg:'1d6',  note:{en:'ranged',tr:'menzilli'}, allowed:['Fighter','Dwarf','Elf','Halfling','Thief']},
+  {name:{en:'Dagger',tr:'Hançer'},                   cost:3,  dmg:'1d4',  note:{en:'',tr:''},        allowed:'all'},
+  {name:{en:'Hand Axe',tr:'El Baltası'},             cost:4,  dmg:'1d6',  note:{en:'thrown',tr:'fırlatılabilir'}, allowed:['Fighter','Dwarf','Elf','Halfling','Thief']},
+  {name:{en:'Javelin',tr:'Cirit'},                   cost:1,  dmg:'1d6',  note:{en:'×6 thrown',tr:'×6 atış'}, allowed:['Fighter','Dwarf','Elf','Halfling']},
+  {name:{en:'Long Bow',tr:'Uzun Yay'},               cost:40, dmg:'1d6',  note:{en:'ranged',tr:'menzilli'}, allowed:['Fighter','Elf','Halfling']},
+  {name:{en:'Mace',tr:'Gürz'},                       cost:5,  dmg:'1d6',  note:{en:'blunt',tr:'ezici'}, allowed:['Fighter','Cleric','Dwarf','Elf','Halfling']},
+  {name:{en:'Pole Arm',tr:'Teber'},                   cost:7,  dmg:'1d10', note:{en:'2-handed',tr:'iki elli'}, allowed:['Fighter','Elf']},
+  {name:{en:'Short Bow',tr:'Kısa Yay'},              cost:25, dmg:'1d6',  note:{en:'ranged',tr:'menzilli'}, allowed:['Fighter','Elf','Halfling','Thief']},
+  {name:{en:'Short Sword',tr:'Kısa Kılıç'},          cost:7,  dmg:'1d6',  note:{en:'',tr:''},        allowed:['Fighter','Dwarf','Elf','Halfling','Thief']},
+  {name:{en:'Silver Dagger',tr:'Gümüş Hançer'},     cost:30, dmg:'1d4',  note:{en:'vs lycanthropes',tr:'kurt adamlara karşı'}, allowed:'all'},
+  {name:{en:'Sling',tr:'Sapan'},                     cost:2,  dmg:'1d4',  note:{en:'ranged',tr:'menzilli'}, allowed:'all'},
+  {name:{en:'Spear',tr:'Mızrak'},                    cost:3,  dmg:'1d6',  note:{en:'',tr:''},        allowed:['Fighter','Elf','Halfling']},
+  {name:{en:'Staff',tr:'Asa'},                       cost:2,  dmg:'1d6',  note:{en:'2-handed,blunt',tr:'iki elli,ezici'}, allowed:'all'},
+  {name:{en:'Sword',tr:'Kılıç'},                     cost:10, dmg:'1d8',  note:{en:'',tr:''},        allowed:['Fighter','Elf','Halfling','Thief']},
+  {name:{en:'Two-Handed Sword',tr:'Çift elli Kılıç'}, cost:15, dmg:'1d10', note:{en:'2-handed',tr:'iki elli'}, allowed:['Fighter','Elf']},
+  {name:{en:'War Hammer',tr:'Savaş Çekici'},         cost:5,  dmg:'1d6',  note:{en:'blunt',tr:'ezlici'}, allowed:['Fighter','Cleric','Dwarf','Elf','Halfling']},
+  {name:{en:'Arrows (20)',tr:'Ok (20 adet)'},        cost:5,  dmg:'—',    ammo:true, allowed:'all'},
+  {name:{en:'Bolts (30)',tr:'Temren (30 adet)'},     cost:10, dmg:'—',    ammo:true, allowed:'all'},
+  {name:{en:'Sling Bullets (30)',tr:'Sapan taşı (30)'}, cost:2, dmg:'—', ammo:true, allowed:'all'},
 ];
 
 const ARMOR_ITEMS=[
-  {id:'leather',name:'Leather Armor',cost:20,baseAC:7,move:90},
-  {id:'chain',  name:'Chainmail',     cost:40,baseAC:5,move:60},
-  {id:'plate',  name:'Plate Mail',    cost:60,baseAC:3,move:60},
+  {id:'leather',name:{en:'Leather Armor',tr:'Deri Zırh'},   cost:20,baseAC:7,move:90},
+  {id:'chain',  name:{en:'Chain Mail',tr:'Örgü Zırh'},    cost:40,baseAC:5,move:60},
+  {id:'plate',  name:{en:'Plate Mail',tr:'Levha Zırh'},     cost:60,baseAC:3,move:60},
 ];
 
-const GEAR=[
-  {name:'Backpack',              cost:5},
-  {name:'Flask of Oil',          cost:2},
-  {name:'Garlic (1 bud)',        cost:5},
-  {name:'Holy Symbol (wooden)',  cost:2},
-  {name:'Holy Symbol (silver)',  cost:25},
-  {name:'Holy Water (vial)',     cost:25},
-  {name:'Iron Rations (1 week)', cost:15},
-  {name:'Lantern',               cost:10},
-  {name:'Mirror (steel, hand)',  cost:5},
-  {name:"Pole (wooden, 10')",    cost:1},
-  {name:"Rope (50')",            cost:1},
-  {name:'Spell Book (blank)',    cost:25},
-  {name:'Stakes (3) & Mallet',   cost:3},
-  {name:'Standard Rations (1 wk)',cost:5},
-  {name:"Thieves' Tools",        cost:25},
-  {name:'Tinderbox',             cost:3},
-  {name:'Torches (6)',           cost:1},
-  {name:'Waterskin',             cost:1},
-  {name:'Wine (1 quart)',        cost:1},
-  {name:'Wolfsbane (1 bunch)',   cost:10},
+const GEAR_DATA=[
+  {name:{en:'Backpack',tr:'Sırt Çantası'},                   cost:5},
+  {name:{en:'Flask of Oil',tr:'Yağ Şişesi'},                cost:2},
+  {name:{en:'Garlic (1 bud)',tr:'Sarımsak (1 baş)'},        cost:5},
+  {name:{en:'Grappling Hook',tr:'Tırmanma çengeli'},                   cost:5},
+  {name:{en:'Holy Symbol (wood)',tr:'Kutsal Simge (ahşap)'},cost:2},
+  {name:{en:'Holy Symbol (silver)',tr:'Kutsal Simge (gümüş)'},cost:25},
+  {name:{en:'Holy Water (vial)',tr:'Kutsal Su (şişe)'},      cost:25},
+  {name:{en:'Iron Rations (1 week)',tr:'Kuru Erzak (1 hafta)'},cost:15},
+  {name:{en:'Lantern',tr:'Fener'},                           cost:10},
+  {name:{en:"Mirror (steel, hand)",tr:'Çelik El Aynası'},   cost:5},
+  {name:{en:"Pole (10')",tr:'Sırık (3 m)'},                 cost:1},
+  {name:{en:"Rope (50')",tr:'İp (15 m)'},                   cost:1},
+  {name:{en:'Spell Book (blank)',tr:'Büyü Defteri (boş)'},   cost:25},
+  {name:{en:'Stakes (3) & Mallet',tr:'Kazık (3) ve Tokmak'},cost:3},
+  {name:{en:'Standard Rations (1 wk)',tr:'Taze Erzak (1 hafta)'},cost:5},
+  {name:{en:"Thieves' Tools",tr:'Maymuncuk Takımı'},         cost:25},
+  {name:{en:'Tinderbox',tr:'Çakmak Kutusu'},                cost:3},
+  {name:{en:'Torches (6)',tr:'Meşale (6 adet)'},            cost:1},
+  {name:{en:'Waterskin',tr:'Su Tulumu'},                    cost:1},
+  {name:{en:'Wolfsbane (bunch)',tr:'Kurtboğan (demet)'},     cost:10},
 ];
 
+// Spells — names and descriptions both bilingual
 const MU_SPELLS={
-  'Charm Person':       'Target humanoid regards caster as trusted friend. Save vs. Spells negates. Duration: until dispelled.',
-  'Detect Magic':       'Detects magical auras within 60\'. Duration: 20 minutes.',
-  'Floating Disc':      'Creates a magical tray that carries up to 5,000 coins weight, 3\' off ground. Duration: 6 turns.',
-  'Hold Portal':        'Magically holds a door or gate shut. Duration: 2d6 turns.',
-  'Light':              'Creates 30\' radius light. Can blind if cast on eyes (save). Duration: 6 turns + 1/level.',
-  'Magic Missile':      'Always strikes target for 1d6+1 damage. No attack roll. Additional missiles at higher levels.',
-  'Protection from Evil':'+1 AC and saves vs. evil creatures. Blocks mental control. Duration: 6 turns.',
-  'Read Languages':     'Read and understand any written language. Duration: 2 turns.',
-  'Shield':             'Invisible shield: AC 2 vs. missiles, AC 4 vs. melee, +1 to all saves. Duration: 2 turns.',
-  'Sleep':              'Puts 2d8 HD of creatures to magical sleep. No save allowed. Affects lowest HD creatures first.',
-  'Ventriloquism':      "Caster throws their voice up to 60'. Duration: 2 turns.",
+  'Charm Person':{
+    tr:'Kişiyi Büyüle',
+    desc:{en:'Target humanoid regards caster as trusted friend. Save vs. Spells negates. Duration: until dispelled.',
+          tr:'Hedef insansı, büyücüyü güvenilir dost sayar. Büyüye Karşı Kurtulma iptal eder. Süre: bozulana dek.'}
+  },
+  'Detect Magic':{
+    tr:'Büyü Algıla',
+    desc:{en:'Detects magical auras within 60\'. Duration: 20 minutes.',
+          tr:'18 m içindeki büyüsel aurayı algılar. Süre: 20 dakika.'}
+  },
+  'Floating Disc':{
+    tr:'Süzülen Disk',
+    desc:{en:'Creates a magical tray carrying up to 5,000 coin weight, 3\' off the ground. Duration: 6 turns.',
+          tr:'Yerden 1 m yüksekte, 5.000 sikke ağırlık taşıyan büyüsel bir tepsi yaratır. Süre: 6 tur.'}
+  },
+  'Hold Portal':{
+    tr:'Kapıyı Kilitle',
+    desc:{en:'Magically holds a door or gate shut. Duration: 2d6 turns.',
+          tr:'Bir kapıyı büyüsel olarak kapalı tutar. Süre: 2z6 tur.'}
+  },
+  'Light':{
+    tr:'Işık',
+    desc:{en:'Creates a 30\' radius light. Can blind if cast on eyes (save). Duration: 6 turns + 1/level.',
+          tr:'9 m yarıçaplı ışık yaratır. Gözlere atılırsa körlük (kurtulma). Süre: 6 tur + 1/seviye.'}
+  },
+  'Magic Missile':{
+    tr:'Sihirli Ok',
+    desc:{en:'Always strikes for 1d6+1 damage per missile. No attack roll needed.',
+          tr:'Her ok 1z6+1 hasar verir. Saldırı zarı gerekmez.'}
+  },
+  'Protection from Evil':{
+    tr:'Kötülükten Korunma',
+    desc:{en:'+1 AC and saves vs. evil creatures. Blocks mental control. Duration: 6 turns.',
+          tr:'Kötü yaratıklara karşı +1 ZS ve kurtarma. Zihinsel kontrolü engeller. Süre: 6 tur.'}
+  },
+  'Read Languages':{
+    tr:'Dil Oku',
+    desc:{en:'Read and understand any written language. Duration: 2 turns.',
+          tr:'Herhangi bir yazılı dili okuyup anlar. Süre: 2 tur.'}
+  },
+  'Shield':{
+    tr:'Kalkan',
+    desc:{en:'Invisible shield: AC 2 vs. missiles, AC 4 vs. melee, +1 to all saves. Duration: 2 turns.',
+          tr:'Görünmez kalkan: menzilli 2 ZS, yakın 4 ZS, tüm kurtarmalara +1. Süre: 2 tur.'}
+  },
+  'Sleep':{
+    tr:'Uyku',
+    desc:{en:'Puts 2d8 HD of creatures to magical sleep. No save. Affects lowest HD first.',
+          tr:'2z8 CZ yaratığı büyüsel uykuya daldırır. Kurtarma yok. En düşük CZ\'dan başlar.'}
+  },
+  'Ventriloquism':{
+    tr:'Boşkonuş',
+    desc:{en:"Throws voice up to 60' away. Duration: 2 turns.",
+          tr:'Sesi 18 m uzağa atar. Süre: 2 tur.'}
+  },
 };
 
-const THIEF_SKILLS=[
-  {s:'Open Locks',       v:'15%'},
-  {s:'Find/Remove Traps',v:'10%'},
-  {s:'Pick Pockets',     v:'20%'},
-  {s:'Move Silently',    v:'20%'},
-  {s:'Climb Walls',      v:'87%'},
-  {s:'Hide in Shadows',  v:'10%'},
-  {s:'Hear Noise',       v:'1–2 on d6'},
-  {s:'Backstab',         v:'+4 to hit, ×2 dmg'},
-];
-
-const CLERIC_TURN=[
-  ['Skeleton','7'],['Zombie','9'],['Ghoul','11'],
-  ['Wight','—'],['Wraith','—'],['Mummy','—'],
-  ['Spectre','—'],['Vampire','—'],
-];
-
+// Class abilities — bilingual
 const CLASS_ABILITIES={
-  'Fighter':   ['<strong>Combat Machine:</strong> Makes 1 attack per level vs. creatures of 1 HD or fewer per round.','<strong>Battle-Hardened:</strong> Best attack progression of all human classes. Uses d8 Hit Dice.','<strong>All Arms & Armor:</strong> Proficient with every weapon, shield, and armor type.','<strong>THAC0 Advance:</strong> Improves by 2 every 3 levels (best among human classes).'],
-  'Cleric':    ['<strong>Turn Undead:</strong> Roll 2d6 to drive off or destroy undead creatures (see table below).','<strong>Divine Armor:</strong> May wear any armor and bear a shield; uses blunt weapons only.','<strong>Blunt Weapons Only:</strong> Restricted to club, mace, war hammer, staff, and sling.','<strong>Divine Spells:</strong> Gains access to cleric spells from 2nd level onward; no spells at 1st level.'],
-  'Magic-User':['<strong>Arcane Spellcasting:</strong> Reads spells from a spell book; memorizes and casts 1 spell/day at 1st level.','<strong>Scroll Use:</strong> Can scribe and use magic-user scrolls (at higher levels).','<strong>Fragile Scholar:</strong> d4 Hit Dice; may not wear any armor or carry a shield.','<strong>Limited Arms:</strong> Proficient with dagger and staff only.'],
-  'Thief':     ['<strong>Backstab:</strong> When attacking from behind or by surprise: +4 to attack rolls and ×2 damage.','<strong>Thief Skills:</strong> Unique class abilities (see table). Improve with each level.','<strong>Read Languages:</strong> At 4th level gains 80% chance to decipher any written language.','<strong>Light Footed:</strong> Leather armor only, no shield. Compensated by unmatched stealth skills.'],
-  'Dwarf':     ['<strong>Infravision:</strong> Sees clearly in complete darkness up to 60\'.','<strong>Stone Cunning:</strong> Detects traps, new construction, sliding walls, and sloping passages on 2-in-6.','<strong>Magic Resistance:</strong> +4 bonus to all saving throws vs. magic and poison.','<strong>Difficult Target:</strong> Opponents larger than ogre-sized suffer −4 to-hit penalty against dwarves.','<strong>Fighter Combat:</strong> Uses Fighter attack progression and hit dice.'],
-  'Elf':       ['<strong>Two-Class:</strong> Simultaneously acts as Fighter and Magic-User; can cast spells in armor.','<strong>Infravision:</strong> Sees clearly in complete darkness up to 60\'.','<strong>Secret Doors:</strong> Notices secret/concealed doors on 2-in-6; 4-in-6 when actively searching.','<strong>Ghoul Immunity:</strong> Immune to the paralysis caused by ghouls and similar undead.','<strong>Keen Senses:</strong> Group is never surprised if elves are on watch.'],
-  'Halfling':  ['<strong>Missile Expert:</strong> +1 bonus to all attack rolls with missile weapons.','<strong>Difficult Target:</strong> Opponents larger than man-sized have −2 AC (harder to hit halflings).','<strong>Stealth:</strong> 90% chance to vanish in natural surroundings; 2-in-6 chance indoors.','<strong>Initiative Bonus:</strong> +1 to all individual initiative rolls.','<strong>Brave:</strong> +4 bonus to saving throws vs. magic and poison.','<strong>Size Limit:</strong> Cannot use two-handed swords or pole arms.'],
+  'Fighter':{
+    en:[
+      {n:'Combat Machine',d:"Makes 1 attack per level vs. creatures of 1 HD or fewer per round."},
+      {n:'All Arms & Armor',d:'Proficient with every weapon, shield, and armor type.'},
+      {n:'Battle-Hardened',d:'Best attack progression and largest Hit Die (d8) of all human classes.'},
+      {n:'Stronghold (9th)',d:'At 9th level may build a stronghold and attract a body of troops.'},
+    ],
+    tr:[
+      {n:'Savaş Makinası',d:'Her turda 1 CZ veya daha az olan yaratıklara seviye başına 1 saldırı yapar.'},
+      {n:'Tam Silah & Zırh',d:'Her türlü silah, kalkan ve zırh kullanmaya yetkindir.'},
+      {n:'Savaş Deneyimi',d:'Tüm insan sınıfları içinde en iyi saldırı gelişimi ve en büyük CZ (z8).'},
+      {n:'Kale (9. Seviye)',d:'9. seviyede bir kale inşa edip asker toplayabilir.'},
+    ]
+  },
+  'Cleric':{
+    en:[
+      {n:'Turn Undead',d:'Roll 2d6 to drive off or destroy undead. See table below.'},
+      {n:'Blunt Weapons Only',d:'Restricted to club, mace, war hammer, staff, and sling.'},
+      {n:'Divine Armor',d:'May wear any armor and bear a shield.'},
+      {n:'Divine Spells (2nd+)',d:'No spells at 1st level. Gains access from 2nd level onward.'},
+    ],
+    tr:[
+      {n:'Hortlak Savma',d:'Hortlakları kovmak veya yok etmek için 2z6 at. Aşağıdaki tabloya bak.'},
+      {n:'Yalnızca Ezici Silahlar',d:'Sopa, gürz, savaş çekici, asa ve sapanla sınırlıdır.'},
+      {n:'İlahi Zırh',d:'Her türlü zırh ve kalkan kullanabilir.'},
+      {n:'İlahi Büyüler (2.+)',d:'1. seviyede büyü yok. 2. seviyeden itibaren erişim kazanır.'},
+    ]
+  },
+  'Magic-User':{
+    en:[
+      {n:'Arcane Spellcasting',d:'Memorizes and casts spells from a spellbook. 1 spell/day at 1st level.'},
+      {n:'Read Magic',d:'Can always decipher magical writings (no slot used).'},
+      {n:'Fragile Scholar',d:'d4 Hit Dice. May not wear any armor or carry a shield.'},
+      {n:'Limited Arms',d:'Proficient with dagger only.'},
+    ],
+    tr:[
+      {n:'Tılsımlı Güç',d:'Büyü defterinden büyüleri ezberler ve yapar. 1. seviyede günde 1 büyü.'},
+      {n:'Büyü Oku',d:'Büyüsel yazıları her zaman çözebilir (slot kullanmaz).'},
+      {n:'Narin Alim',d:'z4 CZ. Hiçbir zırh veya kalkan kullanamaz.'},
+      {n:'Sınırlı Silah',d:'Yalnızca hançer kullanmaya yetkindir.'},
+    ]
+  },
+  'Thief':{
+    en:[
+      {n:'Backstab',d:'When attacking from behind or surprise: +4 to attack, ×2 damage.'},
+      {n:'Thief Skills',d:'Unique class abilities (see table). Improve each level.'},
+      {n:'Read Languages (4th)',d:'At 4th level: 80% chance to read any written language.'},
+      {n:'Light Footed',d:'Leather armor only, no shield. Compensated by unmatched stealth.'},
+    ],
+    tr:[
+      {n:'Sinsi Saldırı',d:'Arkadan veya sürpriz saldırıda: +4 saldırı, ×2 hasar.'},
+      {n:'Hırsız Hünerleri',d:'Özgün sınıf yetenekleri (tabloya bak). Her seviyede gelişir.'},
+      {n:'Dil Bilme (4.)',d:'4. seviyede: herhangi bir yazılı dili okuma %80 şansı.'},
+      {n:'Çevik',d:'Yalnızca deri zırh, kalkan yok. Eşsiz bir gizlilikle telafi edilir.'},
+    ]
+  },
+  'Dwarf':{
+    en:[
+      {n:'Infravision',d:'Sees in complete darkness up to 60\'.'},
+      {n:'Stone Cunning',d:'Detects traps, new construction, sliding walls, sloping passages on 2-in-6.'},
+      {n:'Magic Resistance',d:'+4 bonus to all saving throws vs. magic and poison.'},
+      {n:'Difficult Target',d:'Opponents larger than ogre-sized suffer −4 to-hit penalty.'},
+      {n:'Level Limit',d:'Maximum level: 12.'},
+    ],
+    tr:[
+      {n:'Altgörü',d:'Tam karanlıkta 18 m\'ye kadar görebilir.'},
+      {n:'Taş Sezgisi',d:'Tuzakları, yeni yapıları, kayan duvarları ve eğimli geçitleri 6\'da 2 ile algılar.'},
+      {n:'Büyü Direnci',d:'Büyü ve zehire karşı tüm kurtarma atışlarına +4 bonus.'},
+      {n:'Zor Hedef',d:'Ogur\'dan büyük rakipler −4 saldırı cezası alır.'},
+      {n:'Seviye Sınırı',d:'Azami seviye: 12.'},
+    ]
+  },
+  'Elf':{
+    en:[
+      {n:'Two Classes',d:'Acts as Fighter and Magic-User simultaneously. Cannot cast in armor.'},
+      {n:'Infravision',d:'Sees in complete darkness up to 60\'.'},
+      {n:'Secret Doors',d:'Notices secret doors on 2-in-6; 4-in-6 when searching.'},
+      {n:'Ghoul Immunity',d:'Immune to ghoul paralysis.'},
+      {n:'Level Limit',d:'Maximum level: 10.'},
+    ],
+    tr:[
+      {n:'İki Sınıf',d:'Aynı anda Savaşçı ve Büyücü olarak hareket eder. Zırhlıyken büyü yapamaz.'},
+      {n:'Altgörü',d:'Tam karanlıkta 18 m\'ye kadar görebilir.'},
+      {n:'Gizli Kapılar',d:'Gizli kapıları 6\'da 2 fark eder; aralarken 6\'da 4.'},
+      {n:'Gulyabani Bağışıklığı',d:'Gulyabani felcine bağışıklıdır.'},
+      {n:'Seviye Sınırı',d:'Maksimum seviye: 10.'},
+    ]
+  },
+  'Halfling':{
+    en:[
+      {n:'Missile Expert',d:'+1 to all attack rolls with missile weapons.'},
+      {n:'Difficult Target',d:'Man-sized+ opponents suffer −2 to-hit penalty.'},
+      {n:'Stealth',d:'90% to hide in natural surroundings; 2-in-6 indoors.'},
+      {n:'Initiative Bonus',d:'+1 to all individual initiative rolls.'},
+      {n:'Brave',d:'+4 to saving throws vs. magic and poison.'},
+      {n:'Level Limit',d:'Maximum level: 8.'},
+    ],
+    tr:[
+      {n:'Menzil Uzmanı',d:'Menzilli silahlarla tüm saldırı zarlarına +1.'},
+      {n:'Zor Hedef',d:'İnsan boyutunda veya daha büyük rakipler saldırı zarına −2 ceza alır.'},
+      {n:'Gizlenme',d:'Doğal ortamda %90 gizlenme; kapalı alanda 6\'da 2.'},
+      {n:'Öncelik Bonusu',d:'Tüm bireysel öncelik atışlarına +1.'},
+      {n:'Cesur',d:'Büyü ve zehire karşı kurtarma atışlarına +4.'},
+      {n:'Seviye Sınırı',d:'Azami seviye: 8.'},
+    ]
+  },
 };
+
+const THIEF_SKILLS_DATA=[
+  {en:'Open Locks',       tr:'Çilingirlik'},
+  {en:'Find/Remove Traps',tr:'Tuzak Bulma/Kaldır'},
+  {en:'Pick Pockets',     tr:'Cepçilik'},
+  {en:'Move Silently',    tr:'Sessizce Hareket'},
+  {en:'Climb Walls',      tr:'Düz Duvara Tırmanma'},
+  {en:'Hide in Shadows',  tr:'Gölgere Karışma'},
+  {en:'Hear Noise',       tr:'Dinleme'},
+  {en:'Backstab',         tr:'Sinsi Saldırı'},
+];
+const THIEF_SKILLS_VAL=['15%','10%','20%','20%','87%','10%','1–2 on d6','+4 / ×2'];
+
+const CLERIC_TURN_DATA=[
+  {en:'Skeleton',tr:'İskelet'},{en:'Zombie',tr:'Zombi'},{en:'Ghoul',tr:'Gulyabani'},
+  {en:'Wight',tr:'Karaltı'},{en:'Wraith',tr:'Tayf'},{en:'Mummy',tr:'Mumya'},
+  {en:'Spectre',tr:'Heyula'},{en:'Vampire',tr:'Vampir'},
+];
+const CLERIC_TURN_ROLL=['7','9','11','—','—','—','—','—'];
 
 const CLASS_LANG={
-  'Fighter':   ['Common','Alignment tongue'],
-  'Cleric':    ['Common','Alignment tongue'],
-  'Magic-User':['Common','Alignment tongue'],
-  'Thief':     ['Common','Alignment tongue'],
-  'Dwarf':     ['Common','Dwarvish','Gnomish','Kobold','Goblin'],
-  'Elf':       ['Common','Elvish','Orcish','Hobgoblin','Gnoll'],
-  'Halfling':  ['Common','Halfling','Alignment tongue'],
+  'Fighter':   [{en:'Common',tr:'Kamuca'},{en:'Alignment tongue',tr:'Taraf Dili'}],
+  'Cleric':    [{en:'Common',tr:'Kamuca'},{en:'Alignment tongue',tr:'Taraf Dili'}],
+  'Magic-User':[{en:'Common',tr:'Kamuca'},{en:'Alignment tongue',tr:'Taraf Dili'}],
+  'Thief':     [{en:'Common',tr:'Kamuca'},{en:'Alignment tongue',tr:'Taraf Dili'}],
+  'Dwarf':     [{en:'Common',tr:'Kamuca'},{en:'Dwarvish',tr:'Cüce Dili'},{en:'Gnomish',tr:'Nom Dili'},{en:'Kobold',tr:'Koboltça'},{en:'Goblin',tr:'Goblince'}],
+  'Elf':       [{en:'Common',tr:'Kamuca'},{en:'Elvish',tr:'Elfçe'},{en:'Orcish',tr:'Orkça'},{en:'Hobgoblin',tr:'Hobgoblince'},{en:'Gnoll',tr:'Mankurtça'}],
+  'Halfling':  [{en:'Common',tr:'Kamuca'},{en:'Halfling',tr:'Buçukluk Dili'},{en:'Alignment tongue',tr:'Taraf Dili'}],
 };
 
 const EXTRA_LANG=[
-  'Bugbear','Doppleganger','Dragon','Dwarvish','Elvish','Gargoyle','Gnoll','Gnome',
-  'Goblin','Halfling','Harpy','Hobgoblin','Kobold','Lizard Man','Medusa',
-  'Minotaur','Ogre','Orcish','Pixie','Human Dialect'
+  {en:'Bugbear',tr:'Bugbear'},{en:'Doppelganger',tr:'Doppelganger'},{en:'Dragon',tr:'Ejderha'},
+  {en:'Dwarvish',tr:'Cücece'},{en:'Elvish',tr:'Elfçe'},{en:'Gargoyle',tr:'Çörten'},
+  {en:'Gnoll',tr:'Mankurt'},{en:'Gnomish',tr:'Nomca'},{en:'Goblin',tr:'Goblin'},
+  {en:'Halfling',tr:'Buçukluk'},{en:'Harpy',tr:'Harpi'},{en:'Hobgoblin',tr:'Hobgoblin'},
+  {en:'Kobold',tr:'Kobolt'},{en:'Lizard Man',tr:'Keler'},{en:'Medusa',tr:'Medusa'},
+  {en:'Minotaur',tr:'Minotor'},{en:'Ogre',tr:'Ogr'},{en:'Orcish',tr:'Orkça'},
+  {en:'Pixie',tr:'Peri'},{en:'Human Dialect',tr:'İnsan Lehçesi'},
 ];
+
+const ALIGNMENTS_DATA={
+  Lawful: {
+    en:{desc:'Upholds order, law, and civilization. Believes in rules and the greater good.'},
+    tr:{desc:'Düzeni, yasaları ve medeniyeti destekler. Kurallara ve ortak iyiye inanır.'}
+  },
+  Neutral: {
+    en:{desc:'Seeks balance between law and chaos. Acts pragmatically.'},
+    tr:{desc:'Yasa ve kaos arasında denge arar. Pragmatik davranır.'}
+  },
+  Chaotic: {
+    en:{desc:'Embraces freedom and self-interest. Distrusts authority.'},
+    tr:{desc:'Özgürlüğü ve kişisel çıkarı benimser. Otoriteye güvenmez.'}
+  }
+};
 
 const FIRST_NAMES=['Aldric','Bram','Cormac','Dorin','Edric','Falco','Gareth','Hadwin',
   'Ivar','Jorin','Kadar','Leoric','Maron','Nolan','Oswin','Percival','Rand','Sigurd',
-  'Taran','Ulric','Vance','Wulfric','Yorin','Aelys','Brenna','Calla','Deva','Elara',
-  'Faye','Gwen','Hilda','Jory','Kira','Lyra','Mara','Nessa','Orla','Petra','Raya',
-  'Sable','Tess','Wren','Zara','Theron','Brennan','Calder','Emrys','Flynn','Gideon'];
+  'Taran','Ulric','Aelys','Brenna','Calla','Elara','Faye','Gwen','Hilda','Kira',
+  'Lyra','Mara','Nessa','Orla','Petra','Raya','Wren','Emrys','Flynn','Gideon','Theron'];
 const LAST_NAMES=['Ashwood','Blackthorn','Coldwater','Darkstone','Embervale','Frostmere',
-  'Greymantle','Highhill','Ironforge','Jadestone','Knotwood','Longstride','Moonwhisper',
-  'Nighthollow','Oakheart','Quicksilver','Ravenmoor','Silverbrook','Thornwall','Underhill',
-  'Veilstone','Wildmane','Wyrmsong','Stormcloak','Brightvale','Cindermoor','Fellwind',
-  'Bonecaller','Dusthallow','Edgewater'];
+  'Greymantle','Ironforge','Jadestone','Knotwood','Longstride','Moonwhisper',
+  'Nighthollow','Oakheart','Quicksilver','Ravenmoor','Silverbrook','Thornwall',
+  'Underhill','Veilstone','Wyrmsong','Stormcloak','Brightvale','Cindermoor'];
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════════════════
-let C=null; // current character
+// ═══════════════════════════════════════════════════
+let lang='en';
+let C=null;
 let S={armor:null,shield:false,weapons:new Set(),gear:new Set()};
 let activeTab='weapons';
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  UTILITY
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 const r=n=>Math.floor(Math.random()*n)+1;
-const d=( n,s)=>{let t=0;for(let i=0;i<n;i++)t+=r(s);return t;}
+const roll=(n,s)=>{let t=0;for(let i=0;i<n;i++)t+=r(s);return t;}
 const pick=a=>a[Math.floor(Math.random()*a.length)];
+const t=k=>STRINGS[lang][k]; // shorthand for current-lang string
+const L=o=>o[lang];           // shorthand for bilingual object
 
-function calcAC(armorId,hasShield,dexMod){
+function calcAC(armorId,shield,dexMod){
   let base=9;
   if(armorId==='leather')base=7;
   else if(armorId==='chain')base=5;
   else if(armorId==='plate')base=3;
-  return base-dexMod-(hasShield?1:0);
+  return base-dexMod-(shield?1:0);
 }
 function calcMove(armorId){
-  if(armorId==='chain'||armorId==='plate')return "60'";
-  if(armorId==='leather')return "90'";
-  return "120'";
+  if(armorId==='chain'||armorId==='plate')return"60'";
+  if(armorId==='leather')return"90'";
+  return"120'";
 }
 function calcSpent(){
   let sp=0;
-  const ai=ARMOR_ITEMS.find(a=>a.id===S.armor);
-  if(ai)sp+=ai.cost;
+  const ai=ARMOR_ITEMS.find(a=>a.id===S.armor);if(ai)sp+=ai.cost;
   if(S.shield)sp+=10;
-  S.weapons.forEach(n=>{const w=WEAPONS.find(x=>x.name===n);if(w)sp+=w.cost;});
-  S.gear.forEach(n=>{const g=GEAR.find(x=>x.name===n);if(g)sp+=g.cost;});
+  S.weapons.forEach(n=>{const w=WEAPONS_DATA.find(x=>L(x.name)===n||x.name.en===n);if(w)sp+=w.cost;});
+  S.gear.forEach(n=>{const g=GEAR_DATA.find(x=>L(x.name)===n||x.name.en===n);if(g)sp+=g.cost;});
   return sp;
 }
-
 function classScore(cls,st){
-  const{STR,INT,WIS,DEX,CON,CHA}=st;
+  const{STR,INT,WIS,DEX,CON}=st;
   switch(cls){
     case'Fighter':    return STR*1.0+CON*0.35;
     case'Cleric':     return WIS*1.0+STR*0.2;
     case'Magic-User': return INT*1.0+CON*0.1;
-    case'Thief':      return DEX*1.0+CHA*0.2;
-    case'Dwarf':      return (STR+CON)*0.55;
-    case'Elf':        return (INT+STR)*0.5;
-    case'Halfling':   return (DEX+STR)*0.5;
+    case'Thief':      return DEX*1.0;
+    case'Dwarf':      return(STR+CON)*0.55;
+    case'Elf':        return(INT+STR)*0.5;
+    case'Halfling':   return(DEX+STR)*0.5;
   }return 0;
 }
 function bestClass(st){
   return['Fighter','Cleric','Magic-User','Thief','Dwarf','Elf','Halfling']
     .sort((a,b)=>classScore(b,st)-classScore(a,st))[0];
 }
-
 function xpBonus(cls,st){
   const stat=st[PRIME[cls]];
-  if(stat>=16)return'+10% XP';
-  if(stat>=13)return'+5% XP';
-  if(stat<=5) return'−10% XP';
-  return'No XP modifier';
+  if(stat>=16)return'+10%';
+  if(stat>=13)return'+5%';
+  if(stat<=5) return'−10%';
+  return'—';
+}
+function openDoors(str){
+  if(str<=8)return'1-in-6';
+  if(str<=12)return'2-in-6';
+  if(str<=15)return'3-in-6';
+  if(str<=17)return'4-in-6';
+  return'5-in-6';
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  LANGUAGE TOGGLE
+// ═══════════════════════════════════════════════════
+function toggleLang(){
+  lang=lang==='en'?'tr':'en';
+  document.documentElement.lang=lang;
+  applyUIStrings();
+  if(C){
+    const sheet=document.getElementById('char-sheet');
+    sheet.innerHTML=buildAll();
+    refreshGold();
+  }
+}
+function applyUIStrings(){
+  document.getElementById('h-title').innerHTML=t('pageTitle');
+  document.getElementById('h-subtitle').textContent=t('pageSubtitle');
+  document.getElementById('btn-generate').innerHTML=t('btnGenerate');
+  document.getElementById('btn-export').innerHTML=t('btnExport');
+  document.getElementById('btn-print').innerHTML=t('btnPrint');
+  document.getElementById('lang-btn').innerHTML=t('btnLang');
+}
+
+// ═══════════════════════════════════════════════════
 //  GENERATE
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function generate(){
-  const stats={
-    STR:d(3,6),INT:d(3,6),WIS:d(3,6),
-    DEX:d(3,6),CON:d(3,6),CHA:d(3,6)
-  };
+  const stats={STR:roll(3,6),INT:roll(3,6),WIS:roll(3,6),DEX:roll(3,6),CON:roll(3,6),CHA:roll(3,6)};
   const cls=bestClass(stats);
   let hp=r(HD[cls])+getMod(stats.CON);
   if(hp<1)hp=1;
-  const gold=d(3,6)*10;
+  const gold=roll(3,6)*10;
   const alignRoll=r(6);
   const alignment=alignRoll<=3?'Lawful':alignRoll<=5?'Neutral':'Chaotic';
 
   // Languages
-  const langs=[...CLASS_LANG[cls]];
-  const ai=langs.indexOf('Alignment tongue');
-  if(ai>=0)langs[ai]=`${alignment} tongue`;
+  const baseLangs=[...CLASS_LANG[cls]];
   const extraCount=Math.max(0,getMod(stats.INT));
-  const used=new Set(langs.map(l=>l.toLowerCase()));
+  const usedEn=new Set(baseLangs.map(l=>l.en.toLowerCase()));
+  const extraLangs=[];
+  let tries=0;
   for(let i=0;i<extraCount;i++){
-    let tries=0;
-    while(tries<30){
-      const L=EXTRA_LANG[r(20)-1];
-      if(!used.has(L.toLowerCase())){langs.push(L);used.add(L.toLowerCase());break;}
+    while(tries<40){
+      const L2=EXTRA_LANG[r(20)-1];
+      if(!usedEn.has(L2.en.toLowerCase())){
+        extraLangs.push(L2);
+        usedEn.add(L2.en.toLowerCase());
+        break;
+      }
       tries++;
     }
   }
 
   // MU spell
   let muSpell=null;
-  if(cls==='Magic-User'){
+  if(cls==='Magic-User'||cls==='Elf'){
     const keys=Object.keys(MU_SPELLS);
     muSpell=pick(keys);
   }
 
   C={
     name:`${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`,
-    cls,stats,hp,gold,alignment,langs,muSpell,
+    cls,stats,hp,gold,alignment,
+    baseLangs,extraLangs,muSpell,
     saves:SAVES[cls],xp2:XP2[cls],
-    xpBonus:xpBonus(cls,stats),
+    xpB:xpBonus(cls,stats),
   };
   S={armor:null,shield:false,weapons:new Set(),gear:new Set()};
+  activeTab='weapons';
 
   const sheet=document.getElementById('char-sheet');
-  sheet.style.display='none';
   sheet.innerHTML=buildAll();
-  sheet.style.display='block';
-  // Scroll & animate scores
-  setTimeout(()=>sheet.scrollIntoView({behavior:'smooth'}),50);
+  sheet.classList.add('visible');
+  setTimeout(()=>sheet.scrollIntoView({behavior:'smooth',block:'start'}),60);
   animateStats(stats);
-  const btn=document.getElementById('export-btn');
-  if(btn)btn.disabled=false;
+  document.getElementById('btn-export').disabled=false;
 }
 
-// ═══════════════════════════════════════════════════════
-//  ANIMATE STAT ROLLS
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  ANIMATE
+// ═══════════════════════════════════════════════════
 function animateStats(finalStats){
-  const keys=['STR','INT','WIS','DEX','CON','CHA'];
-  keys.forEach((k,i)=>{
-    const el=document.getElementById(`score-${k}`);
+  ['STR','INT','WIS','DEX','CON','CHA'].forEach((k,i)=>{
+    const el=document.getElementById(`sc-${k}`);
     if(!el)return;
-    const final=finalStats[k];
     el.classList.add('rolling');
-    let count=0;
-    const maxTicks=10+i*2;
+    let count=0;const maxTicks=8+i*2;
     const iv=setInterval(()=>{
       el.textContent=Math.floor(Math.random()*18)+1;
-      count++;
-      if(count>=maxTicks){
-        clearInterval(iv);
-        el.textContent=final;
-        el.classList.remove('rolling');
-      }
-    },60);
+      if(++count>=maxTicks){clearInterval(iv);el.textContent=finalStats[k];el.classList.remove('rolling');}
+    },55);
   });
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  BUILD HTML
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function buildAll(){
   if(!C)return'';
-  const{cls,stats,hp,gold,alignment,langs,muSpell,saves,xp2,xpBonus}=C;
+  const{cls,stats,hp,gold,alignment,baseLangs,extraLangs,muSpell,saves,xp2,xpB}=C;
   const dexMod=getMod(stats.DEX);
+  const strMod=getMod(stats.STR);
+  const wisMod=getMod(stats.WIS);
+  const conMod=getMod(stats.CON);
   const ac=calcAC(S.armor,S.shield,dexMod);
   const mv=calcMove(S.armor);
-  const spent=calcSpent();
-  const remain=gold-spent;
-  const alignCls=alignment==='Lawful'?'align-lawful':alignment==='Neutral'?'align-neutral':'align-chaotic';
+  const clsName=t('classes')[cls];
+  const alignName=t('alignments')[alignment];
+
+  // Restriction note
+  const restrictKey='restrict'+cls.replace('-','').replace(' ','');
+  const restrictStr=STRINGS[lang][restrictKey]||STRINGS.en[restrictKey]||'';
+
+  // Ability effects
+  const abilNames=[t('abilStr'),t('abilInt'),t('abilWis'),t('abilDex'),t('abilCon'),t('abilCha')];
+  const abilKeys=['STR','INT','WIS','DEX','CON','CHA'];
+  const abilEffects=lang==='en'?[
+    `Melee to-hit/dmg ${fmtMod(stats.STR)} · Open doors: ${openDoors(stats.STR)}`,
+    `${Math.max(0,getMod(stats.INT))} extra lang(s) · ${stats.INT>=9?'Literate':'Illiterate'}`,
+    `Magic saves ${fmtMod(stats.WIS)}`,
+    `Missile ${fmtMod(stats.DEX)} · AC ${fmtMod(stats.DEX)} · Init ${fmtMod(stats.DEX)}`,
+    `HP per die ${fmtMod(stats.CON)}`,
+    `Reaction ${fmtMod(stats.CHA)} · Ret. max ${stats.CHA<=3?1:stats.CHA<=5?2:stats.CHA<=8?3:stats.CHA<=12?4:stats.CHA<=15?5:stats.CHA<=17?6:7} · Morale ${stats.CHA<=3?4:stats.CHA<=5?5:stats.CHA<=8?6:stats.CHA<=12?7:stats.CHA<=15?8:stats.CHA<=17?9:10}`,
+  ]:[
+    `Dövüşte saldırı ve hasar ${fmtMod(stats.STR)} · Kapı açma: ${openDoors(stats.STR)}`,
+    `${Math.max(0,getMod(stats.INT))} ek dil · ${stats.INT>=9?'Okuryazar':'Okuma yazma bilmez'}`,
+    `Büyü kurtulma ${fmtMod(stats.WIS)}`,
+    `Menzilli saldırı ${fmtMod(stats.DEX)} · ZS ${fmtMod(stats.DEX)} · Öncelik ${fmtMod(stats.DEX)}`,
+    `CZ başı CP ${fmtMod(stats.CON)}`,
+    `Tepki ${fmtMod(stats.CHA)} · Azami yaver ${stats.CHA<=3?1:stats.CHA<=5?2:stats.CHA<=8?3:stats.CHA<=12?4:stats.CHA<=15?5:stats.CHA<=17?6:7} · Yaver Morali ${stats.CHA<=3?4:stats.CHA<=5?5:stats.CHA<=8?6:stats.CHA<=12?7:stats.CHA<=15?8:stats.CHA<=17?9:10}`,
+  ];
+
+  // Save names
+  const saveNames=[t('savePoison'),t('saveWands'),t('savePara'),t('saveBreath'),t('saveSpells')];
+
+  // Spells section
+  let spellsSection='';
+  if(cls==='Magic-User'||cls==='Elf'){
+    const sp=MU_SPELLS[muSpell];
+    const spName=lang==='tr'?sp.tr:muSpell;
+    spellsSection=`
+    <div class="section">
+      <div class="sec-title">${t('ornSpells')}</div>
+      <div style="margin-bottom:8px">
+        <span class="spell-tag always">${t('readMagic')} <small style="font-weight:normal">${t('readMagicNote')}</small></span>
+        <span class="spell-tag">${spName}</span>
+      </div>
+      <div class="spell-desc"><strong>${spName}:</strong> ${L(sp.desc)}</div>
+      <p class="note" style="margin-top:8px">${t('spellsPerDay')}</p>
+    </div>`;
+  }
+
+  // Thief skills
+  let thiefSection='';
+  if(cls==='Thief'){
+    const rows=THIEF_SKILLS_DATA.map((sk,i)=>`<tr><td>${L(sk)}</td><td>${THIEF_SKILLS_VAL[i]}</td></tr>`).join('');
+    thiefSection=`
+    <div class="section">
+      <div class="sec-title">${t('thiefSkillsTitle')}</div>
+      <table class="rules-table"><thead><tr><th>${lang==='en'?'Skill':'Yetenek'}</th><th style="text-align:right">${lang==='en'?'Chance':'Şans'}</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+    </div>`;
+  }
+
+  // Cleric turn
+  let turnSection='';
+  if(cls==='Cleric'){
+    const rows=CLERIC_TURN_DATA.slice(0,5).map((u,i)=>`<tr><td>${L(u)}</td><td>${CLERIC_TURN_ROLL[i]}</td></tr>`).join('');
+    turnSection=`
+    <div class="section">
+      <div class="sec-title">${t('clericTurnTitle')}</div>
+      <table class="rules-table"><thead><tr><th>${lang==='en'?'Undead':'Ölümsüz'}</th><th style="text-align:right">${lang==='en'?'Roll (2d6)':'Atış (2d6)'}</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+      <p class="note">${t('clericTurnNote')}</p>
+    </div>`;
+  }
+
+  // Languages
+  const allLangs=[...baseLangs,...extraLangs];
+  const langTags=allLangs.map(l=>{
+    const isExtra=extraLangs.includes(l);
+    const lname=lang==='tr'?l.tr:l.en;
+    return`<span class="lang-tag${isExtra?' extra':''}">${lname}</span>`;
+  }).join('');
+
+  // Class abilities
+  const abilData=CLASS_ABILITIES[cls][lang];
+  const abilHtml=abilData.map(a=>`<div class="ability-item"><div class="abil-name">${a.n}</div><div class="abil-desc">${a.d}</div></div>`).join('');
 
   return `
-  <div class="ornament">✦ &nbsp; CHARACTER RECORD &nbsp; ✦</div>
-
-  ${buildIdentityCard(alignCls)}
-
-  ${buildCombatRow(ac,hp,mv,remain,stats)}
-
-  <div class="ornament" style="margin:20px 0 16px">✦ ABILITY SCORES ✦</div>
-  ${buildAbilities(stats)}
-
-  <div class="two-col mb12">
-    ${buildSaves(saves)}
-    ${buildLanguages(langs,stats.INT)}
+  <!-- IDENTITY -->
+  <div class="id-band">
+    <div>
+      <div class="id-name">${C.name}</div>
+      <div class="id-sub">${t('level')} ${clsName} &nbsp;·&nbsp; ${t('hp')}: <strong>${hp}</strong> &nbsp;·&nbsp; ${t('xpBonus')}: <strong>${xpB}</strong> &nbsp;·&nbsp; ${t('xpNext')}: <strong>${xp2}</strong></div>
+    </div>
+    <div class="id-align">
+      <div class="align-label">${t('alignLabel')}</div>
+      <div class="align-val">${alignName}</div>
+      <div style="font-size:0.72rem;color:var(--muted);max-width:150px;margin-top:2px;line-height:1.3;text-align:right">${ALIGNMENTS_DATA[alignment][lang].desc}</div>
+    </div>
   </div>
 
-  <div class="mb12">${buildSpecialAbilities(cls)}</div>
-  ${cls==='Magic-User'?buildSpells(muSpell):''}
-  ${cls==='Thief'?buildThiefSkills():''}
-  ${cls==='Cleric'?buildTurning():''}
+  <div class="sheet-cols">
 
-  <div class="ornament" style="margin:24px 0 16px">✦ EQUIPMENT SHOP ✦</div>
-  ${buildShop(cls,gold,spent,remain)}
+  <!-- LEFT COLUMN -->
+  <div>
+    <!-- ABILITIES -->
+    <div class="section">
+      <div class="sec-title">${t('ornAbilities')}</div>
+      <table class="ability-table">
+        ${abilKeys.map((k,i)=>{
+          const mod=getMod(stats[k]);
+          const mc=mod>0?'mod-pos':mod<0?'mod-neg':'mod-zero';
+          return`<tr>
+            <td class="ab-abbr">${k}</td>
+            <td class="ab-score" id="sc-${k}">${stats[k]}</td>
+            <td class="ab-mod ${mc}">${fmtMod(stats[k])}</td>
+            <td class="ab-effect">${abilNames[i]}<br>${abilEffects[i]}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>
+
+    <!-- COMBAT -->
+    <div class="section">
+      <div class="sec-title">${t('ornCombat')}</div>
+      <div class="combat-grid">
+        <div class="cstat"><span class="cstat-label">${t('ac')}</span><span class="cstat-val" id="ac-val">${ac}</span><span class="cstat-sub" id="armor-name">${t('armorNone')}</span></div>
+        <div class="cstat"><span class="cstat-label">${t('hp')}</span><span class="cstat-val">${hp}</span><span class="cstat-sub">d${HD[cls]}${conMod!==0?(conMod>0?` +${conMod}`:` ${conMod}`)+' CON':''}</span></div>
+        <div class="cstat"><span class="cstat-label">${t('move')}</span><span class="cstat-val" id="mv-val">${mv}</span><span class="cstat-sub" id="mv-enc">${lang==='en'?`/ ${parseInt(mv)/3}' enc.`:`/ ${parseInt(mv)/3}' yüklü`}</span></div>
+        <div class="cstat"><span class="cstat-label">${t('thac0')}</span><span class="cstat-val">19</span><span class="cstat-sub">vs AC 0</span></div>
+        <div class="cstat"><span class="cstat-label">${t('meleeBonus')}</span><span class="cstat-val">${fmtMod(stats.STR)}</span><span class="cstat-sub">${t('toHitDmg')}</span></div>
+        <div class="cstat"><span class="cstat-label">${t('missileBonus')}</span><span class="cstat-val">${fmtMod(stats.DEX)}</span><span class="cstat-sub">${t('toHit')}</span></div>
+      </div>
+    </div>
+
+    <!-- SAVES -->
+    <div class="section">
+      <div class="sec-title">${t('ornSaves')}</div>
+      ${saveNames.map((n,i)=>`<div class="save-row"><span class="save-name">${n}</span><span class="save-val">${saves[i]}</span></div>`).join('')}
+      ${wisMod!==0?`<p class="note">${t('saveWisNote')} (${fmtMod(stats.WIS)})</p>`:''}
+    </div>
+
+    <!-- LANGUAGES -->
+    <div class="section">
+      <div class="sec-title">${t('ornLangs')}</div>
+      <div style="line-height:2">${langTags}</div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right-col">
+    <!-- CLASS ABILITIES -->
+    <div class="section">
+      <div class="sec-title">${t('ornClass')} — ${clsName}</div>
+      <p class="note" style="margin-bottom:10px">${restrictStr}</p>
+      ${abilHtml}
+    </div>
+
+    ${thiefSection}
+    ${turnSection}
+    ${spellsSection}
+  </div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="shop-section">
+    <div class="orn">${t('ornShop')}</div>
+    <div class="gold-bar">
+      <div>
+        <div class="gl">${t('startingGold')}</div>
+      </div>
+      <div class="gv" id="gold-remain-val">${gold}</div>
+      <div style="font-family:var(--mono);font-size:0.9rem;color:var(--muted)" id="gold-spent-label"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 260px;gap:20px">
+      <div>
+        <div class="shop-tabs">
+          <button class="shop-tab active" onclick="switchTab('weapons',this)">${t('tabWeapons')}</button>
+          <button class="shop-tab" onclick="switchTab('armor',this)">${t('tabArmor')}</button>
+          <button class="shop-tab" onclick="switchTab('gear',this)">${t('tabGear')}</button>
+        </div>
+        <div id="shop-body">${buildTabContent(cls)}</div>
+      </div>
+      <div>
+        <div class="sec-title">${t('ornInventory')}</div>
+        <div id="inv-list"><p class="note">${t('noItems')}</p></div>
+        <div id="inv-total" style="margin-top:10px;font-family:var(--mono);font-size:0.85rem;color:var(--muted)"></div>
+      </div>
+    </div>
+  </div>
   `;
 }
 
-function buildIdentityCard(){
-  const{name,cls,alignment,xp2,xpBonus:xpB}=C;
-  const{stats}=C;
-  const prStat=PRIME[cls];
-  const alignCls=alignment==='Lawful'?'align-lawful':alignment==='Neutral'?'align-neutral':'align-chaotic';
-  return `
-  <div class="panel mb16">
-    <div class="identity">
-      <div>
-        <div class="char-name">${name}</div>
-        <div class="char-subline">1st Level ${cls} &mdash; optimized for ${prStat} ${stats[prStat]}</div>
-      </div>
-      <div class="meta-cluster">
-        <div class="meta-badge">
-          <span class="val">${cls}</span>
-          <span class="lbl">Class</span>
-        </div>
-        <div class="meta-badge ${alignCls}">
-          <span class="val">${alignment}</span>
-          <span class="lbl">Alignment</span>
-        </div>
-        <div class="meta-badge">
-          <span class="val">d${HD[cls]}</span>
-          <span class="lbl">Hit Die</span>
-        </div>
-        <div class="meta-badge">
-          <span class="val">${xp2.toLocaleString()}</span>
-          <span class="lbl">XP for Lvl 2</span>
-        </div>
-        <div class="meta-badge">
-          <span class="val" style="font-size:0.8rem">${xpB}</span>
-          <span class="lbl">XP Bonus</span>
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-
-function buildCombatRow(ac,hp,mv,remain,stats){
-  const odMod=getMod(stats.STR);
-  const od=Math.max(1,Math.min(5,2+odMod));
-  const wisMod=getMod(stats.WIS);
-  const wisSaveNote=wisMod!==0?`(${fmtMod(stats.WIS)} to magic saves)`:'';
-  return `
-  <div class="combat-row mb16">
-    <div class="combat-tile">
-      <span class="val" id="ac-val">${ac}</span>
-      <span class="lbl">Armor Class</span>
-    </div>
-    <div class="combat-tile hp">
-      <span class="val">${hp}</span>
-      <span class="lbl">Hit Points</span>
-    </div>
-    <div class="combat-tile">
-      <span class="val" id="mv-val">${mv}</span>
-      <span class="lbl">Move/Turn</span>
-    </div>
-    <div class="combat-tile">
-      <span class="val">19</span>
-      <span class="lbl">THAC0</span>
-    </div>
-    <div class="combat-tile">
-      <span class="val">${od}-in-6</span>
-      <span class="lbl">Open Doors</span>
-    </div>
-    <div class="combat-tile gold-tile">
-      <span class="val" id="remain-val">${remain}</span>
-      <span class="lbl">Gold (gp)</span>
-    </div>
-  </div>`;
-}
-
-function buildAbilities(stats){
-  const defs=[
-    {k:'STR',full:'Strength',    efx:s=>`Melee to-hit: <span>${fmtMod(s)}</span> / Damage: <span>${fmtMod(s)}</span><br>Open doors: <span>${Math.max(1,Math.min(5,2+getMod(s)))}-in-6</span>`},
-    {k:'INT',full:'Intelligence',efx:s=>{
-      const lit=s<=3?'Illiterate':s<=5?'Barely literate':s<=8?'Native tongue only':'Literate';
-      const el=Math.max(0,getMod(s));
-      return `Additional languages: <span>${el}</span><br>Literacy: <span>${lit}</span>`;
-    }},
-    {k:'WIS',full:'Wisdom',      efx:s=>`Magic saving throw bonus: <span>${fmtMod(s)}</span><br>Applies to spells, wands, rods, staves`},
-    {k:'DEX',full:'Dexterity',   efx:s=>`Missile to-hit: <span>${fmtMod(s)}</span><br>Armor Class: <span>${fmtMod(s)}</span> / Initiative: <span>${fmtMod(s)}</span>`},
-    {k:'CON',full:'Constitution',efx:s=>`HP per hit die: <span>${fmtMod(s)}</span><br>Minimum 1 HP even on bad rolls`},
-    {k:'CHA',full:'Charisma',    efx:s=>{
-      const ret=[,'1','2','3','4','5','6','7'][Math.min(7,Math.max(1,4+getMod(s)))];
-      const mor=[,'4','5','6','7','8','9','10'][Math.min(6,Math.max(1,4+getMod(s)))];
-      return `NPC reaction: <span>${fmtMod(s)}</span><br>Max retainers: <span>${ret||'4'}</span> / Morale: <span>${mor||'7'}</span>`;
-    }},
-  ];
-  const pr=PRIME[C.cls];
-  let h='<div class="abilities-grid mb16">';
-  defs.forEach(({k,full,efx})=>{
-    const s=stats[k];
-    const isPrime=k===pr;
-    h+=`
-    <div class="ability-card${isPrime?' prime-req':''}">
-      <div class="ability-header">
-        <div class="ability-label">${k} &mdash; ${full}</div>
-        <div class="ability-mod ${modClass(s)}">${fmtMod(s)}</div>
-      </div>
-      <div class="ability-score" id="score-${k}">${s}</div>
-      ${isPrime?`<div class="prime-pip">★ Prime Requisite</div>`:''}
-      <div class="ability-effects">${efx(s)}</div>
-    </div>`;
-  });
-  h+='</div>';
-  return h;
-}
-
-function buildSaves(saves){
-  let rows='';
-  SAVE_NAMES.forEach((n,i)=>{
-    rows+=`<tr>
-      <td>${n}</td>
-      <td class="num">${saves[i]}+</td>
-    </tr>`;
-  });
-  return `
-  <div class="panel">
-    <div class="panel-title">Saving Throws</div>
-    <table class="sheet-table">
-      <thead><tr><th>Category</th><th>Target</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div class="footnote">Roll d20 equal to or above target. WIS modifier applies to magic-based saves (spells, wands, rods, staves).</div>
-  </div>`;
-}
-
-function buildLanguages(langs,intScore){
-  const extraCount=Math.max(0,getMod(intScore));
-  const baseCount=CLASS_LANG[C.cls].filter(l=>!l.startsWith('INT')).length;
-  const tags=langs.map((l,i)=>`<span class="tag${i<(CLASS_LANG[C.cls].length)?' base':''}">${l}</span>`).join('');
-  return `
-  <div class="panel">
-    <div class="panel-title">Languages Known</div>
-    <div style="line-height:2.2">${tags}</div>
-    ${extraCount>0?`<div class="footnote" style="margin-top:10px">High INT grants ${extraCount} additional language${extraCount>1?'s':''}. Rolled randomly from d20 language table.</div>`:''}
-    ${intScore<=8?`<div class="footnote" style="color:var(--crimson-bright);margin-top:8px">⚠ Low INT: limited literacy.</div>`:''}
-  </div>`;
-}
-
-function buildSpecialAbilities(cls){
-  const items=(CLASS_ABILITIES[cls]||[]).map(a=>`<li>${a}</li>`).join('');
-  return `
-  <div class="panel">
-    <div class="panel-title">Class Abilities &mdash; ${cls}</div>
-    <ul class="ability-list">${items}</ul>
-  </div>`;
-}
-
-function buildSpells(muSpell){
-  return `
-  <div class="panel mb12">
-    <div class="panel-title">Spells Known &mdash; Magic-User Level 1</div>
-    <div class="spell-card">
-      <div class="spell-badge">Always Memorized</div>
-      <div class="spell-name">Read Magic</div>
-      <div class="spell-desc">Allows the magic-user to read magical writings and identify scrolls. Required to learn new spells from scrolls or spell books. Duration: 1 reading.</div>
-    </div>
-    <div class="spell-card highlight">
-      <div class="spell-badge">Randomly Determined Spell</div>
-      <div class="spell-name">${muSpell}</div>
-      <div class="spell-desc">${MU_SPELLS[muSpell]}</div>
-    </div>
-    <div class="footnote">Magic-users may memorize 1 spell per day at 1st level. A memorized spell is erased from memory upon casting and must be re-memorized. Both spells are recorded in the character's spell book.</div>
-  </div>`;
-}
-
-function buildThiefSkills(){
-  const rows=THIEF_SKILLS.map(x=>`
-    <div class="skill-row">
-      <div class="skill-name">${x.s}</div>
-      <div class="skill-val">${x.v}</div>
-    </div>`).join('');
-  return `
-  <div class="panel mb12">
-    <div class="panel-title">Thief Skills &mdash; Level 1</div>
-    ${rows}
-    <div class="footnote" style="margin-top:10px">All skills improve each level. Backstab requires attacking from behind or by surprise; victim must be unaware of the attack.</div>
-  </div>`;
-}
-
-function buildTurning(){
-  const rows=CLERIC_TURN.map(([u,t])=>`
-    <tr>
-      <td>${u}</td>
-      <td class="num ${t==='—'?'muted':''}">${t==='—'?'Cannot turn':t+'+'}</td>
-    </tr>`).join('');
-  return `
-  <div class="panel mb12">
-    <div class="panel-title">Turn Undead &mdash; Cleric Level 1</div>
-    <table class="sheet-table">
-      <thead><tr><th>Undead Type</th><th>Roll 2d6 ≥</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div class="footnote" style="margin-top:10px">Roll 2d6 each round when facing undead. Success drives them away. A natural 12 (double six) destroys the undead outright. Cleric gains spells from 2nd level onward.</div>
-  </div>`;
-}
-
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  SHOP
-// ═══════════════════════════════════════════════════════
-function buildShop(cls,startGold,spent,remain){
-  return `
-  <div class="shop-header">
-    <div></div>
-    <div class="gold-tracker">
-      <span class="start-gold">Treasury: <strong>${startGold} gp</strong></span>
-      <span class="spent">Spent: <strong id="spent-val">${spent} gp</strong></span>
-      <span class="remain${remain<0?' overbudget':''}" id="remain-shop">${remain} gp remaining</span>
-    </div>
-  </div>
-  <div class="shop-tabs">
-    <div class="shop-tab${activeTab==='weapons'?' active':''}" onclick="switchTab('weapons')">⚔ Weapons</div>
-    <div class="shop-tab${activeTab==='armor'?' active':''}" onclick="switchTab('armor')">🛡 Armor</div>
-    <div class="shop-tab${activeTab==='gear'?' active':''}" onclick="switchTab('gear')">🎒 Gear</div>
-  </div>
-  <div class="shop-body" id="shop-body">
-    ${buildTabContent(cls)}
-  </div>`;
+// ═══════════════════════════════════════════════════
+function weaponAllowed(w,cls){
+  if(w.allowed==='all')return true;
+  if(!w.allowed.includes(cls))return false;
+  if(cls==='Cleric'&&w.dmg!=='—'&&!w.name.en.match(/Club|Mace|Hammer|Staff|Sling/i))return false;
+  if(cls==='Magic-User'&&w.dmg!=='—'&&!w.name.en.match(/Dagger/i))return false;
+  return true;
 }
 
 function buildTabContent(cls){
-  if(activeTab==='weapons') return buildWeaponTab(cls);
-  if(activeTab==='armor')   return buildArmorTab(cls);
-  return buildGearTab();
-}
-
-function buildWeaponTab(cls){
-  return WEAPONS.map(w=>{
-    const ok=w.allowed==='all'||w.allowed.includes(cls);
-    const ck=S.weapons.has(w.name);
-    return `
-    <div class="shop-item${!ok?' restricted':''}">
-      <input type="checkbox" class="shop-check" ${ck?'checked':''} ${!ok?'disabled':''}
-        onchange="toggleWeapon('${esc(w.name)}',this.checked)">
-      <div class="item-name">${w.name}${w.note?`<span class="item-note">(${w.note})</span>`:''}
-        ${!ok?`<span class="restricted-note">— not for ${cls}</span>`:''}</div>
-      <div class="item-dmg">${w.ammo?'ammo':w.dmg}</div>
-      <div class="item-cost">${w.cost} gp</div>
+  if(activeTab==='weapons'){
+    return WEAPONS_DATA.map(w=>{
+      const ok=weaponAllowed(w,cls);
+      const nm=L(w.name);
+      const ck=S.weapons.has(w.name.en);
+      const nt=w.note?L(w.note):'';
+      return`<div class="shop-item${!ok?' disabled':''}${ck?' selected':''}">
+        <input type="checkbox" ${ck?'checked':''} ${!ok?'disabled':''}
+          onchange="toggleWeapon('${esc(w.name.en)}',this.checked)">
+        <span class="item-name">${nm}${nt?`<span class="item-note">${nt}</span>`:''}</span>
+        <span class="item-dmg">${w.dmg}</span>
+        <span class="item-cost">${w.cost} gp</span>
+      </div>`;
+    }).join('');
+  }
+  if(activeTab==='armor'){
+    const armorOk=CLASS_ARMOR[cls].length>0;
+    const shieldOk=CLASS_ARMOR[cls].includes('shield');
+    let html='';
+    html+=ARMOR_ITEMS.map(a=>{
+      const ok=CLASS_ARMOR[cls].includes(a.id);
+      const sel=S.armor===a.id;
+      return`<div class="shop-item${!ok?' disabled':''}${sel?' selected':''}" onclick="${ok?`selectArmor('${a.id}')`:''}" style="cursor:${ok?'pointer':'not-allowed'}">
+        <span class="item-name">${L(a.name)}</span>
+        <span class="item-dmg">AC ${a.baseAC}</span>
+        <span class="item-cost">${a.cost} gp</span>
+      </div>`;
+    }).join('');
+    html+=`<div class="shop-item${!shieldOk?' disabled':''}${S.shield?' selected':''}" onclick="${shieldOk?`toggleShield()`:''}" style="cursor:${shieldOk?'pointer':'not-allowed'}">
+      <span class="item-name">${t('shield')} <span class="item-note">${t('shieldNote')}</span></span>
+      <span class="item-dmg">−1 AC</span>
+      <span class="item-cost">10 gp</span>
+    </div>`;
+    return html;
+  }
+  // gear
+  return GEAR_DATA.map(g=>{
+    const nm=L(g.name);
+    const ck=S.gear.has(g.name.en);
+    return`<div class="shop-item${ck?' selected':''}">
+      <input type="checkbox" ${ck?'checked':''}
+        onchange="toggleGear('${esc(g.name.en)}',this.checked)">
+      <span class="item-name">${nm}</span>
+      <span class="item-dmg"></span>
+      <span class="item-cost">${g.cost} gp</span>
     </div>`;
   }).join('');
 }
 
-function buildArmorTab(cls){
-  const allowed=CLASS_ARMOR[cls];
-  let h='';
-  // Radio: No armor
-  h+=`<div class="shop-item">
-    <input type="radio" name="armorsel" class="shop-check" value="none"
-      ${!S.armor?'checked':''} onchange="selectArmor(null)">
-    <div class="item-name">No Armor</div>
-    <div class="item-dmg" style="color:var(--text-dim)">AC 9</div>
-    <div class="item-cost">—</div>
-  </div>`;
-  ARMOR_ITEMS.forEach(a=>{
-    const ok=allowed.includes(a.id);
-    const ck=S.armor===a.id;
-    h+=`<div class="shop-item${!ok?' restricted':''}">
-      <input type="radio" name="armorsel" class="shop-check" value="${a.id}"
-        ${ck?'checked':''} ${!ok?'disabled':''} onchange="selectArmor('${a.id}')">
-      <div class="item-name">${a.name}${!ok?`<span class="restricted-note">— not for ${cls}</span>`:''}</div>
-      <div class="item-dmg" style="color:var(--text-dim)">AC ${a.baseAC}</div>
-      <div class="item-cost">${a.cost} gp</div>
-    </div>`;
-  });
-  h+='<hr class="rule">';
-  const shieldOk=allowed.includes('shield');
-  h+=`<div class="shop-item${!shieldOk?' restricted':''}">
-    <input type="checkbox" class="shop-check" ${S.shield?'checked':''} ${!shieldOk?'disabled':''}
-      onchange="toggleShield(this.checked)">
-    <div class="item-name">Shield${!shieldOk?`<span class="restricted-note">— not for ${cls}</span>`:''}</div>
-    <div class="item-dmg" style="color:var(--text-dim)">−1 AC</div>
-    <div class="item-cost">10 gp</div>
-  </div>`;
-  return h;
-}
-
-function buildGearTab(){
-  return GEAR.map(g=>{
-    const ck=S.gear.has(g.name);
-    return `<div class="shop-item">
-      <input type="checkbox" class="shop-check" ${ck?'checked':''}
-        onchange="toggleGear('${esc(g.name)}',this.checked)">
-      <div class="item-name">${g.name}</div>
-      <div class="item-dmg"></div>
-      <div class="item-cost">${g.cost} gp</div>
-    </div>`;
-  }).join('');
-}
-
-// ═══════════════════════════════════════════════════════
-//  SHOP INTERACTION
-// ═══════════════════════════════════════════════════════
-function esc(s){return s.replace(/'/g,"\\'");}
-
-function switchTab(tab){
+function switchTab(tab,btn){
   activeTab=tab;
-  document.querySelectorAll('.shop-tab').forEach(t=>{
-    const match=(tab==='weapons'&&t.textContent.includes('Weapon'))||
-                (tab==='armor'&&t.textContent.includes('Armor'))||
-                (tab==='gear'&&t.textContent.includes('Gear'));
-    t.classList.toggle('active',match);
-  });
+  document.querySelectorAll('.shop-tab').forEach(t2=>t2.classList.remove('active'));
+  btn.classList.add('active');
   document.getElementById('shop-body').innerHTML=buildTabContent(C.cls);
 }
-
-function toggleWeapon(name,checked){
-  if(checked)S.weapons.add(name);else S.weapons.delete(name);
-  refreshGold();
-}
-function selectArmor(id){
-  S.armor=id;
-  refreshGold();
-  refreshCombat();
-}
-function toggleShield(v){
-  S.shield=v;
-  refreshGold();
-  refreshCombat();
-}
-function toggleGear(name,checked){
-  if(checked)S.gear.add(name);else S.gear.delete(name);
-  refreshGold();
-}
+function toggleWeapon(name,checked){if(checked)S.weapons.add(name);else S.weapons.delete(name);refreshGold();updateInv();}
+function selectArmor(id){S.armor=S.armor===id?null:id;refreshGold();refreshCombat();updateInv();document.getElementById('shop-body').innerHTML=buildTabContent(C.cls);}
+function toggleShield(){S.shield=!S.shield;refreshGold();refreshCombat();updateInv();document.getElementById('shop-body').innerHTML=buildTabContent(C.cls);}
+function toggleGear(name,checked){if(checked)S.gear.add(name);else S.gear.delete(name);refreshGold();updateInv();}
 
 function refreshGold(){
+  if(!C)return;
   const sp=calcSpent();
   const rm=C.gold-sp;
-  const el=document.getElementById('remain-shop');
-  const sv=document.getElementById('spent-val');
-  const rv=document.getElementById('remain-val');
-  if(el){el.textContent=`${rm} gp remaining`;el.className='remain'+(rm<0?' overbudget':'');}
-  if(sv)sv.textContent=`${sp} gp`;
-  if(rv){rv.textContent=rm;rv.style.color=rm<0?'var(--crimson-bright)':'var(--gold-bright)';}
+  const el=document.getElementById('gold-remain-val');
+  const sl=document.getElementById('gold-spent-label');
+  if(el){el.textContent=rm;el.className='gv'+(rm<0?' over':'');}
+  if(sl&&sp>0)sl.textContent=`${t('goldSpent')}: ${sp} gp`;
+  else if(sl)sl.textContent='';
 }
-
 function refreshCombat(){
+  if(!C)return;
   const dexMod=getMod(C.stats.DEX);
   const ac=calcAC(S.armor,S.shield,dexMod);
   const mv=calcMove(S.armor);
   const acEl=document.getElementById('ac-val');
   const mvEl=document.getElementById('mv-val');
+  const mvEncEl=document.getElementById('mv-enc');
+  const armorEl=document.getElementById('armor-name');
   if(acEl)acEl.textContent=ac;
   if(mvEl)mvEl.textContent=mv;
+  if(mvEncEl)mvEncEl.textContent=lang==='en'?`/ ${parseInt(mv)/3}' enc.`:`/ ${parseInt(mv)/3}' yüklü`;
+  if(armorEl){
+    const ai=ARMOR_ITEMS.find(a=>a.id===S.armor);
+    armorEl.textContent=ai?L(ai.name):t('armorNone');
+  }
 }
+function updateInv(){
+  const el=document.getElementById('inv-list');
+  if(!el)return;
+  const lines=[];
+  const ai=ARMOR_ITEMS.find(a=>a.id===S.armor);
+  if(ai)lines.push({name:L(ai.name),cost:ai.cost});
+  if(S.shield)lines.push({name:t('shield'),cost:10});
+  S.weapons.forEach(n=>{const w=WEAPONS_DATA.find(x=>x.name.en===n);if(w)lines.push({name:L(w.name),cost:w.cost});});
+  S.gear.forEach(n=>{const g=GEAR_DATA.find(x=>x.name.en===n);if(g)lines.push({name:L(g.name),cost:g.cost});});
+  if(lines.length===0){el.innerHTML=`<p class="note">${t('noItems')}</p>`;return;}
+  el.innerHTML=lines.map(l=>`<div class="inv-row"><span class="inv-name">${l.name}</span><span class="inv-cost">${l.cost} gp</span></div>`).join('');
+}
+function esc(s){return s.replace(/'/g,"\\'");}
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  TXT EXPORT
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function exportTXT(){
   if(!C)return;
-  const{name,cls,stats,hp,gold,alignment,langs,muSpell,saves,xpBonus}=C;
+  const{name,cls,stats,hp,gold,alignment,baseLangs,extraLangs,muSpell,saves,xp2,xpB}=C;
   const dexMod=getMod(stats.DEX);
+  const wisMod=getMod(stats.WIS);
+  const conMod=getMod(stats.CON);
   const ac=calcAC(S.armor,S.shield,dexMod);
   const mv=calcMove(S.armor);
   const spent=calcSpent();
   const remaining=gold-spent;
-  const armorName=ARMOR_ITEMS.find(a=>a.id===S.armor)?.name||'None';
-
-  const line=(n=60)=>'─'.repeat(n);
-  const header=(t)=>`\n${line()}\n  ${t.toUpperCase()}\n${line()}\n`;
-  const row=(label,val,pad=30)=>`  ${(label+':').padEnd(pad)}${val}`;
-  const fm=(s)=>{const m=getMod(s);return m>0?`+${m}`:String(m);}
-
-  const MOD_EFFECTS={
-    STR:`Melee to-hit/dmg ${fm(stats.STR)} | Open Doors: ${stats.STR<=8?'1-in-6':stats.STR<=12?'2-in-6':stats.STR<=15?'3-in-6':stats.STR<=17?'4-in-6':'5-in-6'}`,
-    INT:`Extra languages: +${Math.max(0,getMod(stats.INT))} | ${stats.INT>=9?'Literate (reads & writes)':'Illiterate'}`,
-    WIS:`Magic saves ${fm(stats.WIS)} | ${stats.WIS>=13?'Strong divine attunement':stats.WIS<=8?'Weak willpower':'Average willpower'}`,
-    DEX:`Missile to-hit ${fm(stats.DEX)} | AC ${fm(stats.DEX)} | Initiative ${fm(stats.DEX)}`,
-    CON:`HP per die ${fm(stats.CON)} | ${stats.CON>=15?'Vigorous constitution':stats.CON<=8?'Sickly constitution':'Average constitution'}`,
-    CHA:`NPC reaction ${fm(stats.CHA)} | Max retainers: ${stats.CHA<=3?1:stats.CHA<=5?2:stats.CHA<=8?3:stats.CHA<=12?4:stats.CHA<=15?5:stats.CHA<=17?6:7} | Retainer morale: ${stats.CHA<=3?4:stats.CHA<=5?5:stats.CHA<=8?6:stats.CHA<=12?7:stats.CHA<=15?8:stats.CHA<=17?9:10}`,
-  };
+  const clsName=t('classes')[cls];
+  const alignName=t('alignments')[alignment];
+  const armorItem=ARMOR_ITEMS.find(a=>a.id===S.armor);
+  const armorName=armorItem?L(armorItem.name):t('armorNone');
+  const W=60;
+  const hr='─'.repeat(W);
+  const row=(k,v)=>`  ${(k+':').padEnd(28)}${v}`;
+  const fm=s=>{const m=getMod(s);return m>0?`+${m}`:String(m);};
+  const saveNames=[t('savePoison'),t('saveWands'),t('savePara'),t('saveBreath'),t('saveSpells')];
+  const abilKs=['STR','INT','WIS','DEX','CON','CHA'];
+  const abilNs=[t('abilStr'),t('abilInt'),t('abilWis'),t('abilDex'),t('abilCon'),t('abilCha')];
 
   // Weapon list
   const weaponLines=S.weapons.size>0
-    ?[...S.weapons].map(n=>{const w=WEAPONS.find(x=>x.name===n);return `  - ${n} (${w?.dmg||'—'}, ${w?.cost||'?'} gp)`;}).join('\n')
-    :'  (none)';
-
-  // Gear list
+    ?[...S.weapons].map(n=>{const w=WEAPONS_DATA.find(x=>x.name.en===n);return`  - ${L(w.name)} (${w.dmg}, ${w.cost} gp)`;}).join('\n')
+    :`  (${t('noItems')})`;
   const gearLines=S.gear.size>0
-    ?[...S.gear].map(n=>{const g=GEAR.find(x=>x.name===n);return `  - ${n} (${g?.cost||'?'} gp)`;}).join('\n')
-    :'  (none)';
+    ?[...S.gear].map(n=>{const g=GEAR_DATA.find(x=>x.name.en===n);return`  - ${L(g.name)} (${g.cost} gp)`;}).join('\n')
+    :`  (${t('noItems')})`;
 
-  // Equipment summary
-  const shieldLine=S.shield?'\n  - Shield (10 gp)':'';
+  const abilData=CLASS_ABILITIES[cls][lang];
 
-  // Abilities (strip HTML tags)
-  const stripTags=s=>s.replace(/<[^>]+>/g,'');
-  const abils=(CLASS_ABILITIES[cls]||[]).map(a=>`  • ${stripTags(a)}`).join('\n');
+  const allLangs=[...baseLangs,...extraLangs].map(l=>lang==='tr'?l.tr:l.en).join(', ');
 
-  // Thief skills
-  const thiefBlock=cls==='Thief'?`\nTHIEF SKILLS (Level 1)\n${line()}\n`+
-    THIEF_SKILLS.map(t=>`  ${(t.s+':').padEnd(24)}${t.v}`).join('\n')+'\n':'';
-
-  // Cleric turning
-  const clericBlock=cls==='Cleric'?`\nTURN UNDEAD TABLE (Level 1)\n${line()}\n`+
-    CLERIC_TURN.map(([u,v])=>`  ${(u+':').padEnd(20)}${v}`).join('\n')+'\n':'';
-
-  // Spell block
   let spellBlock='';
-  if(cls==='Magic-User'&&muSpell){
-    spellBlock=`\nSPELLS\n${line()}\n`+
-      `  Read Magic (always memorized)\n`+
-      `  ${muSpell}\n\n`+
-      `  ${muSpell}: ${MU_SPELLS[muSpell]}\n`;
+  if((cls==='Magic-User'||cls==='Elf')&&muSpell){
+    const sp=MU_SPELLS[muSpell];
+    const spName=lang==='tr'?sp.tr:muSpell;
+    spellBlock=`\n${lang==='en'?'SPELLS':'BÜYÜLER'}\n${hr}\n  ${t('readMagic')} ${t('readMagicNote')}\n  ${spName}\n\n  ${spName}: ${L(sp.desc)}\n`;
   }
-  if(cls==='Elf'&&muSpell){
-    spellBlock=`\nSPELLS (Elf — Magic-User spells)\n${line()}\n`+
-      `  Read Magic (always memorized)\n`+
-      `  ${muSpell}\n\n`+
-      `  ${muSpell}: ${MU_SPELLS[muSpell]}\n`;
+
+  let thiefBlock='';
+  if(cls==='Thief'){
+    thiefBlock=`\n${t('thiefSkillsTitle')}\n${hr}\n`+
+      THIEF_SKILLS_DATA.map((sk,i)=>`  ${(L(sk)+':').padEnd(26)}${THIEF_SKILLS_VAL[i]}`).join('\n')+'\n';
+  }
+  let turnBlock='';
+  if(cls==='Cleric'){
+    turnBlock=`\n${t('clericTurnTitle')}\n${hr}\n`+
+      CLERIC_TURN_DATA.slice(0,5).map((u,i)=>`  ${(L(u)+':').padEnd(22)}${CLERIC_TURN_ROLL[i]}`).join('\n')+'\n';
   }
 
   const txt=
-`${'═'.repeat(60)}
-  B/X DUNGEONS & DRAGONS — CHARACTER RECORD
-  Moldvay Basic / Old School Essentials Compatible
-${'═'.repeat(60)}
-${header('Identity')}
-${row('Name', name)}
-${row('Class', `${cls} (Level 1)`)}
-${row('Alignment', alignment)}
-${row('Hit Points', `${hp} (d${HD[cls]}${getMod(stats.CON)!==0?` ${getMod(stats.CON)>0?'+':''}${getMod(stats.CON)} CON`:''})`)}
-${row('Experience Bonus', xpBonus)}
-${row('XP to Level 2', String(C.xp2))}
-${header('Ability Scores')}
-  SCORE  MOD   EFFECTS
-  ${line(56)}
-${['STR','INT','WIS','DEX','CON','CHA'].map(k=>`  ${k}:  ${String(stats[k]).padEnd(4)}  ${fm(stats[k]).padEnd(4)}  ${MOD_EFFECTS[k]}`).join('\n')}
-${header('Combat')}
-${row('Armor Class', `${ac}  (${armorName}${S.shield?', Shield':''})`)}
-${row('Movement', mv)}
-${row('THAC0', '19')}
-${row('Melee Attack Bonus', fm(stats.STR))}
-${row('Missile Attack Bonus', fm(stats.DEX))}
-${header('Saving Throws')}
-${SAVE_NAMES.map((n,i)=>`  ${(n+':').padEnd(32)}${saves[i]}`).join('\n')}
-  (WIS modifier ${fm(stats.WIS)} applies to saves vs. Rods/Staves/Spells)
-${header('Languages')}
-  ${langs.join(', ')}
-${header('Class Abilities — ' + cls)}
-${abils}
-${thiefBlock}${clericBlock}${spellBlock}
-${header('Equipment')}
-  Starting Gold:    ${gold} gp
-  Gold Spent:       ${spent} gp
-  Gold Remaining:   ${remaining} gp
+`${'═'.repeat(W)}
+  ${t('exportHeader')}
+  ${t('exportSubHeader')}
+${'═'.repeat(W)}
 
-  ARMOR:
-  - ${armorName}${shieldLine}
+${t('ornIdentity').toUpperCase()}
+${hr}
+${row(lang==='en'?'Name':'İsim', name)}
+${row(lang==='en'?'Class':'Sınıf', `${clsName} (${t('level')})`)}
+${row(t('alignLabel'), alignName)}
+${row(t('hp'), `${hp} (d${HD[cls]}${conMod!==0?(conMod>0?` +${conMod}`:` ${conMod}`)+' CON':''})`)}
+${row(t('xpBonus'), xpB)}
+${row(t('xpNext'), String(xp2))}
 
-  WEAPONS:
+${t('ornAbilities').toUpperCase()}
+${hr}
+  ${lang==='en'?'STAT  MOD   EFFECTS':'ÖZELLİK  EK   ETKİLER'}
+  ${hr}
+${abilKs.map((k,i)=>`  ${k}   ${fm(stats[k]).padEnd(4)}  ${stats[k].toString().padEnd(3)} — ${abilNs[i]}: ${
+  k==='STR'?`${fm(stats.STR)} / ${lang==='en'?'Doors':'Kapı'}: ${openDoors(stats.STR)}`:
+  k==='INT'?`${Math.max(0,getMod(stats.INT))} ${lang==='en'?'extra lang(s)':'ek dil'}`:
+  k==='WIS'?`${lang==='en'?'Magic saves':'Büyü kurtulma'} ${fm(stats.WIS)}`:
+  k==='DEX'?`${lang==='en'?'Missile/AC/Init':'Menzil/ZS/İni'} ${fm(stats.DEX)}`:
+  k==='CON'?`${lang==='en'?'HP/die':'CZ başı'} ${fm(stats.CON)}`:
+  `${lang==='en'?'Reaction':'Tepki'} ${fm(stats.CHA)}`
+}`).join('\n')}
+
+${t('ornCombat').toUpperCase()}
+${hr}
+${row(t('ac'), `${ac}  (${armorName}${S.shield?`, ${t('shield')}`:''} )`)}
+${row(t('move'), mv)}
+${row(t('thac0'), '19')}
+${row(t('meleeBonus'), fm(stats.STR))}
+${row(t('missileBonus'), fm(stats.DEX))}
+
+${t('ornSaves').toUpperCase()}
+${hr}
+${saveNames.map((n,i)=>`  ${(n+':').padEnd(34)}${saves[i]}`).join('\n')}
+  ${t('saveWisNote')}: ${fm(stats.WIS)}
+
+${t('ornLangs').toUpperCase()}
+${hr}
+  ${allLangs}
+
+${t('ornClass').toUpperCase()} — ${clsName}
+${hr}
+${abilData.map(a=>`  • ${a.n}: ${a.d}`).join('\n')}
+
+${thiefBlock}${turnBlock}${spellBlock}
+${lang==='en'?'EQUIPMENT':'EKİPMAN'}
+${hr}
+${row(t('goldStart'), `${gold} gp`)}
+${row(t('goldSpent'), `${spent} gp`)}
+${row(t('goldRemain'), `${remaining} gp`)}
+
+  ${lang==='en'?'ARMOR':'ZIRH'}:
+  - ${armorName}${S.shield?`\n  - ${t('shield')} (10 gp)`:''}
+
+  ${lang==='en'?'WEAPONS':'SİLAHLAR'}:
 ${weaponLines}
 
-  GEAR:
+  ${lang==='en'?'GEAR':'MALZEME'}:
 ${gearLines}
-${line(60)}
-  Generated by B/X Character Generator
-  Compatible with Moldvay Basic D&D and Old School Essentials
-${line(60)}
+
+${hr}
+  ${t('exportGenBy')}
+${hr}
 `;
 
   const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download=`${name.replace(/\s+/g,'_')}_BX_Character.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  a.download=`${name.replace(/\s+/g,'_')}_${lang==='tr'?'Karakter':'Character'}.txt`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
 }
 </script>
 </body>
