@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B/X D&D — Monster Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#111111;
+  --ink2:#333333;
+  --muted:#666666;
+  --rule:#cccccc;
+  --rule2:#e8e8e8;
+  --bg:#ffffff;
+  --bg2:#f7f7f7;
+  --bg3:#f0f0f0;
+  --red:#c0102a;
+  --red2:#e01030;
+  --red-bg:#fdf2f4;
+  --mono:'Share Tech Mono',monospace;
+  --danger-trivial:#555;
+  --danger-easy:#2a6e3a;
+  --danger-moderate:#8a5a00;
+  --danger-tough:#c0102a;
+  --danger-deadly:#6a0010;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Libre Baskerville',Georgia,serif;
+  font-size:14px;
+  line-height:1.65;
+}
+.wrapper{max-width:1100px;margin:0 auto;padding:0 20px 80px}
+
+/* ── HEADER ── */
+.site-header{
+  border-bottom:3px solid var(--ink);
+  padding:36px 0 24px;
+  margin-bottom:36px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+.header-left h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.5rem,4vw,2.4rem);
+  font-weight:900;
+  letter-spacing:-0.02em;
+  line-height:1.05;
+}
+.header-left .subtitle{
+  font-size:0.72rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-top:5px;
+}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.btn{
+  font-family:'Playfair Display',serif;
+  font-size:0.8rem;
+  font-weight:700;
+  letter-spacing:0.04em;
+  padding:9px 22px;
+  cursor:pointer;
+  border:2px solid var(--ink);
+  background:var(--ink);
+  color:var(--bg);
+  transition:background 0.15s,color 0.15s;
+  white-space:nowrap;
+  text-decoration:none;
+  display:inline-block;
+}
+.btn:hover{background:var(--red);border-color:var(--red)}
+.btn.outline{background:transparent;color:var(--ink)}
+.btn.outline:hover{background:var(--ink);color:var(--bg)}
+
+/* ── SEARCH ── */
+.search-bar{
+  display:flex;
+  gap:10px;
+  margin-bottom:28px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.search-input{
+  font-family:'Libre Baskerville',serif;
+  font-size:0.88rem;
+  padding:9px 14px;
+  border:2px solid var(--ink);
+  background:var(--bg);
+  color:var(--ink);
+  flex:1;
+  min-width:200px;
+  outline:none;
+}
+.search-input:focus{border-color:var(--red)}
+.search-input::placeholder{color:var(--muted)}
+.filter-group{display:flex;gap:6px;flex-wrap:wrap}
+.filter-btn{
+  font-family:'Playfair Display',serif;
+  font-size:0.68rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:6px 12px;
+  border:1px solid var(--rule);
+  background:var(--bg2);
+  color:var(--muted);
+  cursor:pointer;
+  transition:all 0.12s;
+}
+.filter-btn:hover,.filter-btn.active{border-color:var(--ink);color:var(--ink);background:var(--bg3)}
+.filter-btn.f-trivial.active{border-color:var(--danger-trivial);color:var(--danger-trivial)}
+.filter-btn.f-easy.active{border-color:var(--danger-easy);color:var(--danger-easy)}
+.filter-btn.f-moderate.active{border-color:var(--danger-moderate);color:var(--danger-moderate)}
+.filter-btn.f-tough.active{border-color:var(--danger-tough);color:var(--danger-tough)}
+.filter-btn.f-deadly.active{border-color:var(--danger-deadly);color:var(--danger-deadly)}
+.result-count{font-size:0.75rem;color:var(--muted);margin-left:4px;white-space:nowrap}
+
+/* ── CATEGORY ── */
+.category{margin-bottom:48px}
+.cat-header{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  margin-bottom:6px;
+  padding-bottom:10px;
+  border-bottom:3px solid var(--ink);
+}
+.cat-number{
+  font-family:'Playfair Display',serif;
+  font-size:0.7rem;
+  font-weight:700;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--red);
+}
+.cat-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.35rem;
+  font-weight:900;
+}
+.cat-subtitle{
+  font-size:0.75rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+  font-style:italic;
+}
+.cat-tip{
+  font-size:0.8rem;
+  color:var(--muted);
+  font-style:italic;
+  line-height:1.55;
+  margin-bottom:20px;
+  padding:10px 14px;
+  border-left:3px solid var(--rule);
+  background:var(--bg2);
+}
+.cat-tip strong{color:var(--ink);font-style:normal}
+
+/* ── SUBCATEGORY ── */
+.subcat{margin-bottom:28px}
+.subcat-title{
+  font-family:'Playfair Display',serif;
+  font-size:0.7rem;
+  font-weight:700;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--red);
+  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.subcat-title::after{
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--rule2);
+}
+
+/* ── MONSTER GRID ── */
+.monster-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:8px;
+}
+
+/* ── MONSTER CARD ── */
+.monster-card{
+  border:1px solid var(--rule2);
+  background:var(--bg);
+  padding:12px 14px;
+  transition:border-color 0.12s,background 0.12s;
+  cursor:pointer;
+  position:relative;
+}
+.monster-card:hover{border-color:var(--ink);background:var(--bg2)}
+.monster-card.expanded{border-color:var(--ink);background:var(--bg2)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.monster-name{
+  font-family:'Playfair Display',serif;
+  font-size:1rem;
+  font-weight:700;
+  line-height:1.2;
+  flex:1;
+}
+.card-tags{display:flex;gap:4px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.danger-tag{
+  font-family:var(--mono);
+  font-size:0.6rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:2px 7px;
+  border:1px solid currentColor;
+  white-space:nowrap;
+}
+.d-trivial{color:var(--danger-trivial)}
+.d-easy{color:var(--danger-easy)}
+.d-moderate{color:var(--danger-moderate)}
+.d-tough{color:var(--danger-tough)}
+.d-deadly{color:var(--danger-deadly);font-weight:bold}
+
+.warn-tag{
+  font-family:var(--mono);
+  font-size:0.58rem;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  padding:2px 6px;
+  background:var(--red-bg);
+  border:1px solid var(--red);
+  color:var(--red);
+  white-space:nowrap;
+}
+
+.card-stats{
+  display:flex;
+  gap:14px;
+  margin-top:7px;
+  flex-wrap:wrap;
+}
+.stat-item{
+  font-size:0.75rem;
+  color:var(--muted);
+}
+.stat-item strong{
+  font-family:var(--mono);
+  color:var(--ink);
+  font-size:0.82rem;
+}
+
+/* Expanded detail */
+.card-detail{
+  display:none;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid var(--rule2);
+}
+.monster-card.expanded .card-detail{display:block}
+.detail-row{
+  display:flex;
+  gap:8px;
+  margin-bottom:4px;
+  font-size:0.8rem;
+  align-items:baseline;
+}
+.detail-label{
+  font-family:'Playfair Display',serif;
+  font-size:0.65rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  min-width:70px;
+  flex-shrink:0;
+}
+.detail-val{color:var(--ink2);line-height:1.4}
+.special-text{
+  color:var(--red);
+  font-style:italic;
+}
+.newbie-tip{
+  margin-top:8px;
+  padding:7px 10px;
+  background:var(--bg3);
+  border-left:2px solid var(--red);
+  font-size:0.76rem;
+  color:var(--muted);
+  line-height:1.45;
+  font-style:italic;
+}
+.newbie-tip strong{color:var(--ink);font-style:normal}
+
+/* ── HIDDEN / FILTERED ── */
+.monster-card.hidden{display:none}
+
+/* ── EMPTY STATE ── */
+.no-results{
+  font-style:italic;
+  color:var(--muted);
+  padding:24px 0;
+  font-size:0.9rem;
+}
+
+/* ── DANGER LEGEND ── */
+.legend{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:28px;
+  padding:12px 16px;
+  background:var(--bg2);
+  border:1px solid var(--rule);
+  font-size:0.75rem;
+  align-items:center;
+}
+.legend-label{
+  font-family:'Playfair Display',serif;
+  font-size:0.65rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-right:4px;
+}
+.leg-item{display:flex;align-items:center;gap:5px}
+
+/* ── HIERARCHY BOX ── */
+.hierarchy-box{
+  margin-bottom:28px;
+  padding:14px 16px;
+  border:1px solid var(--rule);
+  background:var(--bg2);
+}
+.hierarchy-title{
+  font-family:'Playfair Display',serif;
+  font-size:0.65rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--red);
+  margin-bottom:8px;
+}
+.hierarchy-chain{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px;
+  font-size:0.8rem;
+}
+.hc-item{
+  padding:3px 10px;
+  border:1px solid var(--rule);
+  background:var(--bg);
+  font-family:'Playfair Display',serif;
+  font-size:0.78rem;
+}
+.hc-arrow{color:var(--muted);font-size:0.75rem}
+
+@media(max-width:600px){
+  .monster-grid{grid-template-columns:1fr}
+  .site-header{flex-direction:column}
+  .header-right{align-items:flex-start}
+  .legend{gap:8px}
+}
+
+/* ── PRINT ── */
+@media print{
+  .search-bar,.filter-group,.header-right{display:none!important}
+  .monster-card{page-break-inside:avoid;border:1px solid #ccc}
+  .card-detail{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<header class="site-header">
+  <div class="header-left">
+    <h1>B/X Monster Reference</h1>
+    <div class="subtitle">Moldvay Basic / Old School Essentials · All 68 Monsters Categorized</div>
+  </div>
+  <div class="header-right">
+    <a class="btn" href="bx_character_generator.html">⚔ Character Generator</a>
+    <button class="btn outline" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
+
+<!-- SEARCH & FILTER -->
+<div class="search-bar">
+  <input class="search-input" type="text" id="search" placeholder="Search monsters…" oninput="filterAll()">
+  <div class="filter-group">
+    <span style="font-size:0.72rem;color:var(--muted);align-self:center;white-space:nowrap">Filter danger:</span>
+    <button class="filter-btn f-trivial" onclick="toggleFilter('trivial',this)">Trivial</button>
+    <button class="filter-btn f-easy" onclick="toggleFilter('easy',this)">Easy</button>
+    <button class="filter-btn f-moderate" onclick="toggleFilter('moderate',this)">Moderate</button>
+    <button class="filter-btn f-tough" onclick="toggleFilter('tough',this)">Tough</button>
+    <button class="filter-btn f-deadly" onclick="toggleFilter('deadly',this)">Deadly</button>
+    <button class="filter-btn" onclick="clearFilters()" style="margin-left:4px">✕ Clear</button>
+  </div>
+  <span class="result-count" id="result-count"></span>
+</div>
+
+<!-- DANGER LEGEND -->
+<div class="legend">
+  <span class="legend-label">Danger:</span>
+  <span class="leg-item"><span class="danger-tag d-trivial">Trivial</span>&nbsp; &lt;1 HD</span>
+  <span class="leg-item"><span class="danger-tag d-easy">Easy</span>&nbsp; 1–2 HD</span>
+  <span class="leg-item"><span class="danger-tag d-moderate">Moderate</span>&nbsp; 2–4 HD</span>
+  <span class="leg-item"><span class="danger-tag d-tough">Tough</span>&nbsp; 4–6 HD</span>
+  <span class="leg-item"><span class="danger-tag d-deadly">Deadly</span>&nbsp; 6+ HD or special kill</span>
+  <span class="leg-item"><span class="warn-tag">⚠ Special</span>&nbsp; Bypasses normal survival</span>
+  <span style="font-size:0.72rem;color:var(--muted);margin-left:auto;font-style:italic">Click any card to expand</span>
+</div>
+
+<div id="monster-list">
+
+<!-- ══════════════════════════════════════════════════════
+     CATEGORY 1: FACTIONS & SOCIETIES
+══════════════════════════════════════════════════════ -->
+<div class="category" data-cat="1">
+  <div class="cat-header">
+    <span class="cat-number">Category I</span>
+    <span class="cat-title">Factions &amp; Societies</span>
+    <span class="cat-subtitle">The "Who"</span>
+  </div>
+  <div class="cat-tip">
+    <strong>For world-builders:</strong> These are the beings that form tribes, guilds, courts, and settlements. They have leaders, motivations, and internal politics. Every one of these can be talked to, traded with, manipulated, or fought as part of an organized force. <strong>Start here when designing the social layer of your world.</strong>
+  </div>
+
+  <!-- The Civilized -->
+  <div class="subcat">
+    <div class="subcat-title">The Civilized</div>
+    <div class="monster-grid" id="grid-civilized"></div>
+  </div>
+
+  <!-- Outlaws & Tribes -->
+  <div class="subcat">
+    <div class="subcat-title">Outlaws &amp; Tribes</div>
+    <div class="monster-grid" id="grid-outlaws"></div>
+  </div>
+
+  <!-- Humanoid Threat -->
+  <div class="subcat">
+    <div class="subcat-title">The Humanoid Threat</div>
+    <div class="hierarchy-box">
+      <div class="hierarchy-title">Power Hierarchy — weakest to strongest</div>
+      <div class="hierarchy-chain">
+        <span class="hc-item">Kobold</span><span class="hc-arrow">→</span>
+        <span class="hc-item">Goblin</span><span class="hc-arrow">→</span>
+        <span class="hc-item">Hobgoblin</span><span class="hc-arrow">→</span>
+        <span class="hc-item">Gnoll</span><span class="hc-arrow">→</span>
+        <span class="hc-item">Bugbear</span><span class="hc-arrow">→</span>
+        <span class="hc-item">Ogre</span><span class="hc-arrow">→</span>
+        <span class="hc-item" style="border-color:var(--red);color:var(--red)">Lizard Man / Troglodyte ✦ regional variant</span>
+      </div>
+      <div style="font-size:0.74rem;color:var(--muted);margin-top:8px;font-style:italic">
+        A classic dungeon stacks these by level: Kobolds on floor 1, terrorized by Goblins on floor 2, who answer to Hobgoblins, who pay tribute to a Bugbear chief. Each descent is harder <em>and has a reason to be</em>.
+      </div>
+    </div>
+    <div class="monster-grid" id="grid-humanoid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     CATEGORY 2: WILDERNESS & BEASTS
+══════════════════════════════════════════════════════ -->
+<div class="category" data-cat="2">
+  <div class="cat-header">
+    <span class="cat-number">Category II</span>
+    <span class="cat-title">The Wilderness &amp; Beasts</span>
+    <span class="cat-subtitle">The "Outside"</span>
+  </div>
+  <div class="cat-tip">
+    <strong>For world-builders:</strong> These creatures are driven by instinct, hunger, and territory — not ideology. They form the backbone of overland random encounter tables and define what the wilderness <em>feels</em> like to travel through. <strong>Use these to make the journey dangerous, not just the destination.</strong>
+  </div>
+
+  <div class="subcat">
+    <div class="subcat-title">Normal Animals</div>
+    <div class="monster-grid" id="grid-animals"></div>
+  </div>
+  <div class="subcat">
+    <div class="subcat-title">Giant Fauna</div>
+    <div class="monster-grid" id="grid-giant"></div>
+  </div>
+  <div class="subcat">
+    <div class="subcat-title">Swarmers &amp; Pests</div>
+    <div class="monster-grid" id="grid-swarm"></div>
+  </div>
+  <div class="subcat">
+    <div class="subcat-title">Primal Beasts</div>
+    <div class="monster-grid" id="grid-primal"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     CATEGORY 3: DUNGEON TERRORS
+══════════════════════════════════════════════════════ -->
+<div class="category" data-cat="3">
+  <div class="cat-header">
+    <span class="cat-number">Category III</span>
+    <span class="cat-title">Dungeon Terrors &amp; Magical Weirdness</span>
+    <span class="cat-subtitle">The "Deep Dark"</span>
+  </div>
+  <div class="cat-tip">
+    <strong>For world-builders:</strong> The bizarre, the magical, and the unnatural. When stocking a dungeon you reach here for a specific puzzle, a trap with legs, or a terrifying boss. Many of these creatures exist nowhere else — they <em>are</em> the dungeon. <strong>Use these sparingly; each one should feel like an event.</strong>
+  </div>
+
+  <div class="subcat">
+    <div class="subcat-title">Oozes &amp; Hazards — "Dungeon Cleaners"</div>
+    <div class="monster-grid" id="grid-ooze"></div>
+  </div>
+  <div class="subcat">
+    <div class="subcat-title">The Mythic &amp; Magical</div>
+    <div class="monster-grid" id="grid-mythic"></div>
+  </div>
+  <div class="subcat">
+    <div class="subcat-title">The Fae</div>
+    <div class="monster-grid" id="grid-fae"></div>
+  </div>
+  <div class="subcat">
+    <div class="subcat-title">Parasites &amp; Drainers</div>
+    <div class="monster-grid" id="grid-drain"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     CATEGORY 4: THE UNDEAD
+══════════════════════════════════════════════════════ -->
+<div class="category" data-cat="4">
+  <div class="cat-header">
+    <span class="cat-number">Category IV</span>
+    <span class="cat-title">The Undead</span>
+    <span class="cat-subtitle">The "Restless"</span>
+  </div>
+  <div class="cat-tip">
+    <strong>For world-builders:</strong> The undead interact with unique game mechanics — specifically the Cleric's <em>Turn Undead</em> ability — and instantly establish a gothic, death-haunted tone for tombs, crypts, and cursed ruins. <strong>A party with no Cleric should fear these encounters.</strong> Note that Wight causes permanent level drain — this is one of the most dangerous abilities in the game regardless of HD.
+  </div>
+  <div class="monster-grid" id="grid-undead"></div>
+</div>
+
+</div><!-- #monster-list -->
+</div><!-- .wrapper -->
+
+<script>
+// ═══════════════════════════════════════════════
+//  MONSTER DATA
+// ═══════════════════════════════════════════════
+// Fields: name, hd, ac, move, attacks, damage, special, danger, warn, tip, grid
+// danger: trivial | easy | moderate | tough | deadly
+// warn: short warning string (shown as red badge) or null
+// tip: newbie referee tip
+
+const MONSTERS=[
+
+// ── CIVILIZED ──────────────────────────────────
+{name:'Acolyte',         hd:'1',    ac:'9',  move:"60'",  attacks:'1',    damage:'1d6',          special:'1st-level Cleric spells; travels in groups of 2–8 led by a higher-level priest.',                                                       danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> wandering clerics, cult members, servants of a temple. Their leader (a Patriarch) is far more dangerous — treat a group as a social encounter first.',  grid:'civilized'},
+{name:'Dwarf',           hd:'1',    ac:'4',  move:"60'",  attacks:'1',    damage:'1d8',          special:'Infravision 60\'. Detects stonework tricks on 2-in-6. +4 saves vs. magic/poison. Sturdy fighters in good armour.',                     danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> mercenaries, smiths, mine owners, grudge-holders. Dwarves remember every slight. A dwarven NPC can be a recurring ally or a long-term plot hook.',          grid:'civilized'},
+{name:'Elf',             hd:'1+1',  ac:'5',  move:"60'",  attacks:'1',    damage:'1d8',          special:'Infravision 60\'. 2-in-6 detects secret doors. Immune to ghoul paralysis. 1st-level MU spells. Group has mages (2nd–4th level).',     danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> forest sentinels, ancient advisors, haughty nobles. Elf NPCs often hold long memories of ancient wrongs — ideal for feeding history into your world.',      grid:'civilized'},
+{name:'Gnome',           hd:'1',    ac:'5',  move:"60'",  attacks:'1',    damage:'1d6',          special:'Infravision 90\'. Detect underground hazards (as Dwarf). +4 saves vs. magic. Leaders are 2nd–4th level Clerics or MUs.',               danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> tinkerers, illusionists, underground villagers. Gnomes bridge the gap between Dwarves (miners) and Fae (magical). Useful for quirky, non-threatening wilderness settlements.', grid:'civilized'},
+{name:'Halfling',        hd:'1-1',  ac:'7',  move:"90'",  attacks:'1',    damage:'1d6',          special:'+1 to all missile attacks. Nearly invisible outdoors. Leaders are 4th–7th level Fighters. +4 saves vs. magic/poison.',                  danger:'trivial',  warn:null,            tip:'<strong>Use as:</strong> shire-folk, scouts, or surprisingly dangerous ambushers. A halfling village might hire adventurers to deal with a Goblin problem — classic first adventure hook.',  grid:'civilized'},
+{name:'Medium',          hd:'1',    ac:'9',  move:"60'",  attacks:'1',    damage:'1d6',          special:'1st-level Magic-User spells. Travelling fortune-teller or hedge wizard. Found in groups with bodyguards.',                              danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> a wandering sage, mysterious hermit, or shady alchemist. The Medium is the face of low-level arcane power in the civilized world.',                            grid:'civilized'},
+{name:'Noble',           hd:'3',    ac:'2',  move:"60'",  attacks:'1',    damage:'1d8',          special:'Always accompanied by 2d6 Veteran guards and 1d6 servants. Has political leverage and wealth.',                                         danger:'moderate', warn:null,            tip:'<strong>Use as:</strong> quest-givers, obstacles, or patrons. Killing a Noble has political consequences. Their guards are the real danger.',                                           grid:'civilized'},
+{name:'Normal Human',    hd:'1-1',  ac:'9',  move:"60'",  attacks:'1',    damage:'1d6',          special:'No special abilities. The baseline measure of all danger in the game — everything scarier than this is measured against it.',            danger:'trivial',  warn:null,            tip:'<strong>Use as:</strong> villagers, servants, farmers, prisoners. Their fragility is the point — it communicates stakes. A village of Normal Humans in danger is a reason to care.',     grid:'civilized'},
+{name:'NPC Party',       hd:'Varies',ac:'Varies',move:"60'",attacks:'Varies',damage:'Varies',   special:'A full adventuring party (Fighter, Cleric, Thief, MU). Could be allies, rivals, or mercenaries. Use PC class rules.',                   danger:'tough',    warn:null,            tip:'<strong>Use as:</strong> rivals who loot the dungeon before your party, potential hirelings, or desperate enemies. Nothing teaches players about the world like meeting themselves.',   grid:'civilized'},
+{name:'Trader',          hd:'1',    ac:'6',  move:"60'",  attacks:'1',    damage:'1d6',          special:'Travels with 1d8 guards (Veterans). Carries trade goods and information. May fence unusual items.',                                     danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> mobile shop, information broker, or hook delivery system. A Trader passing through is the classic way to introduce a distant rumour or a wanted poster.',      grid:'civilized'},
+{name:'Veteran',         hd:'1–3',  ac:'2',  move:"60'",  attacks:'1',    damage:'1d8',          special:'Experienced fighter 1st–3rd level. Plate mail and sword standard. Often acts as guard or caravan escort.',                              danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> town guards, caravan escorts, retired adventurers. Veterans give the world texture — not every armed person needs to be the party\'s enemy.',               grid:'civilized'},
+
+// ── OUTLAWS ──────────────────────────────────
+{name:'Bandit',          hd:'1',    ac:'6',  move:"60'",  attacks:'1',    damage:'1d6',          special:'Often surprise on 1–2. Led by a Fighter (4th–7th level). Prefer ambush tactics. May demand toll rather than fight.',                   danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> toll collectors, wilderness hazards, or morally grey recruits. Bandits often have a cause — a dispossessed lord, a war veteran, a cult. Give them a reason.',  grid:'outlaws'},
+{name:'Berserker',       hd:'1+1',  ac:'7',  move:"60'",  attacks:'1',    damage:'1d8',          special:'+2 to all attack rolls. Fight to the death — never check morale. In battle-rage: cannot be reasoned with. Dangerous in large numbers.', danger:'easy',     warn:'⚠ Berserk',     tip:'<strong>Use as:</strong> a shock-troops encounter or a ticking time bomb in a social situation. Berserkers that aren\'t attacking are either restrained or about to stop being restrained.',grid:'outlaws'},
+{name:'Neanderthal',     hd:'2',    ac:'8',  move:"60'",  attacks:'1',    damage:'2d4',          special:'Throw rocks (1d6, range 60\'). Deeply fear fire — morale check when fire is used. Primitive but not stupid; deeply superstitious.',     danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> pre-human inhabitants of lost valleys, dungeon sub-levels, or frozen wastes. A Neanderthal tribe can be a tragic encounter — they\'re people, just older.',   grid:'outlaws'},
+
+// ── HUMANOID THREAT ──────────────────────────
+{name:'Bugbear',         hd:'3+1',  ac:'5',  move:"60'",  attacks:'1',    damage:'2d4',          special:'Surprise on 1–3 on d6 (unusually quiet for their size). Leaders are 5 HD. Cruel and cunning — use Goblins as cannon fodder.',          danger:'moderate', warn:null,            tip:'<strong>Use as:</strong> mid-level dungeon lords, Goblin-tribe enforcers, or the thing that the Goblins are scared of. A Bugbear lair on level 2 tells players the dungeon gets worse.',  grid:'humanoid'},
+{name:'Gnoll',           hd:'2',    ac:'5',  move:"60'",  attacks:'1',    damage:'2d4',          special:'Hyena-like humanoids. Form warbands. Leaders are 3 HD. Aggressive, greedy. Often mercenaries for larger evil forces.',                  danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> marauders, caravan raiders, or hired muscle. Gnolls fight for profit — they can be bribed or turned against their employer.',                                 grid:'humanoid'},
+{name:'Goblin',          hd:'1-1',  ac:'6',  move:"60'",  attacks:'1',    damage:'1d6',          special:'−1 to attack in bright sunlight. Infravision 90\'. Kings are 3 HD. Cowardly alone, dangerous in swarms. Usually led by a Hobgoblin.', danger:'trivial',  warn:null,            tip:'<strong>Use as:</strong> dungeon level 1 staples, a never-ending threat, comic relief that can still kill you. Goblins are the \'starter\' monster that teaches players to take all threats seriously.', grid:'humanoid'},
+{name:'Hobgoblin',       hd:'1+1',  ac:'6',  move:"60'",  attacks:'1',    damage:'1d8',          special:'Infravision 60\'. Disciplined military structure. Kings are 4 HD. Use organized tactics, not just swarming.',                           danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> soldiers, garrison troops, or the military arm of a larger humanoid empire. Hobgoblins feel like a real army, not a mob.',                                     grid:'humanoid'},
+{name:'Kobold',          hd:'½',    ac:'7',  move:"60'",  attacks:'1',    damage:'1d4',          special:'−1 to attack in bright light. Infravision 90\'. Chiefs are 2 HD. Set cunning traps. Very cowardly — flee when losing.',               danger:'trivial',  warn:null,            tip:'<strong>Use as:</strong> trap-layers, nuisances, or a starter dungeon encounter. Kobold warrens reward careful exploration over rushing — perfect for teaching dungeon procedure.',   grid:'humanoid'},
+{name:'Lizard Man',      hd:'2+1',  ac:'5',  move:"60'/90'swim",attacks:'3',damage:'1d3/1d3/1d6',special:'Claw/claw/bite. Excellent swimmers. Semi-intelligent tribal society. Worship water spirits. Found near swamps, coasts, rivers.',      danger:'moderate', warn:null,            tip:'<strong>Use as:</strong> a swamp or coastal faction with their own territory and grievances. Lizard Men may be defending their ancestral waters — not just mindless killers.',          grid:'humanoid'},
+{name:'Ogre',            hd:'4+1',  ac:'5',  move:"60'",  attacks:'1',    damage:'1d10',         special:'Throw boulders (1d10, range 30\'). Stupid but cunning enough to demand tribute. Love gold and food.',                                  danger:'tough',    warn:null,            tip:'<strong>Use as:</strong> a bridge troll, a dungeon bully extorting weaker monsters, or hired muscle for a smarter villain. Ogres make great \'boss of level 2\' encounters.',        grid:'humanoid'},
+{name:'Troglodyte',      hd:'2',    ac:'5',  move:"60'",  attacks:'3',    damage:'1d4/1d4/1d4',  special:'Stench: all within 10\' must save vs. Poison or −2 to all attacks. Chameleon skin: surprise on 1–4. Infravision 90\'.',               danger:'easy',     warn:'⚠ Stench',      tip:'<strong>Use as:</strong> an underground regional faction different from Goblins. Their stench mechanic makes them memorable — groups that don\'t prepare will suffer.',               grid:'humanoid'},
+
+// ── NORMAL ANIMALS ────────────────────────────
+{name:'Bat',             hd:'1',    ac:'9',  move:"9'/180'fly",attacks:'1',damage:'1d2',         special:'Attacks cause confusion (−2 to hit) unless save vs. Paralysis. Swarms of 10d10 possible. Mostly harmless alone.',                     danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> ambient dungeon hazard or wandering encounter. A large colony in a cave can force a retreat more effectively than a monster fight.',                          grid:'animals'},
+{name:'Bear',            hd:'5',    ac:'6',  move:"90'",  attacks:'3',    damage:'1d3/1d3/1d6',  special:'Bear hug: if both claws hit, additional 2d8 crush damage. Brown or polar varies. Territorial, not aggressive if unprovoked.',           danger:'tough',    warn:null,            tip:'<strong>Use as:</strong> a wilderness guardian or a dungeon-level apex predator. Bears teach parties to consider retreat — the hug can instantly drop a lightly armoured PC.',       grid:'animals'},
+{name:'Boar',            hd:'3',    ac:'7',  move:"150'", attacks:'1',    damage:'2d4',          special:'Continues attacking below 0 HP until dead — does not fall when reduced to 0. Extremely aggressive when cornered.',                     danger:'moderate', warn:'⚠ Fights at 0 HP',tip:'<strong>Use as:</strong> a forest hazard or hunting-gone-wrong encounter. The "continues at 0 HP" rule needs to be demonstrated once to be memorable forever.',                        grid:'animals'},
+{name:'Cat, Great',      hd:'3+2',  ac:'6',  move:"150'", attacks:'3',    damage:'1d4/1d4/1d8',  special:'Surprise on 1–4 on d6. Mountain lion, leopard, tiger type. Very fast — often acts before party can respond.',                          danger:'moderate', warn:null,            tip:'<strong>Use as:</strong> a stalking wilderness threat. The Great Cat rarely attacks a full party; it picks isolated stragglers — use it to punish poor marching order.',               grid:'animals'},
+{name:'Mule',            hd:'2',    ac:'7',  move:"120'", attacks:'1',    damage:'1d4',          special:'Stubborn: 2-in-6 chance to refuse to enter dungeon, cross water, or move toward fire. Carries 2,000 coins. Kicks when startled.',      danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> a party resource, not a monster. But a stubborn mule at a critical moment is a memorable \'encounter\' that costs time and makes noise.',                    grid:'animals'},
+{name:'Rat',             hd:'½',    ac:'9',  move:"60'/120'swim",attacks:'1',damage:'1d3',       special:'Disease on hit: save vs. Poison or contract a random illness. Giant rats (1 HD) are significantly larger and bolder.',               danger:'trivial',  warn:'⚠ Disease',     tip:'<strong>Use as:</strong> a low-level resource drain (disease) and an ambient dungeon presence. Rats that flee signal something worse is nearby.',                                      grid:'animals'},
+{name:'Snake',           hd:'½–4',  ac:'6–8',move:"60'–90'",attacks:'1', damage:'1d4–1d8',      special:'Poison varies by species (most cause death or damage). Constrictor types deal automatic damage each round after hit.',                  danger:'moderate', warn:'⚠ Poison',      tip:'<strong>Use as:</strong> a trap-companion (pit with snakes), a swamp hazard, or a cave denizen. Poison forces parties to carry antitoxin — or regret it.',                          grid:'animals'},
+
+// ── GIANT FAUNA ────────────────────────────────
+{name:'Beetle, Giant (Oil)',   hd:'2',  ac:'4',  move:"120'",attacks:'1',  damage:'2d4',         special:'Squirts black oil: 10\' range, save vs. Death or blinded 1d4 hours. Sought by alchemists.',                                           danger:'easy',     warn:'⚠ Blinding oil',tip:'<strong>Use as:</strong> a dungeon-level hazard that punishes combat at range. The oil is a plot hook too — alchemists will pay well for live specimens.',                            grid:'giant'},
+{name:'Beetle, Giant (Fire)',  hd:'1+2',ac:'4',  move:"120'",attacks:'1',  damage:'2d4',         special:'Two glowing glands above eyes and near abdomen. Glands shed light 10\' radius for 1d6 days after beetle dies. Prized by miners.',      danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> a low-level encounter that rewards cleverness. Killing beetles for their glands is a classic B/X resource-management puzzle.',                                grid:'giant'},
+{name:'Beetle, Giant (Tiger)', hd:'3+1',ac:'3',  move:"150'",attacks:'1',  damage:'2d6',         special:'Fastest beetle variant. Aggressive. No special ability but sheer toughness and speed make it dangerous.',                             danger:'moderate', warn:null,            tip:'<strong>Use as:</strong> a strong random encounter for mid-level wilderness. Their speed means the party cannot easily retreat.',                                                        grid:'giant'},
+{name:'Centipede, Giant',      hd:'½',  ac:'9',  move:"60'", attacks:'1',  damage:'—',           special:'Bite: save vs. Poison or lose 1d4 STR (restored next day). Does no HP damage directly — the stat drain is the danger.',              danger:'trivial',  warn:'⚠ STR drain',   tip:'<strong>Use as:</strong> a dungeon vermin hazard that drains resources without killing. A weakened STR changes what the party can carry and fight for a whole session.',            grid:'giant'},
+{name:'Driver Ant',            hd:'4',  ac:'3',  move:"180'",attacks:'1',  damage:'2d6',         special:'Never stop attacking — ignore morale, fight to the death. A colony of 100–400 ants. The entire colony attacks if lair is disturbed.',  danger:'tough',    warn:'⚠ Colony attack',tip:'<strong>Use as:</strong> a catastrophic environmental hazard rather than a standard fight. A Driver Ant column should be avoided, diverted, or fled — not fought head-on.',          grid:'giant'},
+{name:'Ferret, Giant',         hd:'1+1',ac:'5',  move:"150'",attacks:'1',  damage:'1d8',         special:'Attach on hit and automatically deal 1d8 each round until killed. Used by some demi-humans as hunting animals.',                       danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> a dungeon pest or someone\'s escaped "pet." The auto-damage attachment mechanic is simple but effective at creating urgency.',                              grid:'giant'},
+{name:'Lizard, Giant (Draco)', hd:'4+2',ac:'5',  move:"120'",attacks:'3',  damage:'1d4/1d4/1d10',special:'Can glide 200\' from high point. Fin-winged. Claw/claw/bite attack pattern.',                                                       danger:'tough',    warn:null,            tip:'<strong>Use as:</strong> a cliff-dwelling or tower-top predator. The glide ability means fleeing downhill or off a balcony can put you right in its flight path.',                   grid:'giant'},
+{name:'Lizard, Giant (Horned)',hd:'5',  ac:'4',  move:"120'",attacks:'3',  damage:'1d4/1d4/1d8+1',special:'Spits blood at eyes: range 10\', save vs. Wands or blind for 1d4 rounds.',                                                           danger:'tough',    warn:'⚠ Blood spit',  tip:'<strong>Use as:</strong> a desert or badlands guardian. The blood-spit targets the front-line fighter\'s ability to fight effectively.',                                            grid:'giant'},
+{name:'Lizard, Giant (Tuatara)',hd:'6', ac:'4',  move:"90'", attacks:'3',  damage:'1d4/1d4/2d6', special:'Infravision 90\'. Ancient, almost supernatural. Claw/claw/fierce bite. Very slow to anger but implacable once fighting.',              danger:'tough',    warn:null,            tip:'<strong>Use as:</strong> a primordial guardian of a sacred site. A Tuatara that chooses not to attack is an omen — one that attacks is a crisis.',                                  grid:'giant'},
+{name:'Robber Fly',            hd:'2',  ac:'6',  move:"30'/180'fly",attacks:'1',damage:'1d8',    special:'Surprise on 1–4 (mimics bumblebee colouring). Dive-attacks from above. Fast flier — difficult to outrun.',                           danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> an aerial wilderness hazard in summer or tropical regions. The mimicry surprise element punishes parties that don\'t scan overhead.',                         grid:'giant'},
+{name:'Shrew, Giant',          hd:'1',  ac:'4',  move:"180'",attacks:'2',  damage:'1d6/1d6',     special:'Causes fear in horses and mules (morale check). Never checks morale itself. Moves before anything else in initiative.',                danger:'easy',     warn:'⚠ Fear (mounts)',tip:'<strong>Use as:</strong> a mounted-party nightmare. A single Shrew that routes the pack animals is more dangerous than one that injures a character.',                                 grid:'giant'},
+{name:'Spider, Giant (Crab)',  hd:'2+2',ac:'7',  move:"120'",attacks:'1',  damage:'1d8',         special:'Poison: save vs. Poison or die in 1d4 days (delayed). Nearly transparent in webs — surprise on 1–4.',                               danger:'moderate', warn:'⚠ Delayed death',tip:'<strong>Use as:</strong> a web-room encounter. The delayed death poison is nasty: the party may not realize someone is dying until they\'re a day\'s travel from town.',            grid:'giant'},
+{name:'Spider, Giant (Black Widow)',hd:'3',ac:'6',move:"60'/120'web",attacks:'1',damage:'2d6',  special:'Poison: save vs. Poison or die. Web: as Hold Person spell. Web is flammable.',                                                         danger:'moderate', warn:'⚠ Deadly poison', tip:'<strong>Use as:</strong> the classic dungeon web-room. Fire is the counter — but it also burns the web the party might need as rope.',                                             grid:'giant'},
+{name:'Spider, Giant (Tarantella)',hd:'4',ac:'5',move:"120'",attacks:'1', damage:'1d8',          special:'Poison: save vs. Poison or involuntary dancing for 2d6 turns. Watchers must save or also dance (suggestion effect). Exhausting.',      danger:'tough',    warn:'⚠ Dance poison', tip:'<strong>Use as:</strong> a chaos encounter. Dancing characters are helpless in combat. Multiple saves cascade — this can wipe out a whole party through laughter.',                  grid:'giant'},
+
+// ── SWARMERS ───────────────────────────────────
+{name:'Cave Locust',     hd:'2',    ac:'4',  move:"60'/180'fly",attacks:'1',damage:'1d2',        special:'Shriek when disturbed: attracts 1d6 wandering monsters on 1–2 on d6. Spit: save vs. Poison or blinded 1d4 turns.',                  danger:'easy',     warn:'⚠ Shriek/Spit',  tip:'<strong>Use as:</strong> an alarm system. The real danger is what they summon, not what they deal. Cave Locusts in a dungeon section mean every fight risks escalation.',           grid:'swarm'},
+{name:'Insect Swarm',    hd:'2',    ac:'7',  move:"30'",  attacks:'special',damage:'2/round',    special:'Auto-hits anything in 10\' radius. Torch repels. All actions in swarm at −4. Destroyed by fire or fleeing the area.',                danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> an environmental hazard layered onto another encounter. Fighting anything difficult while also taking 2/round is a harsh lesson in prioritization.',          grid:'swarm'},
+{name:'Killer Bee',      hd:'½',    ac:'7',  move:"150'fly",attacks:'1',   damage:'1d3',         special:'Poison: save vs. Poison or die. Bee dies after stinging. Hive of 5d6 × 10 bees. 5% chance of exceptional honey (worth 50 gp/jug).',  danger:'trivial',  warn:'⚠ Deadly poison', tip:'<strong>Use as:</strong> a swarm that punishes low saves. Single bee: trivial. Forty bees: lethal. The honey loot is a classic risk/reward hook for greedy players.',               grid:'swarm'},
+
+// ── PRIMAL BEASTS ─────────────────────────────
+{name:'Ape, White',      hd:'4',    ac:'6',  move:"120'", attacks:'2',    damage:'1d4/1d4',      special:'Hurls rocks for 1d6 damage. Strong arms — can rip doors off hinges. Territorial but not aggressive unless approached.',               danger:'tough',    warn:null,            tip:'<strong>Use as:</strong> a dungeon-living relic of an older world, or a jungle apex predator. White Apes are lonely and territorial — they can be avoided with care.',              grid:'primal'},
+{name:'Rock Baboon',     hd:'2',    ac:'6',  move:"120'", attacks:'2',    damage:'1d3/1d6',      special:'Never use fire or tools. Fight to the death in their lair. Attack in packs. Troop leader is 3 HD.',                                   danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> a social-structure encounter. A baboon troop has a hierarchy — defeat the leader and the rest may scatter.',                                                grid:'primal'},
+
+// ── OOZES ──────────────────────────────────────
+{name:'Gelatinous Cube', hd:'4',    ac:'8',  move:"60'",  attacks:'1',    damage:'2d4',          special:'Paralysis on hit (save vs. Paralysis or frozen 2d4 turns). Transparent — surprise on 1–4. Immune to lightning, cold, fear, polymorph. Carries any treasure of its victims.',danger:'tough',warn:'⚠ Paralysis/Transparent',tip:'<strong>Use as:</strong> a dungeon-corridor cleaner that has swallowed previous explorers\' gear. The paralysis + transparency combo is lethal the first time a party meets one.',  grid:'ooze'},
+{name:'Gray Ooze',       hd:'3',    ac:'8',  move:"10'",  attacks:'1',    damage:'2d8',          special:'Destroys metal armour/weapons on hit (save vs. Wands or item is eaten). Immune to all spells, fire, and cold. Almost indistinguishable from wet stone.',danger:'moderate',warn:'⚠ Destroys metal',tip:'<strong>Use as:</strong> a nightmare for armoured fighters. Gray Ooze that eats a sword mid-combat is a session-defining moment that changes gear priorities forever.',    grid:'ooze'},
+{name:'Green Slime',     hd:'2',    ac:'—',  move:"3'",   attacks:'special',damage:'see special', special:'Contact turns flesh to Green Slime in 1d4 rounds (no save). Only cure: fire, cold, or Cure Disease spell. Clings from above. Dissolves wood and metal.',danger:'moderate',warn:'⚠ Lethal on contact',tip:'<strong>Use as:</strong> a ceiling hazard and a lesson in looking up. Green Slime falling on a character creates a ticking clock that changes the entire session.',   grid:'ooze'},
+{name:'Ochre Jelly',     hd:'5',    ac:'8',  move:"30'",  attacks:'1',    damage:'2d6',          special:'Immune to lightning (splits into 1d4 smaller jellies, 2 HD each). Weapons split it too. Only fire and cold truly kill it. Dissolves wood.',danger:'tough',warn:'⚠ Splits on hit', tip:'<strong>Use as:</strong> a puzzle monster. Players who discover the \'fire only\' rule have learned something that helps them for the rest of the campaign.',                        grid:'ooze'},
+{name:'Shrieker',        hd:'3',    ac:'7',  move:"9'",   attacks:'none', damage:'—',            special:'Screams when light (30\') or movement (10\') detected. Scream lasts 1d3 rounds. Each round: 50% chance of wandering monster.',        danger:'moderate', warn:'⚠ Alarm',        tip:'<strong>Use as:</strong> the dungeon\'s alarm bell. A room with a Shrieker is a puzzle, not a fight — how do you remove it without screaming?',                                     grid:'ooze'},
+{name:'Yellow Mold',     hd:'—',    ac:'—',  move:"—",    attacks:'special',damage:'1d6 + spores',special:'Contact: 1d6 damage + cloud of spores (save vs. Death or die in 1d4 rounds). Fire kills it. Only fire. Cannot be hit by weapons.',  danger:'deadly',   warn:'⚠ SPORE DEATH',  tip:'<strong>Use as:</strong> the definitive "look before you touch" lesson. Yellow Mold should be encountered once, respected forever after. Fire is the answer, but fire causes noise.',  grid:'ooze'},
+
+// ── MYTHIC ─────────────────────────────────────
+{name:'Doppleganger',    hd:'4',    ac:'5',  move:"90'",  attacks:'1',    damage:'1d12',         special:'Can perfectly mimic any humanoid 5\' away. Immune to sleep and charm. Surprised only on 1. Detects thoughts. A single Doppleganger can impersonate any party member.',danger:'tough',warn:'⚠ Shapechanger', tip:'<strong>Use as:</strong> a paranoia encounter. Once players know a Doppleganger is loose, they distrust everything. Even after it\'s killed.',                                   grid:'mythic'},
+{name:'Dragon',          hd:'6–11', ac:'2',  move:"90'/240'fly",attacks:'3+breath',damage:'1d8/1d8/2d10+breath',special:'Breath weapon (type by colour) deals damage equal to current HP. Spells (some types). Immune to own breath type. Lair contains enormous treasure. Most B/X dragons can talk.',danger:'deadly',warn:'⚠ BOSS MONSTER', tip:'<strong>Use as:</strong> the centrepiece of an entire adventure, not a random encounter. A Dragon should have a name, a motivation, and a history with the region.',      grid:'mythic'},
+{name:'Gargoyle',        hd:'4',    ac:'5',  move:"90'/150'fly",attacks:'4',damage:'1d3/1d3/1d6/1d4',special:'Claw/claw/bite/gore. Only hit by magic weapons. Appear as stone statues — surprise on 1–3. Immune to sleep and charm.',          danger:'tough',    warn:'⚠ Magic weapons only',tip:'<strong>Use as:</strong> the first encounter that teaches the "magic weapons required" lesson. Without a magic weapon, the party can only flee.',                               grid:'mythic'},
+{name:'Harpy',           hd:'3',    ac:'7',  move:"60'/150'fly",attacks:'3',damage:'1d4/1d4/1d6',special:'Charm Song: all who hear must save vs. Spells or move toward Harpy (cannot attack). Then touch charms for 1d6 weeks.',               danger:'moderate', warn:'⚠ Charm song',   tip:'<strong>Use as:</strong> a tactical problem, not just a fight. Charmed party members turn the encounter into chaos. Earplugs, Silence spell, or attacking from maximum range.',    grid:'mythic'},
+{name:'Living Statue (Crystal)',hd:'3',ac:'4',move:"90'",attacks:'2',    damage:'1d6/1d6',       special:'Immune to fire. Absorbs fire spells (healed). Looks exactly like a decorative statue until it attacks.',                               danger:'moderate', warn:null,            tip:'<strong>Use as:</strong> a guardian for a fire-themed dungeon area. The immunity to fire shuts down the party\'s most common magic solution.',                                        grid:'mythic'},
+{name:'Living Statue (Iron)',   hd:'4',ac:'2',move:"30'", attacks:'2',    damage:'1d8/1d8',       special:'Absorbs metal weapons that hit it: weapon is stuck (save vs. Spells to free). Extremely slow. Extremely hard to hurt.',               danger:'tough',    warn:'⚠ Absorbs weapons',tip:'<strong>Use as:</strong> an unstoppable slow guardian. The weapon absorption is devastating — and provides a ticking clock (you will run out of weapons).',                         grid:'mythic'},
+{name:'Living Statue (Rock)',   hd:'5',ac:'4',move:"60'", attacks:'2',    damage:'2d6/2d6',       special:'Shoots two rock fragments per round (1d6 each, 20\' range) in addition to melee attacks. Resembles natural rock formations.',         danger:'tough',    warn:null,            tip:'<strong>Use as:</strong> a ranged/melee combo threat in a cavern. The rock-shooting means the back rank isn\'t safe.',                                                              grid:'mythic'},
+{name:'Lycanthrope',     hd:'4–5',  ac:'4',  move:"120'", attacks:'1',    damage:'2d4',          special:'Only hit by silver or magic weapons. Any character bitten and losing ½+ HP contracts lycanthropy (becomes Lycanthrope at next full moon). Type varies (were-wolf, bear, etc.).',danger:'tough',warn:'⚠ Lycanthropy infection',tip:'<strong>Use as:</strong> a social mystery as much as a combat encounter. Who in town is the Lycanthrope? What happens when a PC is bitten?',                         grid:'mythic'},
+{name:'Medusa',          hd:'4',    ac:'8',  move:"90'",  attacks:'3',    damage:'1d4/1d4/1d6+poison',special:'Gaze: anyone who meets eyes is petrified (save vs. Turn to Stone). Averting eyes: −4 to hit Medusa, she is −4 to hit you. Snake hair bites: poison (save or die). Presence in a dungeon changes how the whole area is explored.',danger:'tough',warn:'⚠ PETRIFY/POISON',tip:'<strong>Use as:</strong> a puzzle encounter. Mirrors, blindfolds, and averted eyes. The Medusa rewards preparation more than combat skill.',                                        grid:'mythic'},
+{name:'Minotaur',        hd:'6',    ac:'6',  move:"120'", attacks:'2',    damage:'1d6/1d6',       special:'Never lost in a maze. Pursues prey relentlessly (morale 12). Gore if charge (2d6). Feared throughout civilizations as a dungeon-guardian.',danger:'tough',warn:null,           tip:'<strong>Use as:</strong> the apex humanoid-beast threat — a dungeon boss or the legendary terror of a labyrinth. A Minotaur that \'isn\'t supposed to be here\' signals real danger.',grid:'mythic'},
+{name:'Owl Bear',        hd:'5',    ac:'5',  move:"120'", attacks:'3',    damage:'1d8/1d8/2d8',  special:'Bear Hug: if both claws hit, automatic 2d8 crush per round until Owl Bear or victim is dead. Extremely aggressive — attacks on sight.', danger:'tough',    warn:'⚠ Crushing hug', tip:'<strong>Use as:</strong> a terrifying wilderness or dungeon predator. The hug mechanic creates a "someone needs to die saving them" moment.',                                       grid:'mythic'},
+{name:'Rust Monster',    hd:'5',    ac:'2',  move:"120'", attacks:'2',    damage:'special',       special:'Touch rusts any metal object (save vs. Wands or weapon/armour is instantly destroyed). Attracted to metal — will pursue even fleeing parties. Non-metal weapons deal normal damage.',danger:'tough',warn:'⚠ DESTROYS EQUIPMENT',tip:'<strong>Use as:</strong> the equipment economy\'s nemesis. A Rust Monster in the dungeon changes everything the party carries and how they fight.',                     grid:'mythic'},
+{name:'Thoul',           hd:'3',    ac:'6',  move:"120'", attacks:'3',    damage:'1d3/1d3/1d3',  special:'Ghoul-like paralysis on hit (save vs. Paralysis). Regenerates 1 HP per round (Troll-like). Only fire or acid prevents regeneration. Hybrid monster unique to B/X.',danger:'moderate',warn:'⚠ Paralysis+Regen',tip:'<strong>Use as:</strong> a mid-level dungeon shock. The combination of paralysis and regeneration means a Thoul that isn\'t burned keeps coming back.',                   grid:'mythic'},
+
+// ── FAE ────────────────────────────────────────
+{name:'Pixie',           hd:'1',    ac:'3',  move:"30'/90'fly",attacks:'1',damage:'1d4',         special:'Permanently invisible until attacking. Carry sleep arrows (save or sleep) and confusion arrows (save vs. Spells or random action). Very mischievous but not inherently evil.',danger:'easy',warn:null,tip:'<strong>Use as:</strong> a wilderness mystery. An invisible Pixie playing tricks creates confusion without combat. They can become allies if treated well.',                    grid:'fae'},
+{name:'Sprite',          hd:'½',    ac:'5',  move:"18'/54'fly",attacks:'1',damage:'1d6',         special:'Can curse any creature it judges evil: random curse effect. Tiny and elusive. Live in forests and react strongly to desecration of nature.',danger:'trivial',warn:null,tip:'<strong>Use as:</strong> a conscience encounter. Sprites don\'t fight, they curse. A party that respects the forest gets a blessing; one that doesn\'t gets a memorable lesson.',              grid:'fae'},
+
+// ── DRAINERS ───────────────────────────────────
+{name:'Stirge',          hd:'1',    ac:'7',  move:"30'/180'fly",attacks:'1',damage:'1d3',        special:'+2 to attack rolls. Attaches on hit: automatically drains 1d3 blood per round until full (4 rounds) or killed. A flock of 10d10 is possible.',danger:'easy',warn:'⚠ Blood drain',tip:'<strong>Use as:</strong> a resource-drain encounter. One Stirge: irritating. Ten Stirge: a party emergency. They\'re most dangerous in an enclosed space where flight is limited.',  grid:'drain'},
+{name:'Shadow',          hd:'2+2',  ac:'7',  move:"90'",  attacks:'1',    damage:'1d4+STR drain',special:'Each hit permanently drains 1 STR (restored after rest). A character reduced to 0 STR becomes a Shadow under the monster\'s control. Only hit by magic weapons. Undead immunities (sleep, charm, hold).',danger:'moderate',warn:'⚠ STR drain/Creates Shadows',tip:'<strong>Use as:</strong> a creeping dread encounter. The STR drain means a party member gets weaker each round — and a dead PC doesn\'t stay dead.',                           grid:'drain'},
+
+// ── UNDEAD ─────────────────────────────────────
+{name:'Ghoul',           hd:'2',    ac:'6',  move:"90'",  attacks:'3',    damage:'1d3/1d3/1d3',  special:'Claw/claw/bite: any hit causes paralysis (save vs. Paralysis; Elves immune). Paralysis lasts 2d4 turns. Undead immunities.',            danger:'easy',     warn:'⚠ Paralysis',    tip:'<strong>Use as:</strong> a mid-tier undead threat whose danger scales with numbers. One Ghoul: manageable. A pack of five Ghouls where paralysis stacks: TPK risk.',              grid:'undead'},
+{name:'Skeleton',        hd:'1',    ac:'7',  move:"60'",  attacks:'1',    damage:'1d6',          special:'Undead immunities: sleep, charm, hold, cold. Mindless — will not retreat, negotiate, or be demoralized. Edged weapons deal minimum damage.',danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> a dungeon staple and a Cleric tutorial. Skeleton encounters teach that fire and blunt weapons matter, and that Clerics are not optional.',                 grid:'undead'},
+{name:'Wight',           hd:'3',    ac:'5',  move:"90'",  attacks:'1',    damage:'Energy drain',  special:'Hit drains 1 experience level permanently (no save). Only magic or silver weapons hit. Slain humans become Wights in 1d4 days. Undead immunities.',danger:'deadly',  warn:'⚠ LEVEL DRAIN',  tip:'<strong>Use as:</strong> a horror encounter. Permanent level drain is the most severe mechanic in B/X — a Wight that hits twice can cripple a PC beyond recovery.',           grid:'undead'},
+{name:'Zombie',          hd:'2',    ac:'8',  move:"60'",  attacks:'1',    damage:'1d8',          special:'Always acts last in every round (no initiative roll). Mindless: no morale, will not retreat. Immune to sleep, charm, hold, cold.',        danger:'easy',     warn:null,            tip:'<strong>Use as:</strong> a predictable, reliable threat that teaches action economy. Zombies always going last means the party gets one free attack every round — but they soak a lot of damage.',grid:'undead'},
+];
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+function dangerClass(d){
+  return{trivial:'d-trivial',easy:'d-easy',moderate:'d-moderate',tough:'d-tough',deadly:'d-deadly'}[d]||'d-easy';
+}
+function dangerLabel(d){
+  return{trivial:'Trivial',easy:'Easy',moderate:'Moderate',tough:'Tough',deadly:'Deadly'}[d]||d;
+}
+
+function buildCard(m){
+  const dc=dangerClass(m.danger);
+  const dl=dangerLabel(m.danger);
+  const warnTag=m.warn?`<span class="warn-tag">${m.warn}</span>`:'';
+  return `<div class="monster-card"
+    data-name="${m.name.toLowerCase()}"
+    data-danger="${m.danger}"
+    data-grid="${m.grid}"
+    onclick="toggleCard(this)">
+    <div class="card-top">
+      <div class="monster-name">${m.name}</div>
+      <div class="card-tags">
+        ${warnTag}
+        <span class="danger-tag ${dc}">${dl}</span>
+      </div>
+    </div>
+    <div class="card-stats">
+      <span class="stat-item">HD <strong>${m.hd}</strong></span>
+      <span class="stat-item">AC <strong>${m.ac}</strong></span>
+      <span class="stat-item">Move <strong>${m.move}</strong></span>
+      <span class="stat-item">Att <strong>${m.attacks}</strong></span>
+      <span class="stat-item">Dmg <strong>${m.damage}</strong></span>
+    </div>
+    <div class="card-detail">
+      <div class="detail-row">
+        <span class="detail-label">Special</span>
+        <span class="detail-val special-text">${m.special}</span>
+      </div>
+      <div class="newbie-tip">⚔ <strong>Referee note:</strong> ${m.tip}</div>
+    </div>
+  </div>`;
+}
+
+function renderAll(){
+  const grids={};
+  MONSTERS.forEach(m=>{
+    if(!grids[m.grid])grids[m.grid]=[];
+    grids[m.grid].push(m);
+  });
+  for(const[id,monsters] of Object.entries(grids)){
+    const el=document.getElementById('grid-'+id);
+    if(el)el.innerHTML=monsters.map(buildCard).join('');
+  }
+  updateCount();
+}
+
+// ═══════════════════════════════════════════════
+//  EXPAND / COLLAPSE
+// ═══════════════════════════════════════════════
+function toggleCard(card){
+  card.classList.toggle('expanded');
+}
+
+// ═══════════════════════════════════════════════
+//  FILTER / SEARCH
+// ═══════════════════════════════════════════════
+let activeFilters=new Set();
+
+function toggleFilter(danger,btn){
+  if(activeFilters.has(danger)){activeFilters.delete(danger);btn.classList.remove('active');}
+  else{activeFilters.add(danger);btn.classList.add('active');}
+  filterAll();
+}
+function clearFilters(){
+  activeFilters.clear();
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('search').value='';
+  filterAll();
+}
+
+function filterAll(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const cards=document.querySelectorAll('.monster-card');
+  cards.forEach(card=>{
+    const nameMatch=!q||card.dataset.name.includes(q);
+    const dangerMatch=activeFilters.size===0||activeFilters.has(card.dataset.danger);
+    card.classList.toggle('hidden',!(nameMatch&&dangerMatch));
+  });
+
+  // Show/hide category and subcat sections based on visible cards
+  document.querySelectorAll('.subcat').forEach(sc=>{
+    const vis=[...sc.querySelectorAll('.monster-card')].some(c=>!c.classList.contains('hidden'));
+    sc.style.display=vis?'':'none';
+  });
+  document.querySelectorAll('.category').forEach(cat=>{
+    const vis=[...cat.querySelectorAll('.monster-card')].some(c=>!c.classList.contains('hidden'));
+    cat.style.display=vis?'':'none';
+  });
+
+  updateCount();
+}
+
+function updateCount(){
+  const total=document.querySelectorAll('.monster-card').length;
+  const vis=[...document.querySelectorAll('.monster-card')].filter(c=>!c.classList.contains('hidden')).length;
+  const el=document.getElementById('result-count');
+  if(el)el.textContent=vis<total?`${vis} of ${total} monsters`:`${total} monsters`;
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+renderAll();
+</script>
+</body>
+</html>
