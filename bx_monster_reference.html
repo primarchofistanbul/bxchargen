@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B/X D&D — Monster Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--ink:#111;--ink2:#333;--muted:#666;--rule:#ccc;--rule2:#e8e8e8;--bg:#fff;--bg2:#f7f7f7;--bg3:#f0f0f0;--red:#c0102a;--red-bg:#fdf2f4;--mono:'Share Tech Mono',monospace;--dt:#555;--de:#2a6e3a;--dm:#8a5a00;--dh:#c0102a;--dd:#6a0010}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Libre Baskerville',Georgia,serif;font-size:14px;line-height:1.65}
+.wrapper{max-width:1100px;margin:0 auto;padding:0 20px 80px}
+.site-header{border-bottom:3px solid var(--ink);padding:36px 0 24px;margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.header-left h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3.5vw,2.2rem);font-weight:900;letter-spacing:-0.02em;line-height:1.05}
+.header-left .subtitle{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.btn{font-family:'Playfair Display',serif;font-size:0.8rem;font-weight:700;letter-spacing:0.04em;padding:9px 22px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--bg);transition:background 0.15s,color 0.15s;white-space:nowrap;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--red);border-color:var(--red)}
+.btn.outline{background:transparent;color:var(--ink)}
+.btn.outline:hover{background:var(--ink);color:var(--bg)}
+.search-bar{display:flex;gap:10px;margin-bottom:20px;align-items:center;flex-wrap:wrap}
+.search-input{font-family:'Libre Baskerville',serif;font-size:0.88rem;padding:9px 14px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);flex:1;min-width:200px;outline:none}
+.search-input:focus{border-color:var(--red)}
+.search-input::placeholder{color:var(--muted)}
+.filter-group{display:flex;gap:5px;flex-wrap:wrap}
+.filter-btn{font-family:'Playfair Display',serif;font-size:0.67rem;letter-spacing:0.08em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--rule);background:var(--bg2);color:var(--muted);cursor:pointer;transition:all 0.12s}
+.filter-btn:hover,.filter-btn.active{border-color:var(--ink);color:var(--ink);background:var(--bg3)}
+.filter-btn.ft.active{border-color:var(--dt);color:var(--dt)}
+.filter-btn.fe.active{border-color:var(--de);color:var(--de)}
+.filter-btn.fm.active{border-color:var(--dm);color:var(--dm)}
+.filter-btn.fh.active{border-color:var(--dh);color:var(--dh)}
+.filter-btn.fd.active{border-color:var(--dd);color:var(--dd)}
+.result-count{font-size:0.75rem;color:var(--muted);white-space:nowrap}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;padding:10px 14px;background:var(--bg2);border:1px solid var(--rule);font-size:0.74rem;align-items:center}
+.legend-label{font-family:'Playfair Display',serif;font-size:0.64rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.leg-item{display:flex;align-items:center;gap:5px}
+.category{margin-bottom:48px}
+.cat-header{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;padding-bottom:10px;border-bottom:3px solid var(--ink)}
+.cat-number{font-family:'Playfair Display',serif;font-size:0.7rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--red)}
+.cat-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900}
+.cat-subtitle{font-size:0.74rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-style:italic}
+.cat-tip{font-size:0.8rem;color:var(--muted);font-style:italic;line-height:1.55;margin-bottom:20px;padding:10px 14px;border-left:3px solid var(--rule);background:var(--bg2)}
+.cat-tip strong{color:var(--ink);font-style:normal}
+.subcat{margin-bottom:26px}
+.subcat-title{font-family:'Playfair Display',serif;font-size:0.7rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.subcat-title::after{content:'';flex:1;height:1px;background:var(--rule2)}
+.hierarchy-box{margin-bottom:16px;padding:12px 14px;border:1px solid var(--rule);background:var(--bg2)}
+.hierarchy-title{font-family:'Playfair Display',serif;font-size:0.64rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+.hierarchy-chain{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:0.78rem}
+.hc-item{padding:3px 9px;border:1px solid var(--rule);background:var(--bg);font-family:'Playfair Display',serif;font-size:0.76rem}
+.hc-arrow{color:var(--muted);font-size:0.74rem}
+.hc-note{font-size:0.72rem;color:var(--muted);font-style:italic;margin-top:7px}
+.undead-chain{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-bottom:6px}
+.monster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:7px}
+.monster-card{border:1px solid var(--rule2);background:var(--bg);padding:11px 13px;transition:border-color 0.12s,background 0.12s;cursor:pointer}
+.monster-card:hover{border-color:var(--ink);background:var(--bg2)}
+.monster-card.expanded{border-color:var(--ink);background:var(--bg2)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.monster-name{font-family:'Playfair Display',serif;font-size:0.97rem;font-weight:700;line-height:1.2;flex:1}
+.card-tags{display:flex;gap:4px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.danger-tag{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor;white-space:nowrap}
+.dt{color:var(--dt)}.de{color:var(--de)}.dm{color:var(--dm)}.dh{color:var(--dh)}.dd{color:var(--dd);font-weight:bold}
+.warn-tag{font-family:var(--mono);font-size:0.56rem;letter-spacing:0.05em;text-transform:uppercase;padding:2px 5px;background:var(--red-bg);border:1px solid var(--red);color:var(--red);white-space:nowrap}
+.card-stats{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap}
+.stat-item{font-size:0.73rem;color:var(--muted)}
+.stat-item strong{font-family:var(--mono);color:var(--ink);font-size:0.8rem}
+.card-detail{display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--rule2)}
+.monster-card.expanded .card-detail{display:block}
+.detail-row{display:flex;gap:8px;margin-bottom:4px;font-size:0.79rem;align-items:baseline}
+.detail-label{font-family:'Playfair Display',serif;font-size:0.63rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);min-width:66px;flex-shrink:0}
+.detail-val{color:var(--ink2);line-height:1.4}
+.special-text{color:var(--red);font-style:italic}
+.newbie-tip{margin-top:8px;padding:6px 9px;background:var(--bg3);border-left:2px solid var(--red);font-size:0.74rem;color:var(--muted);line-height:1.45;font-style:italic}
+.newbie-tip strong{color:var(--ink);font-style:normal}
+.monster-card.hidden{display:none}
+@media(max-width:600px){.monster-grid{grid-template-columns:1fr}.site-header{flex-direction:column}.header-right{align-items:flex-start}}
+@media print{.search-bar,.header-right{display:none!important}.monster-card{page-break-inside:avoid;border:1px solid #ccc}.card-detail{display:block!important}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<header class="site-header">
+  <div class="header-left">
+    <h1>B/X Monster Reference</h1>
+    <div class="subtitle">Moldvay Basic + Cook/Marsh Expert · OSE Compatible · 138 Monsters</div>
+  </div>
+  <div class="header-right">
+    <a class="btn" href="index.html">⚔ Character Generator</a>
+    <button class="btn outline" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
+<div class="search-bar">
+  <input class="search-input" type="text" id="search" placeholder="Search monsters…" oninput="filterAll()">
+  <div class="filter-group">
+    <span style="font-size:0.71rem;color:var(--muted);align-self:center;white-space:nowrap">Danger:</span>
+    <button class="filter-btn ft" onclick="toggleFilter('trivial',this)">Trivial</button>
+    <button class="filter-btn fe" onclick="toggleFilter('easy',this)">Easy</button>
+    <button class="filter-btn fm" onclick="toggleFilter('moderate',this)">Moderate</button>
+    <button class="filter-btn fh" onclick="toggleFilter('tough',this)">Tough</button>
+    <button class="filter-btn fd" onclick="toggleFilter('deadly',this)">Deadly</button>
+    <button class="filter-btn" onclick="clearFilters()" style="margin-left:3px">✕ Clear</button>
+  </div>
+  <span class="result-count" id="result-count"></span>
+</div>
+<div class="legend">
+  <span class="legend-label">Danger:</span>
+  <span class="leg-item"><span class="danger-tag dt">Trivial</span> &lt;1 HD</span>
+  <span class="leg-item"><span class="danger-tag de">Easy</span> 1–2 HD</span>
+  <span class="leg-item"><span class="danger-tag dm">Moderate</span> 2–4 HD</span>
+  <span class="leg-item"><span class="danger-tag dh">Tough</span> 4–7 HD</span>
+  <span class="leg-item"><span class="danger-tag dd">Deadly</span> 7+ HD or ability that can end a PC</span>
+  <span class="leg-item"><span class="warn-tag">⚠ Special</span> bypasses normal survival</span>
+  <span style="font-size:0.71rem;color:var(--muted);margin-left:auto;font-style:italic">Click any card to expand</span>
+</div>
+<div id="monster-list">
+<div class="category">
+  <div class="cat-header"><span class="cat-number">Category I</span><span class="cat-title">Factions &amp; Societies</span><span class="cat-subtitle">The "Who"</span></div>
+  <div class="cat-tip"><strong>For world-builders:</strong> These beings form tribes, courts, guilds, and settlements. They have leaders, motivations, and internal politics. Every entry can be talked to, traded with, or fought as an organised force. <strong>Start here when designing the social layer of your world.</strong></div>
+  <div class="subcat"><div class="subcat-title">The Civilized</div><div class="monster-grid" id="grid-civilized"></div></div>
+  <div class="subcat"><div class="subcat-title">Outlaws &amp; Tribes</div><div class="monster-grid" id="grid-outlaws"></div></div>
+  <div class="subcat">
+    <div class="subcat-title">The Humanoid Threat</div>
+    <div class="hierarchy-box">
+      <div class="hierarchy-title">Power Hierarchy — weakest to strongest</div>
+      <div class="hierarchy-chain">
+        <span class="hc-item">Kobold</span><span class="hc-arrow">→</span><span class="hc-item">Goblin</span><span class="hc-arrow">→</span><span class="hc-item">Orc</span><span class="hc-arrow">→</span><span class="hc-item">Hobgoblin</span><span class="hc-arrow">→</span><span class="hc-item">Gnoll</span><span class="hc-arrow">→</span><span class="hc-item">Bugbear</span><span class="hc-arrow">→</span><span class="hc-item">Ogre</span><span class="hc-arrow">→</span><span class="hc-item" style="border-color:var(--red);color:var(--red)">Giant ✦ apex</span>
+      </div>
+      <div class="hc-note">Lizard Man and Troglodyte are regional variants with their own ecological niche. A classic dungeon stacks levels by this hierarchy — each descent is harder and has a reason to be there.</div>
+    </div>
+    <div class="monster-grid" id="grid-humanoid"></div>
+  </div>
+  <div class="subcat"><div class="subcat-title">Neutral Folk — Intelligent but Neither Ally nor Enemy by Default</div><div class="monster-grid" id="grid-neutral"></div></div>
+</div>
+<div class="category">
+  <div class="cat-header"><span class="cat-number">Category II</span><span class="cat-title">The Wilderness &amp; Beasts</span><span class="cat-subtitle">The "Outside"</span></div>
+  <div class="cat-tip"><strong>For world-builders:</strong> Creatures driven by instinct, hunger, and territory. They form the backbone of overland random encounter tables and define what travel feels like. <strong>Use these to make the journey dangerous, not just the destination.</strong></div>
+  <div class="subcat"><div class="subcat-title">Normal Animals</div><div class="monster-grid" id="grid-animals"></div></div>
+  <div class="subcat"><div class="subcat-title">Giant Fauna</div><div class="monster-grid" id="grid-giant"></div></div>
+  <div class="subcat"><div class="subcat-title">Swarmers &amp; Pests</div><div class="monster-grid" id="grid-swarm"></div></div>
+  <div class="subcat"><div class="subcat-title">Primal &amp; Great Beasts</div><div class="monster-grid" id="grid-primal"></div></div>
+  <div class="subcat"><div class="subcat-title">The Prehistoric — Lost World &amp; Savage Land</div><div class="monster-grid" id="grid-prehistoric"></div></div>
+  <div class="subcat"><div class="subcat-title">The Aquatic — Sea, River &amp; Deep Water</div><div class="monster-grid" id="grid-aquatic"></div></div>
+</div>
+<div class="category">
+  <div class="cat-header"><span class="cat-number">Category III</span><span class="cat-title">Dungeon Terrors &amp; Magical Weirdness</span><span class="cat-subtitle">The "Deep Dark"</span></div>
+  <div class="cat-tip"><strong>For world-builders:</strong> The bizarre, magical, and unnatural. Reach here for a dungeon puzzle, a trap with legs, or a terrifying boss. Many exist nowhere else — they <em>are</em> the dungeon. <strong>Use these sparingly; each should feel like an event.</strong></div>
+  <div class="subcat"><div class="subcat-title">Oozes &amp; Hazards — "Dungeon Cleaners"</div><div class="monster-grid" id="grid-ooze"></div></div>
+  <div class="subcat"><div class="subcat-title">The Mythic &amp; Magical</div><div class="monster-grid" id="grid-mythic"></div></div>
+  <div class="subcat"><div class="subcat-title">Outsiders &amp; Elementals</div><div class="monster-grid" id="grid-outsiders"></div></div>
+  <div class="subcat"><div class="subcat-title">The Fae — Creatures of Magic and Mischief</div><div class="monster-grid" id="grid-fae"></div></div>
+  <div class="subcat"><div class="subcat-title">Parasites &amp; Drainers</div><div class="monster-grid" id="grid-drain"></div></div>
+</div>
+<div class="category">
+  <div class="cat-header"><span class="cat-number">Category IV</span><span class="cat-title">The Undead</span><span class="cat-subtitle">The "Restless"</span></div>
+  <div class="cat-tip">
+    <strong>For world-builders:</strong> The undead trigger unique mechanics — the Cleric's Turn Undead — and instantly establish a gothic, death-haunted tone. <strong>A party without a Cleric should fear this entire category.</strong>
+    <div class="undead-chain" style="margin-top:10px">
+      <span class="hierarchy-title" style="margin-right:6px">Danger order:</span>
+      <span class="hc-item" style="font-size:0.72rem">Skeleton</span><span class="hc-arrow">→</span><span class="hc-item" style="font-size:0.72rem">Zombie</span><span class="hc-arrow">→</span><span class="hc-item" style="font-size:0.72rem">Ghoul</span><span class="hc-arrow">→</span><span class="hc-item" style="font-size:0.72rem">Shadow</span><span class="hc-arrow">→</span><span class="hc-item" style="font-size:0.72rem">Wight</span><span class="hc-arrow">→</span><span class="hc-item" style="font-size:0.72rem">Wraith</span><span class="hc-arrow">→</span><span class="hc-item" style="font-size:0.72rem">Mummy</span><span class="hc-arrow">→</span><span class="hc-item" style="font-size:0.72rem">Spectre</span><span class="hc-arrow">→</span><span class="hc-item" style="font-size:0.72rem;border-color:var(--red);color:var(--red)">Vampire ✦</span>
+    </div>
+  </div>
+  <div class="monster-grid" id="grid-undead"></div>
+</div>
+</div>
+</div>
+<script>
+const M=[
+{n:'Acolyte',hd:'1',ac:'2',mv:"60'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'1st-level Cleric; travels with 2-8 companions, led by higher-level priest.',tp:'<strong>Use as:</strong> wandering priests, cult members, temple retinue. Their patron Patriarch is far more dangerous. Treat as a social encounter first.',gr:'civilized'},
+{n:'Dwarf',hd:'1',ac:'4',mv:"60'",at:'1',dm:'1d8',dg:'easy',wn:null,sp:'Infravision 60\'. Detects stonework tricks on 2-in-6. +4 saves vs. magic/poison. Leaders are 2nd-6th level Fighters.',tp:'<strong>Use as:</strong> mercenaries, smiths, mine-owners, grudge-holders. Dwarves remember every slight across generations.',gr:'civilized'},
+{n:'Elf',hd:'1+1',ac:'5',mv:"60'",at:'1',dm:'1d8',dg:'easy',wn:null,sp:'Infravision 60\'. Detects secret doors on 2-in-6. Immune to ghoul paralysis. 1st-level MU spells.',tp:'<strong>Use as:</strong> forest sentinels, ancient advisors, haughty nobles. Elves personally remember events that are legend to humans.',gr:'civilized'},
+{n:'Gnome',hd:'1',ac:'5',mv:"60'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Infravision 90\'. Detects underground hazards (as Dwarf). +4 saves vs. magic. Leaders are 2nd-4th level Clerics or MUs.',tp:'<strong>Use as:</strong> tinkerers, illusionists, underground villagers. Bridge between Dwarves and the Fae.',gr:'civilized'},
+{n:'Halfling',hd:'1-1',ac:'7',mv:"90'",at:'1',dm:'1d6',dg:'trivial',wn:null,sp:'+1 to all missile attacks. Near-invisible outdoors; surprised only on 1. +4 saves vs. magic/poison.',tp:'<strong>Use as:</strong> shire-folk, scouts, or dangerous ambushers. A halfling village with a Goblin problem is a classic first hook.',gr:'civilized'},
+{n:'Medium',hd:'1',ac:'9',mv:"60'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'1st-level Magic-User. Found with 1d4 bodyguards. Wandering sage, fortune-teller, or hedge wizard.',tp:'<strong>Use as:</strong> the face of low-level arcane power in the civilised world — shady, knowledgeable, and useful.',gr:'civilized'},
+{n:'Merchant',hd:'1',ac:'5',mv:"60'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Travels with 2d6 armed guards (Veterans) and 1 Fighter of 4th-7th level. Carries goods and regional knowledge.',tp:'<strong>Use as:</strong> mobile shop, information broker, or hook delivery system. A Merchant passing through delivers rumours.',gr:'civilized'},
+{n:'Noble',hd:'3',ac:'2',mv:"60'",at:'1',dm:'1d8',dg:'moderate',wn:null,sp:'Always with 2d6 Veteran guards and servants. Has political leverage, legal authority, and significant wealth.',tp:'<strong>Use as:</strong> quest-giver, obstacle, or patron. Killing a Noble has political consequences. Their guards are the real danger.',gr:'civilized'},
+{n:'Normal Human',hd:'1-1',ac:'9',mv:"60'",at:'1',dm:'1d6',dg:'trivial',wn:null,sp:'No special abilities. The baseline measure of all danger — everything scarier is measured against this.',tp:'<strong>Use as:</strong> villagers, servants, farmers, prisoners. Their fragility establishes stakes.',gr:'civilized'},
+{n:'NPC Party',hd:'Varies',ac:'Varies',mv:"60'",at:'Varies',dm:'Varies',dg:'tough',wn:null,sp:'Full adventuring party using PC class rules. May be allies, rivals, or enemies.',tp:'<strong>Use as:</strong> rivals who loot the dungeon first, potential hirelings, or moral mirrors.',gr:'civilized'},
+{n:'Trader',hd:'1',ac:'6',mv:"60'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Travels with 1d8 guards. Carries trade goods and information. May deal in grey-market items.',tp:'<strong>Use as:</strong> low-key encounter delivering equipment, rumours, or a side quest.',gr:'civilized'},
+{n:'Veteran',hd:'1-3',ac:'2',mv:"60'",at:'1',dm:'1d8',dg:'easy',wn:null,sp:'Fighter of 1st-3rd level. Typically plate mail and sword. Works as guard or caravan escort.',tp:'<strong>Use as:</strong> town guards, hired muscle, retired adventurers. Gives the world texture.',gr:'civilized'},
+{n:'Bandit',hd:'1',ac:'6',mv:"60'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Surprise on 1-2. Led by 4th-7th level Fighter. Prefer ambush. May demand toll rather than fight.',tp:'<strong>Use as:</strong> wilderness hazard or morally grey recruits. Give them a reason to be bandits.',gr:'outlaws'},
+{n:'Berserker',hd:'1+1',ac:'7',mv:"60'",at:'1',dm:'1d8',dg:'easy',wn:'⚠ Berserk',sp:'+2 to all attack rolls. Never check morale — fight to the death. Cannot be reasoned with in rage.',tp:'<strong>Use as:</strong> shock troops or a social time bomb. Berserkers not attacking are either restrained or about to stop.',gr:'outlaws'},
+{n:'Brigand',hd:'1',ac:'6',mv:"60'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Organised bandits. Led by Fighters up to 8th level with Thief/Cleric lieutenants. Have a base and territory.',tp:'<strong>Use as:</strong> a regional power requiring negotiation. Large enough to be a micro-faction with their own politics.',gr:'outlaws'},
+{n:'Buccaneer',hd:'1',ac:'7',mv:"120'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Sea-going raiders. Captain is 4th-7th level Fighter. Operate from hidden coves. Chaotic but negotiable.',tp:'<strong>Use as:</strong> coastal faction, ship encounter, or uneasy allies. Buccaneers have their own code.',gr:'outlaws'},
+{n:'Dervish',hd:'1',ac:'6',mv:"60'",at:'1',dm:'1d8',dg:'easy',wn:null,sp:'Fanatical religious warriors. Never check morale. +1 to melee hit. Led by high-level Clerics.',tp:'<strong>Use as:</strong> desert zealots or militant pilgrims. Excellent foils for Cleric PCs.',gr:'outlaws'},
+{n:'Neanderthal',hd:'2',ac:'8',mv:"60'",at:'1',dm:'2d4',dg:'easy',wn:null,sp:'Throws rocks (1d6, 60\'). Deeply fears fire. Primitive but not unintelligent; deeply superstitious.',tp:'<strong>Use as:</strong> pre-human inhabitants of a lost valley. Neanderthals are people — just older.',gr:'outlaws'},
+{n:'Nomad',hd:'1',ac:'7',mv:"60'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Expert riders; +1 to hit while mounted. Armed with lance and bow. Operate in bands of 30-300.',tp:'<strong>Use as:</strong> a territorial power in open terrain. Very different to face on their terms vs. yours.',gr:'outlaws'},
+{n:'Pirate',hd:'1',ac:'7',mv:"120'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Chaotic sea-raiders. Armed ships. Captain is 4th-7th Fighter. Attack merchants and coastal settlements.',tp:'<strong>Use as:</strong> naval threat, coastal dungeon rivals, or short-term hired muscle.',gr:'outlaws'},
+{n:'Bugbear',hd:'3+1',ac:'5',mv:"90'",at:'1',dm:'2d4',dg:'moderate',wn:null,sp:'Surprise on 1-3. Leaders are 5 HD. Cunning and cruel — use smaller humanoids as cannon fodder.',tp:'<strong>Use as:</strong> mid-dungeon lords or the thing lower humanoids fear. A Bugbear lair on level 2 signals the dungeon gets worse.',gr:'humanoid'},
+{n:'Giant',hd:'8-15',ac:'3-4',mv:"120'",at:'1',dm:'2d8-3d10',dg:'deadly',wn:'⚠ Boulder throw',sp:'All types hurl boulders (200\', 2d6-3d6). Types: Hill, Stone, Frost (cold immune), Fire (fire immune), Cloud, Storm (control weather). Each has a lair and hoard.',tp:'<strong>Use as:</strong> a regional apex threat. The Giant type flavours your environment: Frost = tundra, Fire = volcanic.',gr:'humanoid'},
+{n:'Gnoll',hd:'2',ac:'5',mv:"90'",at:'1',dm:'2d4',dg:'easy',wn:null,sp:'Hyena-humanoid warbands. Leaders are 3 HD. Aggressive, greedy. Will work as mercenaries for payment.',tp:'<strong>Use as:</strong> marauders or hired muscle. Gnolls fight for profit — they can be turned against an employer.',gr:'humanoid'},
+{n:'Goblin',hd:'1-1',ac:'6',mv:"60'",at:'1',dm:'1d6',dg:'trivial',wn:null,sp:'-1 to attack in bright light. Infravision 90\'. Kings are 3 HD. Cowardly alone, lethal in swarms.',tp:'<strong>Use as:</strong> the starter monster that teaches careful play. Their social network is a feature.',gr:'humanoid'},
+{n:'Hobgoblin',hd:'1+1',ac:'6',mv:"90'",at:'1',dm:'1d8',dg:'easy',wn:null,sp:'Infravision 60\'. Disciplined military structure — use tactics, not just swarming. Kings are 4 HD.',tp:'<strong>Use as:</strong> soldiers or garrison troops. Hobgoblins feel like an army, not a mob.',gr:'humanoid'},
+{n:'Kobold',hd:'1/2',ac:'7',mv:"60'",at:'1',dm:'1d4',dg:'trivial',wn:null,sp:'-1 to attack in bright light. Infravision 90\'. Chiefs are 2 HD. Master trap-setters. Flee when losing.',tp:'<strong>Use as:</strong> trap-layers for dungeon level 1. Kobold warrens teach dungeon procedure.',gr:'humanoid'},
+{n:'Lizard Man',hd:'2+1',ac:'5',mv:"60'/90'sw",at:'3',dm:'1d3/1d3/1d6',dg:'moderate',wn:null,sp:'Claw/claw/bite. Excellent swimmers. Semi-intelligent tribal society near swamps and coasts.',tp:'<strong>Use as:</strong> a swamp faction defending ancestral waters. Their grievance makes them more interesting.',gr:'humanoid'},
+{n:'Ogre',hd:'4+1',ac:'5',mv:"90'",at:'1',dm:'1d10',dg:'tough',wn:null,sp:'Hurls rocks (1d10, 30\'). Stupid but cunning enough to demand tribute. Love gold and food.',tp:'<strong>Use as:</strong> bridge troll, dungeon bully, or hired muscle. An Ogre taxing a Goblin tribe creates instant ecology.',gr:'humanoid'},
+{n:'Orc',hd:'1',ac:'6',mv:"120'",at:'1',dm:'1d8',dg:'easy',wn:null,sp:'-1 to attack in daylight. Infravision 60\'. Chieftain is 4 HD. Disciplined when well-led.',tp:'<strong>Use as:</strong> dungeon soldiers or a villain\'s muscle. Threatening in small numbers when organised.',gr:'humanoid'},
+{n:'Troglodyte',hd:'2',ac:'5',mv:"120'",at:'3',dm:'1d4/1d4/1d4',dg:'easy',wn:'⚠ Stench',sp:'Stench: all within 10\' save vs. Poison or -2 to attacks. Chameleon skin: surprise on 1-4.',tp:'<strong>Use as:</strong> underground faction distinct from Goblins. Their stench makes them memorable.',gr:'humanoid'},
+{n:'Centaur',hd:'4',ac:'5',mv:"180'",at:'2+',dm:'1d6/1d6+wpn',dg:'tough',wn:null,sp:'Hooves + weapon. Semi-reclusive forest/plains dwellers. Intelligent; share knowledge or trade.',tp:'<strong>Use as:</strong> a proud neutral power. Centaurs do not pick fights but finish them.',gr:'neutral'},
+{n:'Merman',hd:'1+1',ac:'7',mv:"40'/180'sw",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Breathe water. Underwater settlements with own law. Speak with sea creatures. Fierce coastal defenders.',tp:'<strong>Use as:</strong> undersea faction with trade potential or territorial grievances.',gr:'neutral'},
+{n:'Treant',hd:'8',ac:'2',mv:"60'",at:'2',dm:'2d6/2d6',dg:'tough',wn:null,sp:'Commands 2 trees within 60\'. Immune to mind spells. Vulnerable to fire (+1/die). Ancient and long-memoried.',tp:'<strong>Use as:</strong> guardian of old-growth forests. Treants are not enemies unless provoked.',gr:'neutral'},
+{n:'Bat',hd:'1',ac:'9',mv:"9'/180'fly",at:'1',dm:'1d2',dg:'easy',wn:null,sp:'Causes confusion (-2 to hit) unless save vs. Paralysis. Colony attacks possible (10d10).',tp:'<strong>Use as:</strong> dungeon hazard. Bats fleeing a cave signal something worse is coming.',gr:'animals'},
+{n:'Bear',hd:'5',ac:'6',mv:"90'",at:'3',dm:'1d3/1d3/1d6',dg:'tough',wn:'⚠ Bear hug',sp:'Bear hug: if both claws hit, additional 2d8 crush. Territorial — terrifying when provoked.',tp:'<strong>Use as:</strong> wilderness guardian. The hug can drop a lightly armoured PC instantly.',gr:'animals'},
+{n:'Boar',hd:'3',ac:'7',mv:"150'",at:'1',dm:'2d4',dg:'moderate',wn:'⚠ Fights at 0 HP',sp:'Continues attacking after reaching 0 HP until actually dead. Extremely aggressive when cornered.',tp:'<strong>Use as:</strong> a forest hazard. The "fights past 0 HP" rule needs to be demonstrated once.',gr:'animals'},
+{n:'Camel',hd:'2',ac:'7',mv:"150'",at:'1',dm:'1d4',dg:'easy',wn:null,sp:'Carries 3,000 coins. Goes 2 weeks without water. Stubborn 3-in-6. Kicks when startled (1d6).',tp:'<strong>Use as:</strong> a desert resource and liability. A stubborn camel at the wrong moment is a memorable encounter.',gr:'animals'},
+{n:'Cat, Great',hd:'3+2',ac:'6',mv:"150'",at:'3',dm:'1d4/1d4/1d8',dg:'moderate',wn:null,sp:'Surprise on 1-4. Mountain lion, leopard, or tiger. Stalks isolated targets.',tp:'<strong>Use as:</strong> a wilderness predator punishing poor marching order.',gr:'animals'},
+{n:'Hawk',hd:'1/2',ac:'8',mv:"210'fly",at:'2',dm:'1d2/1d2',dg:'trivial',wn:null,sp:'Dive attack: +2 to hit, double damage on first strike. Used as messengers or hunting birds.',tp:'<strong>Use as:</strong> aerial scout, noble\'s bird, or tiny ambush predator guarding a nest.',gr:'animals'},
+{n:'Herd Animal',hd:'1-4',ac:'7',mv:"240'",at:'1',dm:'1d6',dg:'easy',wn:'⚠ Stampede',sp:'Stampede when frightened: 3d10 animals charge in a line, 2d6 to anything in the path.',tp:'<strong>Use as:</strong> plains encounter rewarding environmental thinking. A party-caused stampede is consequence.',gr:'animals'},
+{n:'Horse',hd:'2-4',ac:'7',mv:"120'-240'",at:'1',dm:'1d4+',dg:'easy',wn:null,sp:'War horses attack (hoof/bite). Riding horses flee. Carry 3,000-4,000 coins by type.',tp:'<strong>Use as:</strong> party resource. A warhorse that bolts at the wrong moment is an encounter all its own.',gr:'animals'},
+{n:'Mule',hd:'2',ac:'7',mv:"120'",at:'1',dm:'1d4',dg:'easy',wn:null,sp:'Stubborn 2-in-6. Carries 2,000 coins. Kicks when startled (1d6).',tp:'<strong>Use as:</strong> party resource and occasional chaos agent. Stubbornness at a critical moment creates tension.',gr:'animals'},
+{n:'Rat',hd:'1/2',ac:'9',mv:"60'/120'sw",at:'1',dm:'1d3',dg:'trivial',wn:'⚠ Disease',sp:'Bite: save vs. Poison or disease. Giant rats (1 HD) are bolder. Common in all dungeon environments.',tp:'<strong>Use as:</strong> dungeon vermin that drains resources through disease. Rats fleeing signal something worse nearby.',gr:'animals'},
+{n:'Rhinoceros',hd:'8',ac:'5',mv:"120'",at:'1',dm:'2d6',dg:'tough',wn:'⚠ Charge',sp:'Charge: double damage. Non-aggressive unless startled. Woolly rhino (12 HD) is larger and meaner.',tp:'<strong>Use as:</strong> savanna encounter rewarding attention to wind and terrain.',gr:'animals'},
+{n:'Snake',hd:'1/2-6',ac:'6-8',mv:"60'-90'",at:'1',dm:'1d4-2d6',dg:'moderate',wn:'⚠ Poison',sp:'Poison varies by species. Constrictors hold and deal automatic crush each round.',tp:'<strong>Use as:</strong> trap companion, swamp hazard, or cave predator. Forces parties to carry antitoxin.',gr:'animals'},
+{n:'Wolf',hd:'2+2',ac:'7',mv:"180'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Hunt in packs (2d6). -2 to morale in daylight. Dire wolves (4+4 HD) are larger and braver.',tp:'<strong>Use as:</strong> persistent wilderness threat. Wolves circling a camp all night is more frightening than a charge.',gr:'animals'},
+{n:'Beetle, Giant',hd:'1+2-3+1',ac:'3-4',mv:"120'-150'",at:'1',dm:'2d4-2d6',dg:'easy',wn:'⚠ Type varies',sp:'Oil: squirts blinding oil (save or blind 1d4h); Fire: glands glow 10\' for 1d6 days after death; Tiger: fastest, no special.',tp:'<strong>Use as:</strong> low-level encounter rewarding cleverness. Fire beetle glands as light sources are a classic resource puzzle.',gr:'giant'},
+{n:'Caecilia',hd:'6',ac:'6',mv:"60'",at:'1',dm:'1d8',dg:'tough',wn:'⚠ Swallow whole',sp:'Swallow on 19-20: 1d8 acid/round inside; escape on save vs. Death at -4. Hunts by scent and vibration.',tp:'<strong>Use as:</strong> underground ambush predator. Even a heavily armoured fighter can be dissolved from within.',gr:'giant'},
+{n:'Centipede, Giant',hd:'1/2',ac:'9',mv:"60'",at:'1',dm:'—',dg:'trivial',wn:'⚠ STR drain',sp:'Bite: no HP damage but save vs. Poison or lose 1d4 STR (restored next day).',tp:'<strong>Use as:</strong> dungeon vermin that weakens without killing. Drained STR changes everything.',gr:'giant'},
+{n:'Driver Ant',hd:'4',ac:'3',mv:"180'",at:'1',dm:'2d6',dg:'tough',wn:'⚠ Colony attack',sp:'Never morale-checks. Colony of 100-400. Entire colony attacks if lair disturbed. Cannot be charmed.',tp:'<strong>Use as:</strong> catastrophic environmental hazard. Should be avoided, not fought.',gr:'giant'},
+{n:'Ferret, Giant',hd:'1+1',ac:'5',mv:"150'",at:'1',dm:'1d8',dg:'easy',wn:null,sp:'Attaches on hit: auto-deals 1d8/round until killed. Fearless toward larger prey.',tp:'<strong>Use as:</strong> dungeon pest or escaped pet. Auto-damage creates urgency.',gr:'giant'},
+{n:'Leech, Giant',hd:'2',ac:'9',mv:"90'sw",at:'1',dm:'1d6',dg:'easy',wn:'⚠ Blood drain',sp:'Attaches on hit: auto-drains 1d6/round until full (4 rounds) or killed. Salt destroys it instantly.',tp:'<strong>Use as:</strong> swamp hazard. A leech going unnoticed until the character is weakened teaches thorough searching.',gr:'giant'},
+{n:'Lizard, Giant',hd:'3+1-6',ac:'4-5',mv:"120'",at:'2-3',dm:'varies',dg:'tough',wn:'⚠ Type varies',sp:'Draco (glides 200\'); Horned (blood-spit blinds 1d4 rounds, save vs. Wands); Tuatara (infravision 90\', near-primal).',tp:'<strong>Use as:</strong> dungeon guardian or prehistoric encounter. The Tuatara should feel ancient and implacable.',gr:'giant'},
+{n:'Rhagodessa',hd:'4+2',ac:'5',mv:"150'",at:'2',dm:'2d8',dg:'tough',wn:'⚠ Grapple',sp:'Sticky front legs: on hit target is held; auto-bite each round. Must kill to escape.',tp:'<strong>Use as:</strong> fast ambush predator. The grapple creates a "rescue them while fighting" dynamic.',gr:'giant'},
+{n:'Robber Fly',hd:'2',ac:'6',mv:"30'/180'fly",at:'1',dm:'1d8',dg:'easy',wn:null,sp:'Mimics bumblebee colouring — surprise on 1-4. Dive attack: +2 to hit.',tp:'<strong>Use as:</strong> aerial wilderness hazard. Punishes parties that do not scan overhead.',gr:'giant'},
+{n:'Scorpion, Giant',hd:'4',ac:'2',mv:"150'",at:'3',dm:'1d10/1d10/1d4',dg:'tough',wn:'⚠ Lethal poison',sp:'Claw/claw/sting. Sting: save vs. Poison or die. Very aggressive — attacks on sight.',tp:'<strong>Use as:</strong> desert or underground threat demanding antitoxin resources.',gr:'giant'},
+{n:'Shrew, Giant',hd:'1',ac:'4',mv:"180'",at:'2',dm:'1d6/1d6',dg:'easy',wn:'⚠ Mount panic',sp:'Causes fear in horses and mules. Never checks morale. Acts first every round.',tp:'<strong>Use as:</strong> mounted-party nightmare. Routing pack animals can strand a party more effectively than direct combat.',gr:'giant'},
+{n:'Spider, Giant',hd:'2+2-4',ac:'5-7',mv:"60'-120'",at:'1',dm:'1d8-2d6',dg:'moderate',wn:'⚠ Poison varies',sp:'Crab (delayed death poison, near-transparent); Black Widow (instant death, web = Hold Person); Tarantella (dance poison, cascading saves).',tp:'<strong>Use as:</strong> web-room encounters. The Tarantella dance-poison is chaos incarnate.',gr:'giant'},
+{n:'Toad, Giant',hd:'2+2',ac:'7',mv:"90'",at:'1',dm:'1d4+1',dg:'easy',wn:'⚠ Swallow',sp:'Tongue (15\') holds on failed save. Swallow whole: save vs. Death or 1d6/round acid inside.',tp:'<strong>Use as:</strong> swamp or cave predator. The tongue targets the back rank — even the wizard.',gr:'giant'},
+{n:'Weasel, Giant',hd:'4+4',ac:'5',mv:"150'",at:'1',dm:'2d4',dg:'moderate',wn:'⚠ Blood drain',sp:'Attaches on hit: auto-drains 2d4/round. Cannot be detached while alive. Fearless and relentless.',tp:'<strong>Use as:</strong> dungeon predator whose auto-drain creates a ticking clock.',gr:'giant'},
+{n:'Cave Locust',hd:'2',ac:'4',mv:"60'/180'fly",at:'1',dm:'1d2',dg:'easy',wn:'⚠ Shriek/Spit',sp:'Shriek when disturbed: 50% wandering monster each round. Spit: blind 1d4 turns on failed save.',tp:'<strong>Use as:</strong> an alarm system. Cave Locusts make every fight a potential escalation.',gr:'swarm'},
+{n:'Insect Swarm',hd:'2',ac:'7',mv:"30'",at:'special',dm:'2/round',dg:'easy',wn:null,sp:'Auto-hits all within 10\'. Torch repels. All actions at -4 inside. Only fire or fleeing destroys it.',tp:'<strong>Use as:</strong> environmental hazard layered onto another encounter.',gr:'swarm'},
+{n:'Killer Bee',hd:'1/2',ac:'7',mv:"150'fly",at:'1',dm:'1d3',dg:'trivial',wn:'⚠ Deadly poison',sp:'Poison: save or die. Bee dies after stinging. Hive of 5d6x10 bees. 5% chance exceptional honey (50 gp/jug).',tp:'<strong>Use as:</strong> swarm punishing low saves. The honey is a risk/reward hook for greedy players.',gr:'swarm'},
+{n:'Ape, White',hd:'4',ac:'6',mv:"120'",at:'2',dm:'1d4/1d4',dg:'tough',wn:null,sp:'Hurls rocks (1d6). Tears doors off hinges. Territorial but not aggressive unless approached.',tp:'<strong>Use as:</strong> dungeon relic or jungle apex predator. Can be avoided with care.',gr:'primal'},
+{n:'Elephant',hd:'9',ac:'5',mv:"120'",at:'2',dm:'2d4/2d4',dg:'deadly',wn:'⚠ Trample',sp:'Trample on charge: 4d8, no save. Intelligent. Non-aggressive unless threatened. Mammoth (+3 HD) is larger.',tp:'<strong>Use as:</strong> a savanna creature commanding respect and space. An accidentally provoked herd is a session-ender.',gr:'primal'},
+{n:'Mastodon',hd:'15',ac:'3',mv:"120'",at:'2',dm:'2d6/2d6',dg:'deadly',wn:'⚠ Trample',sp:'Trample: 4d8. Prehistoric elephant. Very territorial. More aggressive than modern elephant.',tp:'<strong>Use as:</strong> prehistoric region landmark. Meeting one should feel outside the normal rules.',gr:'primal'},
+{n:'Rock Baboon',hd:'2',ac:'6',mv:"120'",at:'2',dm:'1d3/1d6',dg:'easy',wn:null,sp:'Never use fire or tools. Fight to the death in lair. Clear dominance hierarchy. Leader is 3 HD.',tp:'<strong>Use as:</strong> social-structure encounter. Defeat the leader and the troop may scatter.',gr:'primal'},
+{n:'Titanothere',hd:'12',ac:'5',mv:"120'",at:'1',dm:'2d8',dg:'deadly',wn:'⚠ Charge',sp:'Charge: double damage. Prehistoric rhinoceros-like giant. Non-aggressive unless startled.',tp:'<strong>Use as:</strong> prehistoric plains guardian. Approaching quietly is a skill challenge.',gr:'primal'},
+{n:'Pterosaur',hd:'1-5',ac:'7',mv:"60'/180'fly",at:'1',dm:'1d4-1d12',dg:'easy',wn:null,sp:'Pterodactyl (1 HD, fish-hunter) and Pteranodon (5 HD, aggressive apex predator). Territorial near nests.',tp:'<strong>Use as:</strong> aerial threats establishing "this is a lost world" atmosphere.',gr:'prehistoric'},
+{n:'Stegosaurus',hd:'11',ac:'3',mv:"60'",at:'2',dm:'1d6/2d8',dg:'deadly',wn:null,sp:'Tail sweep (2d8) hits all creatures in 5\' arc. Defensive — charges only when cornered.',tp:'<strong>Use as:</strong> a living tank punishing melee-heavy parties. Surrounding it is suicidal.',gr:'prehistoric'},
+{n:'Triceratops',hd:'11',ac:'2',mv:"90'",at:'1',dm:'3d6',dg:'deadly',wn:'⚠ Charge',sp:'Charge: triple damage with horns. Highly territorial. One of the most dangerous charges in the game.',tp:'<strong>Use as:</strong> plains guardian rewarding scouting. Triple damage on a charge can kill outright.',gr:'prehistoric'},
+{n:'Tyrannosaurus Rex',hd:'20',ac:'3',mv:"120'",at:'1',dm:'6d6',dg:'deadly',wn:'⚠ Terror/Swallow',sp:'Terror: all who see must save vs. Spells or flee. Swallow on 20: 3d8/round acid inside. Not a monster — an event.',tp:'<strong>Use as:</strong> lost-world centrepiece. A T-Rex encounter is a chase or an escape, not a fight.',gr:'prehistoric'},
+{n:'Crab, Giant',hd:'3',ac:'2',mv:"60'",at:'2',dm:'2d6/2d6',dg:'moderate',wn:'⚠ Pincers',sp:'On hit 18-20: target held, auto 2d6/round. Found in coastal waters, sea caves, tidal zones.',tp:'<strong>Use as:</strong> coastal encounter creating a rescue sub-problem.',gr:'aquatic'},
+{n:'Crocodile',hd:'2-7',ac:'4',mv:"90'/90'sw",at:'1',dm:'1d8-3d8',dg:'moderate',wn:'⚠ Death roll',sp:'Death roll on 18-20: held and dragged underwater (drowning). Surprise on 1-4 near water.',tp:'<strong>Use as:</strong> river or swamp ambush. A crocodile in a ford the party must cross is a classic environmental problem.',gr:'aquatic'},
+{n:'Fish, Giant',hd:'2-6',ac:'6',mv:"180'sw",at:'1',dm:'1d6-2d6',dg:'moderate',wn:null,sp:'Types: Piranha (frenzy if blood present), Giant Catfish (paralytic slime), Bass (simple predator).',tp:'<strong>Use as:</strong> underwater or river encounter. Their danger is the environment around them.',gr:'aquatic'},
+{n:'Octopus, Giant',hd:'8',ac:'7',mv:"90'sw",at:'9',dm:'1d3x8+1d6',dg:'tough',wn:'⚠ Grapple',sp:'Eight tentacles (1d3 each) + beak (1d6). Each tentacle hit holds and squeezes 1d3/round auto. Ink cloud blinds.',tp:'<strong>Use as:</strong> ship-side or coastal-cave boss. Eight simultaneous grapples.',gr:'aquatic'},
+{n:'Sea Serpent (Lesser)',hd:'6',ac:'5',mv:"150'sw",at:'1',dm:'3d6',dg:'tough',wn:'⚠ Coil',sp:'Coil on 18-20: auto 2d10/round. Can capsize small boats. Often mistaken for a monster island.',tp:'<strong>Use as:</strong> sea-voyage hazard. The coil near a boat is a race against the clock.',gr:'aquatic'},
+{n:'Shark',hd:'4-8',ac:'6',mv:"180'sw",at:'1',dm:'1d6-2d6',dg:'moderate',wn:'⚠ Blood frenzy',sp:'Blood frenzy: any blood in water causes all sharks to attack regardless of morale. Smell blood from 300\'.',tp:'<strong>Use as:</strong> open-water threat. Any combat damage while swimming changes the encounter.',gr:'aquatic'},
+{n:'Squid, Giant',hd:'6',ac:'7',mv:"120'sw",at:'7',dm:'1d6x6+2d10',dg:'tough',wn:'⚠ Grapple',sp:'Six tentacles (1d6 each) + beak (2d10). Ink cloud blinds 30\' for 1d4 rounds. Attacks ships.',tp:'<strong>Use as:</strong> deep-water terror. Combination of grapple and ink makes escape the primary strategy.',gr:'aquatic'},
+{n:'Water Termite',hd:'1-5',ac:'7',mv:"120'sw",at:'1',dm:'1d3',dg:'easy',wn:'⚠ Ship damage',sp:'Bores into wood: colony sinks a vessel in 1d4x10 minutes. Rarely attack creatures directly.',tp:'<strong>Use as:</strong> logistical threat. Water Termites mid-voyage make everything else more urgent.',gr:'aquatic'},
+{n:'Whale',hd:'6-45',ac:'5',mv:"180'sw",at:'1',dm:'1d20-5d6',dg:'moderate',wn:null,sp:'Narwhal (horn 2d6), Sperm Whale (swallow whole, 3d6/round acid), Killer Whale (multiple attacks). Most non-aggressive.',tp:'<strong>Use as:</strong> sea-voyage wonder or unexpected danger. A Sperm Whale attacking is a dramatic crisis.',gr:'aquatic'},
+{n:'Black Pudding',hd:'10',ac:'6',mv:"60'",at:'1',dm:'3d8',dg:'deadly',wn:'⚠ Dissolves metal',sp:'Dissolves wood and metal on contact (no save). Immune to cold. Lightning/weapons split it — each piece fights. Only fire kills.',tp:'<strong>Use as:</strong> equipment economy nightmare. Every attack in a tight corridor makes the problem worse.',gr:'ooze'},
+{n:'Gelatinous Cube',hd:'4',ac:'8',mv:"60'",at:'1',dm:'2d4',dg:'tough',wn:'⚠ Paralysis/Invisible',sp:'Paralysis on hit (save vs. Paralysis or frozen 2d4 turns). Transparent — surprise on 1-4. Immune to lightning, cold, fear.',tp:'<strong>Use as:</strong> the definitive "blind corner in a corridor" encounter. Transparency + paralysis is TPK-capable.',gr:'ooze'},
+{n:'Grey Ooze',hd:'3',ac:'8',mv:"10'",at:'1',dm:'2d8',dg:'moderate',wn:'⚠ Destroys metal',sp:'Destroys metal armour/weapons on hit (save vs. Wands or dissolved). Immune to all spells, fire, cold. Resembles wet stone.',tp:'<strong>Use as:</strong> equipment destroyer. Grey Ooze eating a sword mid-fight changes gear priorities for the campaign.',gr:'ooze'},
+{n:'Green Slime',hd:'2',ac:'—',mv:"3'",at:'special',dm:'see below',dg:'moderate',wn:'⚠ Lethal on contact',sp:'Contact turns flesh to Green Slime in 1d4 rounds — no save. Fire, cold, or Cure Disease halts it. Falls from ceilings.',tp:'<strong>Use as:</strong> ceiling hazard. Slime falling on a character creates a ticking clock defining the rest of the session.',gr:'ooze'},
+{n:'Ochre Jelly',hd:'5',ac:'8',mv:"30'",at:'1',dm:'2d6',dg:'tough',wn:'⚠ Splits on hit',sp:'Lightning splits it into 1d4 smaller jellies (2 HD each). Weapons split it too. Only fire and cold truly kill.',tp:'<strong>Use as:</strong> puzzle monster. Learning fire-only makes players feel clever forever after.',gr:'ooze'},
+{n:'Shrieker',hd:'3',ac:'7',mv:"9'",at:'none',dm:'—',dg:'moderate',wn:'⚠ Alarm',sp:'Screams when light (30\') or movement (10\') detected. Each round: 50% wandering monster. Cannot attack.',tp:'<strong>Use as:</strong> the dungeon\'s alarm bell. A room with a Shrieker is a puzzle — how do you remove it silently?',gr:'ooze'},
+{n:'Yellow Mould',hd:'—',ac:'—',mv:"—",at:'special',dm:'1d6+spores',dg:'deadly',wn:'⚠ SPORE DEATH',sp:'Contact: 1d6 damage + spore cloud (save vs. Death or die in 1d4 rounds). Only fire kills. Weapons useless.',tp:'<strong>Use as:</strong> the "look before you touch" lesson. Encountered once, respected forever. Fire causes noise.',gr:'ooze'},
+{n:'Basilisk',hd:'6+1',ac:'4',mv:"60'",at:'1',dm:'1d10',dg:'tough',wn:'⚠ Petrify gaze',sp:'Gaze petrifies (save vs. Turn to Stone). Averted eyes: -4 to both sides. Killed by own reflection.',tp:'<strong>Use as:</strong> puzzle encounter. A party with a mirror defeats a Basilisk cleverly — very satisfying.',gr:'mythic'},
+{n:'Blink Dog',hd:'4',ac:'5',mv:"120'",at:'1',dm:'1d6',dg:'tough',wn:null,sp:'Teleports up to 120\' before or after attacking. Generally good-natured. Innate hatred of Warp Beasts.',tp:'<strong>Use as:</strong> chaotic neutral encounter or wilderness ally. Blink Dogs that trust the party make excellent scouts.',gr:'mythic'},
+{n:'Chimera',hd:'9',ac:'4',mv:"60'/120'fly",at:'6',dm:'1d3/1d3/1d4/1d4/2d4/3d4',dg:'deadly',wn:'⚠ Fire breath',sp:'Three heads (lion, goat, dragon). Dragon head breathes fire 3/day: 50\' cone, 3d6 (save vs. Breath for half).',tp:'<strong>Use as:</strong> mid-level boss. Six attacks plus breath means terrain and positioning matter as much as damage.',gr:'mythic'},
+{n:'Cockatrice',hd:'5',ac:'6',mv:"60'/180'fly",at:'1',dm:'1d6',dg:'tough',wn:'⚠ Petrify touch',sp:'Touch petrifies (save vs. Turn to Stone). Any contact — including grabbing it — triggers the effect.',tp:'<strong>Use as:</strong> unique wildlife forcing careful tactics. Ranged attacks only.',gr:'mythic'},
+{n:'Cyclops',hd:'13',ac:'2',mv:"90'",at:'1',dm:'3d10',dg:'deadly',wn:'⚠ Curse',sp:'Hurls boulders (3d6, 200\'). -2 to hit (poor depth perception). 1-in-20 attacks forces curse save. Lair holds great treasure.',tp:'<strong>Use as:</strong> near-mythic encounter that is partly negotiable. The lair is the prize; the Cyclops is the obstacle.',gr:'mythic'},
+{n:'Doppelganger',hd:'4',ac:'5',mv:"90'",at:'1',dm:'1d12',dg:'tough',wn:'⚠ Shapechanger',sp:'Perfectly mimics any humanoid within 5\'. Immune to sleep and charm. Detects thoughts within 60\'.',tp:'<strong>Use as:</strong> paranoia encounter. Once players know one is loose they distrust everyone — even after it\'s dead.',gr:'mythic'},
+{n:'Dragon',hd:'6-11',ac:'2',mv:"90'/240'fly",at:'3+breath',dm:'varies+breath',dg:'deadly',wn:'⚠ BOSS MONSTER',sp:'Breath weapon deals damage = current HP. Multiple types (Red, Blue, Green, Black, White, Gold). Can speak. Enormous treasure.',tp:'<strong>Use as:</strong> centrepiece of an entire adventure. A Dragon needs a name, a motivation, and a history with the region.',gr:'mythic'},
+{n:'Dragon Turtle',hd:'30',ac:'0',mv:"30'/90'sw",at:'3',dm:'1d8/1d8/10d6',dg:'deadly',wn:'⚠ STEAM BREATH',sp:'Steam breath: 60\'x60\' cloud, damage = current HP (save vs. Breath for half). Often mistaken for a small island.',tp:'<strong>Use as:</strong> sea-voyage event, not encounter. Approached respectfully it demands payment. Attacked, it sinks the ship.',gr:'mythic'},
+{n:'Gargoyle',hd:'4',ac:'5',mv:"90'/150'fly",at:'4',dm:'1d3/1d3/1d6/1d4',dg:'tough',wn:'⚠ Magic weapons only',sp:'Claw/claw/bite/gore. Only damaged by magic weapons. Appear as statues — surprise on 1-3.',tp:'<strong>Use as:</strong> encounter teaching "magic weapons required." Without one, the only option is to run.',gr:'mythic'},
+{n:'Golem',hd:'8-20',ac:'2-6',mv:"60'-120'",at:'1-2',dm:'3d8+',dg:'deadly',wn:'⚠ Near-immune to spells',sp:'Types: Flesh, Stone, Iron, Amber. All immune to most spells. Specific damage types affect each. Obey last order given.',tp:'<strong>Use as:</strong> dungeon defence system or a maker\'s last legacy. The key question: what order was it given, and by whom?',gr:'mythic'},
+{n:'Gorgon',hd:'8',ac:'2',mv:"120'",at:'2',dm:'2d6/2d6',dg:'tough',wn:'⚠ Petrify breath',sp:'Breathes petrifying gas (60\', save vs. Turn to Stone). Iron-scaled bull. Charge: +4 damage first round.',tp:'<strong>Use as:</strong> high-level wilderness guardian. Breath at range means the party cannot approach safely.',gr:'mythic'},
+{n:'Griffon',hd:'7',ac:'3',mv:"120'/360'fly",at:'3',dm:'1d4/1d4/2d8',dg:'tough',wn:null,sp:'Claw/claw/bite. Attacks horses on sight. Trainable as mount if raised from egg. Egg worth 2,000 gp.',tp:'<strong>Use as:</strong> wilderness apex predator and long-term acquisition goal. Getting an egg is a complete mini-adventure.',gr:'mythic'},
+{n:'Harpy',hd:'3',ac:'7',mv:"60'/150'fly",at:'3',dm:'1d4/1d4/1d6',dg:'moderate',wn:'⚠ Charm song',sp:'Charm Song: save vs. Spells or compelled toward Harpy. Touch charms for 1d6 weeks (no save).',tp:'<strong>Use as:</strong> tactical problem requiring planning. Earplugs, Silence, or attacking at maximum range.',gr:'mythic'},
+{n:'Hellhound',hd:'3-7',ac:'4',mv:"120'",at:'1',dm:'1d6',dg:'moderate',wn:'⚠ Fire breath',sp:'Breathes fire (2d6, save vs. Breath for half). Detects invisible creatures. Only surprised on 1.',tp:'<strong>Use as:</strong> sentinel negating stealth. The Hellhound notices the invisible thief scouting ahead.',gr:'mythic'},
+{n:'Hippogriff',hd:'3+1',ac:'5',mv:"180'/360'fly",at:'3',dm:'1d6/1d6/1d10',dg:'moderate',wn:null,sp:'Claw/claw/bite. Hates Pegasi — attacks on sight. Trainable as mount. Faster than Griffon in level flight.',tp:'<strong>Use as:</strong> aerial predator or mount acquisition goal. More common and affordable than a Griffon.',gr:'mythic'},
+{n:'Hydra',hd:'5-12',ac:'5',mv:"120'",at:'5-12',dm:'1d10/head',dg:'deadly',wn:'⚠ Multiple heads',sp:'One attack per head. Severing a head (8 HP) reduces attacks. Sealing stump with fire prevents regrowth.',tp:'<strong>Use as:</strong> boss rewarding creative thinking. Parties that don\'t burn stumps face a full-strength Hydra next session.',gr:'mythic'},
+{n:'Living Statue',hd:'3-5',ac:'2-4',mv:"30'-90'",at:'2',dm:'1d6+/each',dg:'tough',wn:'⚠ Type varies',sp:'Crystal (absorbs fire); Iron (absorbs metal weapons — stuck until save vs. Spells); Rock (shoots fragments, 2/round).',tp:'<strong>Use as:</strong> guardian shutting down a specific party strategy. Iron disarms fighters. Rock endangers the back row.',gr:'mythic'},
+{n:'Lycanthrope',hd:'4-5',ac:'4',mv:"120'",at:'1',dm:'2d4',dg:'tough',wn:'⚠ Lycanthropy infection',sp:'Only silver or magic weapons hit. Bitten character losing half HP contracts lycanthropy. Types: Werewolf, Wereboar, Werebear, Weretiger, Wererat.',tp:'<strong>Use as:</strong> social mystery as much as combat. The infection is the real danger — and a bitten PC is an adventure.',gr:'mythic'},
+{n:'Manticore',hd:'6+1',ac:'4',mv:"120'/180'fly",at:'3',dm:'1d3/1d3/1d6',dg:'tough',wn:'⚠ Tail spikes',sp:'Tail spikes: up to 6/round, any direction, 180\' range. 18 total (replenish overnight). Cruel and sadistic.',tp:'<strong>Use as:</strong> flying ranged attacker rendering cover irrelevant. Fires from outside melee range.',gr:'mythic'},
+{n:'Medusa',hd:'4',ac:'8',mv:"90'",at:'3',dm:'1d4/1d4/1d6+poison',dg:'tough',wn:'⚠ PETRIFY/POISON',sp:'Gaze petrifies (save vs. Turn to Stone). Averted eyes: -4 both sides. Snake hair: save vs. Poison or die.',tp:'<strong>Use as:</strong> puzzle encounter. Mirrors, blindfolds, averted eyes. Medusa rewards preparation over brute force.',gr:'mythic'},
+{n:'Minotaur',hd:'6',ac:'6',mv:"120'",at:'2',dm:'1d6/1d6',dg:'tough',wn:null,sp:'Never lost in a maze. Morale 12 — pursues relentlessly. Gore on charge (2d6).',tp:'<strong>Use as:</strong> dungeon boss or labyrinth terror. A Minotaur that "is not supposed to be here" signals real danger.',gr:'mythic'},
+{n:'Owl Bear',hd:'5',ac:'5',mv:"120'",at:'3',dm:'1d8/1d8/2d8',dg:'tough',wn:'⚠ Bear hug',sp:'Bear hug: if both claws hit, auto 2d8 crush/round until dead. Attacks on sight — no reasoning.',tp:'<strong>Use as:</strong> dungeon or forest predator. The hug creates a "sacrifice yourself buying time" moment.',gr:'mythic'},
+{n:'Pegasus',hd:'4',ac:'6',mv:"240'/480'fly",at:'2',dm:'1d6/1d6',dg:'tough',wn:null,sp:'Magical winged horse. Fastest flier in the rules. Will not serve evil masters.',tp:'<strong>Use as:</strong> quest goal or reward for good alignment. Meeting one is a test of character.',gr:'mythic'},
+{n:'Purple Worm',hd:'15',ac:'6',mv:"60'",at:'2',dm:'2d8+sting',dg:'deadly',wn:'⚠ SWALLOW/POISON',sp:'Swallow on 20 or 4+ over needed (1d8/round acid inside). Sting: save vs. Poison or die.',tp:'<strong>Use as:</strong> underground apex predator changing how the party moves. A Purple Worm is not fought — it is survived.',gr:'mythic'},
+{n:'Roc',hd:'6-36',ac:'4',mv:"60'/480'fly",at:'2-4',dm:'1d8+-3d6',dg:'tough',wn:null,sp:'Three sizes (Small 6 HD, Large 18 HD, Giant 36 HD). Picks up and carries prey. Enormously territorial.',tp:'<strong>Use as:</strong> wilderness apex predator scaled to party level. Giant Rocs are avoided, not fought.',gr:'mythic'},
+{n:'Rust Monster',hd:'5',ac:'2',mv:"120'",at:'2',dm:'special',dg:'tough',wn:'⚠ DESTROYS EQUIPMENT',sp:'Touch rusts any metal (save vs. Wands or destroyed instantly). Attracted to metal — pursues fleeing parties.',tp:'<strong>Use as:</strong> the equipment economy\'s nemesis. Forces immediate decisions about which gear is worth risking.',gr:'mythic'},
+{n:'Thoul',hd:'3',ac:'6',mv:"120'",at:'3',dm:'1d3/1d3/1d3',dg:'moderate',wn:'⚠ Paralysis+Regen',sp:'Ghoul-like paralysis on hit (save vs. Paralysis). Regenerates 1 HP/round. Only fire or acid stops regen.',tp:'<strong>Use as:</strong> mid-level dungeon shock. Paralysis + regen means a Thoul not burned keeps coming back.',gr:'mythic'},
+{n:'Troll',hd:'6+3',ac:'4',mv:"120'",at:'3',dm:'1d6/1d6/1d10',dg:'tough',wn:'⚠ REGENERATES',sp:'Regenerates 3 HP/round. Severed limbs rejoin and fight. Only fire or acid prevents regeneration.',tp:'<strong>Use as:</strong> the encounter teaching fire management. A party that misses this lesson will face five Trolls next.',gr:'mythic'},
+{n:'Unicorn',hd:'4',ac:'2',mv:"240'",at:'3',dm:'1d8/1d8/1d8',dg:'tough',wn:null,sp:'Ridden only by those of pure heart. Teleports with rider 360\' (1/day). Horn cures poison and disease.',tp:'<strong>Use as:</strong> alignment encounter and moral test. What the party does when they find one says who they are.',gr:'mythic'},
+{n:'Warp Beast',hd:'6',ac:'4',mv:"150'",at:'4',dm:'2d4x4',dg:'tough',wn:'⚠ Displacement',sp:'Displacement: first attack against it always misses. Attacks all adjacent simultaneously. Hates Blink Dogs.',tp:'<strong>Use as:</strong> chaos encounter demonstrating the value of True Seeing. Rewards magical investigation.',gr:'mythic'},
+{n:'Wyvern',hd:'7',ac:'3',mv:"90'/240'fly",at:'2',dm:'2d8+1d6+poison',dg:'tough',wn:'⚠ Lethal poison',sp:'Bite + tail sting. Sting: save vs. Poison or die. Nests in clifftops and towers.',tp:'<strong>Use as:</strong> mid-level flying boss. Flight plus lethal sting forces specific engagement strategy.',gr:'mythic'},
+{n:'Djinni (Lesser)',hd:'7+1',ac:'4',mv:"90'/240'fly",at:'1',dm:'2d8',dg:'tough',wn:null,sp:'Whirlwind form (2d6 to all in 10\'). Gaseous form. Invisible at will. Creates objects. Up to 3 wishes.',tp:'<strong>Use as:</strong> captive power or found lamp. Djinn obey the letter of wishes, not the spirit.',gr:'outsiders'},
+{n:'Efreeti (Lesser)',hd:'10',ac:'3',mv:"90'/240'fly",at:'1',dm:'2d8',dg:'deadly',wn:null,sp:'Wall of fire. Pillar of flame (3d8). Gaseous form. Illusions. 3 wishes. Hostile and resentful.',tp:'<strong>Use as:</strong> bound power with a bad attitude. Freed, it is worse. It will twist every wish.',gr:'outsiders'},
+{n:'Elemental',hd:'8-16',ac:'2',mv:"120'",at:'1',dm:'2d8',dg:'deadly',wn:'⚠ Magic weapons only',sp:'Air/Earth/Fire/Water types. Each immune to its element. Only magic weapons hit. Mindless when summoned.',tp:'<strong>Use as:</strong> summoned guardian or escaped natural force. Elemental type defines the terrain of the fight.',gr:'outsiders'},
+{n:'Salamander',hd:'8',ac:'2',mv:"120'",at:'3-4',dm:'2d4/2d4/1d8',dg:'deadly',wn:'⚠ Heat/Cold aura',sp:'Fire type: heat aura 1d8/round to all within 20\', immune to fire, only magic weapons. Frost type: cold aura.',tp:'<strong>Use as:</strong> guardian of elemental location. Their aura means the party takes damage every round — attrition is the encounter.',gr:'outsiders'},
+{n:'Dryad',hd:'2',ac:'5',mv:"120'",at:'1',dm:'1d4',dg:'easy',wn:'⚠ Charm',sp:'Charm Person at will (save vs. Spells at -2). Charmed victims drawn into tree and kept indefinitely. Never strays 120\' from her tree.',tp:'<strong>Use as:</strong> wilderness mystery. A charmed party member vanishing into a tree changes the session entirely.',gr:'fae'},
+{n:'Nixie',hd:'1',ac:'7',mv:"40'/120'sw",at:'1',dm:'1d4',dg:'easy',wn:'⚠ Charm',sp:'Charm Person (up to 10 at once in their water). Charmed victims enslaved for 1 year underwater.',tp:'<strong>Use as:</strong> lake or river encounter punishing careless swimming. A rescued enslaved party member is its own adventure.',gr:'fae'},
+{n:'Pixie',hd:'1',ac:'3',mv:"30'/90'fly",at:'1',dm:'1d4',dg:'easy',wn:null,sp:'Permanently invisible until attacking. Sleep arrows and confusion arrows. Mischievous but not evil.',tp:'<strong>Use as:</strong> wilderness mystery. Treated well, they become unexpected allies.',gr:'fae'},
+{n:'Sprite',hd:'1/2',ac:'5',mv:"18'/54'fly",at:'1',dm:'1d6',dg:'trivial',wn:null,sp:'Can curse any creature judged evil. React strongly to forest desecration. Will not fight if they can flee.',tp:'<strong>Use as:</strong> conscience encounter. They do not fight — they curse. Respect nature, get a blessing.',gr:'fae'},
+{n:'Stirge',hd:'1',ac:'7',mv:"30'/180'fly",at:'1',dm:'1d3',dg:'easy',wn:'⚠ Blood drain',sp:'+2 to attack. Attaches on hit: auto-drains 1d3/round until full (4 rounds) or killed. Flock of 10d10 possible.',tp:'<strong>Use as:</strong> resource-drain encounter. One Stirge: annoying. A flock in an enclosed cave: party emergency.',gr:'drain'},
+{n:'Shadow',hd:'2+2',ac:'7',mv:"90'",at:'1',dm:'1d4+STR drain',dg:'moderate',wn:'⚠ STR drain/Creates Shadows',sp:'Each hit drains 1 STR permanently (rest restores). Character at 0 STR becomes a Shadow. Magic weapons only.',tp:'<strong>Use as:</strong> creeping dread encounter. STR drain weakens the party each round — and dead PCs don\'t stay dead.',gr:'drain'},
+{n:'Ghoul',hd:'2',ac:'6',mv:"90'",at:'3',dm:'1d3/1d3/1d3',dg:'easy',wn:'⚠ Paralysis',sp:'Any hit causes paralysis (save vs. Paralysis; Elves immune). Paralysis lasts 2d4 turns. Undead immunities.',tp:'<strong>Use as:</strong> threat scaling with numbers. One: manageable. Five with cascading paralysis: TPK risk.',gr:'undead'},
+{n:'Mummy',hd:'5+1',ac:'3',mv:"60'",at:'1',dm:'1d12',dg:'tough',wn:'⚠ MUMMY ROT/FEAR',sp:'Fear on sight (save vs. Spells or paralyzed). Touch: Mummy Rot — no natural healing, magic healing 50% effective. Fire and magic weapons only.',tp:'<strong>Use as:</strong> tomb guardian winning slowly. Fear prevents action; the rot makes surviving a serious problem.',gr:'undead'},
+{n:'Skeleton',hd:'1',ac:'7',mv:"60'",at:'1',dm:'1d6',dg:'easy',wn:null,sp:'Undead immunities: sleep, charm, hold, cold. Edged weapons deal minimum damage. Mindless and relentless.',tp:'<strong>Use as:</strong> dungeon staple and Cleric tutorial. Teaches that blunt weapons matter and Clerics are not optional.',gr:'undead'},
+{n:'Spectre',hd:'6',ac:'2',mv:"150'/300'fly",at:'1',dm:'1d8+2 levels',dg:'deadly',wn:'⚠ 2 LEVEL DRAIN',sp:'Touch drains 2 experience levels (no save). Passes through solid objects. Slain = Spectre in 24h. Magic weapons only.',tp:'<strong>Use as:</strong> high-level horror. Two levels at once cripples even a tough fighter. Reasons to find holy water.',gr:'undead'},
+{n:'Vampire',hd:'7-9',ac:'2',mv:"120'/180'fly",at:'1',dm:'1d10+2 levels',dg:'deadly',wn:'⚠ 2 LEVEL DRAIN/NEAR-UNKILLABLE',sp:'Drains 2 levels. Charm gaze. Gaseous form, spider climb. Summons rats/bats/wolves. Regen 3 HP/round. Only destroyed by sunlight, running water, or stake+beheading.',tp:'<strong>Use as:</strong> apex undead and centrepiece of an entire adventure. Not defeated in one fight — hunted across multiple sessions.',gr:'undead'},
+{n:'Wight',hd:'3',ac:'5',mv:"90'",at:'1',dm:'Energy drain',dg:'deadly',wn:'⚠ PERMANENT LEVEL DRAIN',sp:'Hit drains 1 experience level permanently (no save). Magic or silver weapons only. Slain humans become Wights.',tp:'<strong>Use as:</strong> horror encounter. Permanent level drain is the most severe mechanical effect in B/X.',gr:'undead'},
+{n:'Wraith',hd:'4',ac:'3',mv:"120'/240'fly",at:'1',dm:'1d6+1 level',dg:'tough',wn:'⚠ LEVEL DRAIN',sp:'Touch drains 1 level. Silver or magic weapons only. Weakened in sunlight. Slain = Wraith. Undead immunities.',tp:'<strong>Use as:</strong> dungeon encounter raising the stakes of any fight. A Wraith sighting triggers resource evaluation.',gr:'undead'},
+{n:'Zombie',hd:'2',ac:'8',mv:"60'",at:'1',dm:'1d8',dg:'easy',wn:null,sp:'Always acts last every round. Mindless: no morale, no retreat. Immune to sleep, charm, hold, cold.',tp:'<strong>Use as:</strong> predictable threat teaching action economy. Always going last gives the party one free strike per round.',gr:'undead'},
+];
+const DC={trivial:'dt',easy:'de',moderate:'dm',tough:'dh',deadly:'dd'};
+const DL={trivial:'Trivial',easy:'Easy',moderate:'Moderate',tough:'Tough',deadly:'Deadly'};
+function buildCard(m){
+  const wt=m.wn?`<span class="warn-tag">${m.wn}</span>`:'';
+  return`<div class="monster-card" data-name="${m.n.toLowerCase()}" data-danger="${m.dg}" onclick="this.classList.toggle('expanded')">
+<div class="card-top"><div class="monster-name">${m.n}</div><div class="card-tags">${wt}<span class="danger-tag ${DC[m.dg]}">${DL[m.dg]}</span></div></div>
+<div class="card-stats"><span class="stat-item">HD <strong>${m.hd}</strong></span><span class="stat-item">AC <strong>${m.ac}</strong></span><span class="stat-item">Move <strong>${m.mv}</strong></span><span class="stat-item">Att <strong>${m.at}</strong></span><span class="stat-item">Dmg <strong>${m.dm}</strong></span></div>
+<div class="card-detail"><div class="detail-row"><span class="detail-label">Special</span><span class="detail-val special-text">${m.sp}</span></div><div class="newbie-tip">⚔ <strong>Referee note:</strong> ${m.tp}</div></div>
+</div>`;
+}
+function renderAll(){
+  const grids={};
+  M.forEach(m=>{if(!grids[m.gr])grids[m.gr]=[];grids[m.gr].push(m);});
+  for(const[id,ms] of Object.entries(grids)){const el=document.getElementById('grid-'+id);if(el)el.innerHTML=ms.map(buildCard).join('');}
+  updateCount();
+}
+let activeFilters=new Set();
+function toggleFilter(d,btn){activeFilters.has(d)?activeFilters.delete(d):activeFilters.add(d);btn.classList.toggle('active');filterAll();}
+function clearFilters(){activeFilters.clear();document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));document.getElementById('search').value='';filterAll();}
+function filterAll(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  document.querySelectorAll('.monster-card').forEach(c=>{
+    c.classList.toggle('hidden',!(c.dataset.name.includes(q)&&(activeFilters.size===0||activeFilters.has(c.dataset.danger))));
+  });
+  document.querySelectorAll('.subcat').forEach(s=>{s.style.display=[...s.querySelectorAll('.monster-card')].some(c=>!c.classList.contains('hidden'))?'':'none';});
+  document.querySelectorAll('.category').forEach(c=>{c.style.display=[...c.querySelectorAll('.monster-card')].some(m=>!m.classList.contains('hidden'))?'':'none';});
+  updateCount();
+}
+function updateCount(){
+  const total=document.querySelectorAll('.monster-card').length;
+  const vis=[...document.querySelectorAll('.monster-card')].filter(c=>!c.classList.contains('hidden')).length;
+  const el=document.getElementById('result-count');
+  if(el)el.textContent=vis<total?`${vis} of ${total} shown`:`${total} monsters`;
+}
+renderAll();
+</script>
+</body>
+</html>
