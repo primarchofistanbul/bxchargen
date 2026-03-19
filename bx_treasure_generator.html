@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+Coin handling — EP and PP are fully eliminated. Every EP entry is converted to GP at exactly 0.5 rate (so "1d4×1000ep" becomes "1d4×500gp"), except for individual carry types R and V where EP converts to SP at 5:1 (keeping small amounts practical). PP always converts to GP at 5:1. Converted entries are labelled so the DM can see what happened.
+Gems — each gem rolls a d20 against the B/X value table (10/50/100/500/1,000/5,000gp tiers), gets a random name from the correct tier, and displays with its value. For large rolls like Type H's 1d100 gems, the output groups by value tier rather than listing 70 individual lines.
+Jewellery — each piece rolls 3d6×100gp and gets a procedurally generated description (material + item type scaled to the value: copper rings for cheap pieces, ornate gold medallions for expensive ones). Type H's "1d4×10 pieces" is handled correctly.
+Magic items — potions get a specific name, scrolls get a spell count and level breakdown (e.g. "3 spells: L2, L5, L1"), swords/armour/weapons get a bonus (+1/+2/+3 weighted 65/25/10%), rings and wands get specific names from the full B/X lists. The "not weapons" restriction for Type F is enforced.
+Grand total shown in the header is coins + gems + jewellery converted to GP equivalent. Magic items are listed separately since they have no fixed sale value in B/X.
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B/X D&D — Treasure Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#111;--ink2:#333;--muted:#666;
+  --rule:#ccc;--rule2:#e8e8e8;
+  --bg:#fff;--bg2:#f7f7f7;--bg3:#f0f0f0;
+  --red:#c0102a;--red-bg:#fdf2f4;
+  --mono:'Share Tech Mono',monospace;
+  --gold:#8a6800;--gold-bg:#fffbf0;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Libre Baskerville',Georgia,serif;font-size:15px;line-height:1.65;min-height:100vh}
+.wrapper{max-width:900px;margin:0 auto;padding:0 20px 80px}
+
+/* HEADER */
+.site-header{border-bottom:3px solid var(--ink);padding:36px 0 24px;margin-bottom:36px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.header-left h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2.2rem);font-weight:900;letter-spacing:-0.02em;line-height:1.05}
+.header-left .subtitle{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.btn{font-family:'Playfair Display',serif;font-size:0.8rem;font-weight:700;letter-spacing:0.04em;padding:9px 22px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--bg);transition:background 0.15s,color 0.15s;white-space:nowrap;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--red);border-color:var(--red)}
+.btn.outline{background:transparent;color:var(--ink)}
+.btn.outline:hover{background:var(--ink);color:var(--bg)}
+
+/* TYPE SELECTOR */
+.selector-section{margin-bottom:32px}
+.selector-label{font-family:'Playfair Display',serif;font-size:0.68rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+.type-group{margin-bottom:14px}
+.type-group-label{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.type-btns{display:flex;flex-wrap:wrap;gap:5px}
+.type-btn{
+  font-family:var(--mono);font-size:0.82rem;font-weight:bold;
+  padding:8px 14px;border:2px solid var(--rule);
+  background:var(--bg2);color:var(--ink2);cursor:pointer;
+  transition:all 0.12s;min-width:52px;text-align:center;
+}
+.type-btn:hover{border-color:var(--ink);color:var(--ink);background:var(--bg3)}
+.type-btn.active{border-color:var(--red);background:var(--red);color:#fff}
+.type-btn .avg{display:block;font-family:'Libre Baskerville',serif;font-size:0.6rem;font-weight:normal;opacity:0.7;margin-top:1px;letter-spacing:0}
+
+/* GENERATE */
+.generate-bar{
+  display:flex;align-items:center;gap:16px;margin-bottom:36px;
+  padding:16px 20px;background:var(--bg2);border:2px solid var(--ink);
+}
+.btn-generate{
+  font-family:'Playfair Display',serif;font-size:0.9rem;font-weight:900;
+  letter-spacing:0.05em;padding:12px 32px;
+  border:2px solid var(--ink);background:var(--ink);color:var(--bg);
+  cursor:pointer;transition:background 0.15s,border-color 0.15s;
+  white-space:nowrap;
+}
+.btn-generate:hover{background:var(--red);border-color:var(--red)}
+.selected-info{flex:1}
+.sel-type{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--ink)}
+.sel-meta{font-size:0.78rem;color:var(--muted);margin-top:2px}
+.sel-avg{font-family:var(--mono);color:var(--gold);font-size:0.82rem}
+
+/* RESULTS */
+.result-card{border:2px solid var(--ink);animation:cardIn 0.35s ease}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.result-header{
+  background:var(--ink);color:var(--bg);
+  padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.rh-left{}
+.rh-type{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;line-height:1.1}
+.rh-cat{font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-top:2px}
+.rh-right{text-align:right}
+.rh-total-label{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.55}
+.rh-total{font-family:var(--mono);font-size:1.6rem;font-weight:bold;color:#f0c060;line-height:1}
+
+.result-body{padding:0}
+
+/* RESULT SECTIONS */
+.res-section{padding:18px 22px;border-bottom:1px solid var(--rule2)}
+.res-section:last-child{border-bottom:none}
+.res-title{
+  font-family:'Playfair Display',serif;font-size:0.65rem;font-weight:700;
+  letter-spacing:0.22em;text-transform:uppercase;color:var(--red);
+  margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;
+}
+.res-title-total{font-family:var(--mono);font-size:0.78rem;color:var(--gold)}
+
+/* COINS */
+.coin-list{display:flex;flex-direction:column;gap:5px}
+.coin-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 12px;background:var(--bg2);border:1px solid var(--rule2);
+  font-size:0.88rem;
+}
+.coin-name{color:var(--ink2)}
+.coin-amount{font-family:var(--mono);font-size:0.95rem;font-weight:bold;color:var(--ink)}
+.coin-converted{font-size:0.72rem;color:var(--muted);margin-left:6px;font-style:italic}
+.coin-gp-eq{font-family:var(--mono);font-size:0.75rem;color:var(--muted)}
+
+/* GEMS */
+.gem-list{display:flex;flex-direction:column;gap:4px}
+.gem-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 12px;background:var(--bg2);border:1px solid var(--rule2);
+  font-size:0.85rem;
+}
+.gem-name{color:var(--ink2);flex:1}
+.gem-val{font-family:var(--mono);font-size:0.82rem;color:var(--gold);font-weight:bold}
+.gem-tier-group{margin-bottom:8px}
+.gem-tier-label{font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;padding-left:2px}
+.gem-tier-items{font-size:0.83rem;color:var(--ink2);padding:6px 12px;background:var(--bg2);border:1px solid var(--rule2);display:flex;align-items:center;justify-content:space-between}
+
+/* JEWELLERY */
+.jwl-list{display:flex;flex-direction:column;gap:4px}
+.jwl-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 12px;background:var(--gold-bg);border:1px solid #e8d080;
+  font-size:0.85rem;
+}
+.jwl-name{color:var(--ink2);flex:1}
+.jwl-val{font-family:var(--mono);font-size:0.82rem;color:var(--gold);font-weight:bold}
+
+/* MAGIC */
+.magic-list{display:flex;flex-direction:column;gap:5px}
+.magic-row{
+  display:flex;align-items:baseline;gap:12px;
+  padding:8px 12px;border:1px solid var(--rule2);
+  font-size:0.88rem;
+}
+.magic-num{font-family:var(--mono);font-size:0.75rem;color:var(--red);min-width:20px;flex-shrink:0}
+.magic-cat{font-weight:bold;color:var(--ink);min-width:120px}
+.magic-detail{color:var(--ink2);font-style:italic}
+.magic-note{font-size:0.75rem;color:var(--muted);font-style:italic}
+
+/* NOTHING */
+.nothing-found{
+  padding:32px 22px;text-align:center;font-style:italic;color:var(--muted);
+  font-size:0.9rem;border:2px dashed var(--rule);
+}
+
+/* EMPTY STATE */
+.empty-state{padding:48px 20px;text-align:center;border:2px dashed var(--rule);color:var(--muted);font-style:italic}
+
+@media(max-width:600px){
+  .site-header{flex-direction:column}.header-right{align-items:flex-start}
+  .generate-bar{flex-direction:column;align-items:flex-start}
+  .rh-right{text-align:left}
+}
+@media print{
+  .selector-section,.generate-bar,.header-right{display:none!important}
+  .result-card{border:1px solid #ccc}
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<header class="site-header">
+  <div class="header-left">
+    <h1>Treasure Generator</h1>
+    <div class="subtitle">B/X Dungeons &amp; Dragons · Moldvay Basic / Old School Essentials</div>
+  </div>
+  <div class="header-right">
+    <a class="btn" href="index.html">⚔ Characters</a>
+    <a class="btn outline" href="bx_monster_reference.html">☠ Monsters</a>
+    <a class="btn outline" href="bx_scenario_generator.html">🗺 Scenarios</a>
+  </div>
+</header>
+
+<!-- TYPE SELECTOR -->
+<div class="selector-section">
+  <div class="selector-label">Select Treasure Type</div>
+
+  <div class="type-group">
+    <div class="type-group-label">Hoards A–O · Lair treasure of a large monster or community</div>
+    <div class="type-btns" id="btns-hoard"></div>
+  </div>
+
+  <div class="type-group">
+    <div class="type-group-label">Individual P–T · Carried by each intelligent monster or loot on victims</div>
+    <div class="type-btns" id="btns-indiv"></div>
+  </div>
+
+  <div class="type-group">
+    <div class="type-group-label">Group U–V · Carried collectively by a group</div>
+    <div class="type-btns" id="btns-group"></div>
+  </div>
+</div>
+
+<!-- GENERATE BAR -->
+<div class="generate-bar">
+  <div class="selected-info">
+    <div class="sel-type" id="sel-type">Select a treasure type above</div>
+    <div class="sel-meta" id="sel-meta">&nbsp;</div>
+  </div>
+  <button class="btn-generate" onclick="generate()" id="gen-btn" disabled>🎲 Roll Treasure</button>
+</div>
+
+<!-- RESULTS -->
+<div id="result-area"><div class="empty-state">Select a treasure type and click Roll Treasure.</div></div>
+
+</div><!-- .wrapper -->
+
+<script>
+// ═══════════════════════════════════════════════
+//  DICE
+// ═══════════════════════════════════════════════
+const d = (sides) => Math.floor(Math.random() * sides) + 1;
+const roll = (num, sides) => { let t=0; for(let i=0;i<num;i++) t+=d(sides); return t; };
+const pct = (chance) => Math.random() * 100 < chance;
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const fmt = (n) => Math.round(n).toLocaleString();
+
+function resolveCount(n) {
+  if (typeof n === 'number') return n;
+  const [num, sides] = n.split('d').map(Number);
+  return roll(num, sides);
+}
+
+// ═══════════════════════════════════════════════
+//  TREASURE TYPE DATA
+//  EP → GP at 0.5 rate: mult already halved in data
+//  EP → SP at 5x rate: mult ×5 in data, type:'sp', from:'EP'
+//  PP → GP at 5x rate: mult ×5 in data, from:'PP'
+// ═══════════════════════════════════════════════
+const TYPES = {
+  A:{label:'Type A',avg:'18,000',cat:'Hoard',
+    coins:[
+      {p:25,n:1,s:6,m:1000,t:'cp'},
+      {p:30,n:1,s:6,m:1000,t:'sp'},
+      {p:20,n:1,s:4,m:500, t:'gp',from:'EP'}, // 1d4×1000ep → 1d4×500gp
+      {p:35,n:2,s:6,m:1000,t:'gp'},
+      {p:25,n:1,s:2,m:5000,t:'gp',from:'PP'}, // 1d2×1000pp → 1d2×5000gp
+    ],
+    gems:{p:50,n:6,s:6},jwl:{p:50,n:6,s:6},
+    magic:[{p:30,items:[{n:3,r:'any'}]}]},
+
+  B:{label:'Type B',avg:'2,000',cat:'Hoard',
+    coins:[
+      {p:50,n:1,s:8,m:1000,t:'cp'},
+      {p:25,n:1,s:6,m:1000,t:'sp'},
+      {p:25,n:1,s:4,m:500, t:'gp',from:'EP'},
+      {p:25,n:1,s:3,m:1000,t:'gp'},
+    ],
+    gems:{p:25,n:1,s:6},jwl:{p:25,n:1,s:6},
+    magic:[{p:10,items:[{n:1,r:'sword-armour-weapon'}]}]},
+
+  C:{label:'Type C',avg:'1,000',cat:'Hoard',
+    coins:[
+      {p:20,n:1,s:12,m:1000,t:'cp'},
+      {p:30,n:1,s:4, m:1000,t:'sp'},
+      {p:10,n:1,s:4, m:500, t:'gp',from:'EP'},
+    ],
+    gems:{p:25,n:1,s:4},jwl:{p:25,n:1,s:4},
+    magic:[{p:10,items:[{n:2,r:'any'}]}]},
+
+  D:{label:'Type D',avg:'3,900',cat:'Hoard',
+    coins:[
+      {p:10,n:1,s:8, m:1000,t:'cp'},
+      {p:15,n:1,s:12,m:1000,t:'sp'},
+      {p:60,n:1,s:6, m:1000,t:'gp'},
+    ],
+    gems:{p:30,n:1,s:8},jwl:{p:30,n:1,s:8},
+    magic:[{p:15,items:[{n:2,r:'any'},{n:1,r:'potion'}]}]},
+
+  E:{label:'Type E',avg:'2,300',cat:'Hoard',
+    coins:[
+      {p:5, n:1,s:10,m:1000,t:'cp'},
+      {p:30,n:1,s:12,m:1000,t:'sp'},
+      {p:25,n:1,s:4, m:500, t:'gp',from:'EP'},
+      {p:25,n:1,s:8, m:1000,t:'gp'},
+    ],
+    gems:{p:10,n:1,s:10},jwl:{p:10,n:1,s:10},
+    magic:[{p:25,items:[{n:3,r:'any'},{n:1,r:'scroll'}]}]},
+
+  F:{label:'Type F',avg:'7,700',cat:'Hoard',
+    coins:[
+      {p:10,n:2,s:10,m:1000,t:'sp'},
+      {p:20,n:1,s:8, m:500, t:'gp',from:'EP'}, // 1d8×1000ep → 1d8×500gp
+      {p:45,n:1,s:12,m:1000,t:'gp'},
+      {p:30,n:1,s:3, m:5000,t:'gp',from:'PP'}, // 1d3×1000pp → 1d3×5000gp
+    ],
+    gems:{p:20,n:2,s:12},jwl:{p:10,n:1,s:12},
+    magic:[{p:30,items:[{n:3,r:'no-weapons'},{n:1,r:'potion'},{n:1,r:'scroll'}]}]},
+
+  G:{label:'Type G',avg:'23,000',cat:'Hoard',
+    coins:[
+      {p:50,n:1,s:4,m:10000,t:'gp'},
+      {p:50,n:1,s:6,m:5000, t:'gp',from:'PP'}, // 1d6×1000pp → 1d6×5000gp
+    ],
+    gems:{p:25,n:3,s:6},jwl:{p:25,n:1,s:10},
+    magic:[{p:35,items:[{n:4,r:'any'},{n:1,r:'scroll'}]}]},
+
+  H:{label:'Type H',avg:'60,000',cat:'Hoard',
+    coins:[
+      {p:25,n:3,s:8,  m:1000, t:'cp'},
+      {p:50,n:1,s:100,m:1000, t:'sp'},
+      {p:50,n:1,s:4,  m:5000, t:'gp',from:'EP'}, // 1d4×10000ep → 1d4×5000gp
+      {p:50,n:1,s:6,  m:10000,t:'gp'},
+      {p:25,n:5,s:4,  m:5000, t:'gp',from:'PP'}, // 5d4×1000pp → 5d4×5000gp
+    ],
+    gems:{p:50,n:1,s:100},jwl:{p:50,n:1,s:4,jmult:10}, // 1d4×10 pieces
+    magic:[{p:15,items:[{n:4,r:'any'},{n:1,r:'potion'},{n:1,r:'scroll'}]}]},
+
+  I:{label:'Type I',avg:'11,000',cat:'Hoard',
+    coins:[
+      {p:30,n:1,s:8,m:5000,t:'gp',from:'PP'}, // 1d8×1000pp → 1d8×5000gp
+    ],
+    gems:{p:50,n:2,s:6},jwl:{p:50,n:2,s:6},
+    magic:[{p:15,items:[{n:1,r:'any'}]}]},
+
+  J:{label:'Type J',avg:'25',cat:'Hoard',
+    coins:[
+      {p:25,n:1,s:4,m:1000,t:'cp'},
+      {p:10,n:1,s:3,m:1000,t:'sp'},
+    ]},
+
+  K:{label:'Type K',avg:'180',cat:'Hoard',
+    coins:[
+      {p:30,n:1,s:6,m:1000,t:'sp'},
+      {p:10,n:1,s:2,m:500, t:'gp',from:'EP'}, // 1d2×1000ep → 1d2×500gp
+    ]},
+
+  L:{label:'Type L',avg:'240',cat:'Hoard',
+    gems:{p:50,n:1,s:4}},
+
+  M:{label:'Type M',avg:'50,000',cat:'Hoard',
+    coins:[
+      {p:40,n:2,s:4,m:1000, t:'gp'},
+      {p:50,n:5,s:6,m:5000, t:'gp',from:'PP'}, // 5d6×1000pp → 5d6×5000gp
+    ],
+    gems:{p:55,n:5,s:4},jwl:{p:45,n:2,s:6}},
+
+  N:{label:'Type N',avg:'0',cat:'Hoard',
+    magic:[{p:40,items:[{n:'2d4',r:'potion'}]}]},
+
+  O:{label:'Type O',avg:'0',cat:'Hoard',
+    magic:[{p:50,items:[{n:'1d4',r:'scroll'}]}]},
+
+  P:{label:'Type P',avg:'0.1',cat:'Individual',
+    coins:[{p:100,n:3,s:8,m:1,t:'cp'}]},
+
+  Q:{label:'Type Q',avg:'1',cat:'Individual',
+    coins:[{p:100,n:3,s:6,m:1,t:'sp'}]},
+
+  R:{label:'Type R',avg:'3',cat:'Individual',
+    coins:[{p:100,n:2,s:6,m:5,t:'sp',from:'EP'}]}, // 2d6ep → 2d6×5sp
+
+  S:{label:'Type S',avg:'5',cat:'Individual',
+    coins:[{p:100,n:2,s:4,m:1,t:'gp'}]},
+
+  T:{label:'Type T',avg:'17',cat:'Individual',
+    coins:[{p:100,n:1,s:6,m:5,t:'gp',from:'PP'}]}, // 1d6pp → 1d6×5gp
+
+  U:{label:'Type U',avg:'160',cat:'Group',
+    coins:[
+      {p:10,n:1,s:100,m:1,t:'cp'},
+      {p:10,n:1,s:100,m:1,t:'sp'},
+      {p:5, n:1,s:100,m:1,t:'gp'},
+    ],
+    gems:{p:5,n:1,s:4},jwl:{p:5,n:1,s:4},
+    magic:[{p:2,items:[{n:1,r:'any'}]}]},
+
+  V:{label:'Type V',avg:'330',cat:'Group',
+    coins:[
+      {p:10,n:1,s:100,m:1, t:'sp'},
+      {p:5, n:1,s:100,m:5, t:'sp',from:'EP'}, // 1d100ep → 1d100×5sp
+      {p:10,n:1,s:100,m:1, t:'gp'},
+      {p:5, n:1,s:100,m:5, t:'gp',from:'PP'}, // 1d100pp → 1d100×5gp
+    ],
+    gems:{p:10,n:1,s:4},jwl:{p:10,n:1,s:4},
+    magic:[{p:5,items:[{n:1,r:'any'}]}]},
+};
+
+// ═══════════════════════════════════════════════
+//  GEMS
+// ═══════════════════════════════════════════════
+const GEM_TIERS = [
+  {max:5,  val:10,   names:['Azurite','Banded Agate','Blue Quartz','Eye Agate','Hematite','Lapis Lazuli','Malachite','Moss Agate','Obsidian','Rhodochrosite','Tiger Eye','Turquoise']},
+  {max:9,  val:50,   names:['Bloodstone','Carnelian','Chalcedony','Chrysoprase','Citrine','Jasper','Moonstone','Onyx','Rock Crystal','Sardonyx','Smoky Quartz','Zircon']},
+  {max:14, val:100,  names:['Amber','Amethyst','Chrysoberyl','Coral','Garnet','Jade','Jet','Red Spinel','Tourmaline','White Pearl']},
+  {max:17, val:500,  names:['Aquamarine','Alexandrite','Black Pearl','Topaz','Violet Garnet']},
+  {max:19, val:1000, names:['Blue Sapphire','Emerald','Fire Opal','Star Ruby','Star Sapphire','White Opal']},
+  {max:20, val:5000, names:['Black Opal','Diamond','Jacinth','Ruby']},
+];
+
+function rollGem() {
+  const r = d(20);
+  const tier = GEM_TIERS.find(t => r <= t.max);
+  return { name: pick(tier.names), value: tier.val };
+}
+
+function rollGems(count) {
+  const gems = [];
+  for (let i = 0; i < count; i++) gems.push(rollGem());
+  return gems;
+}
+
+// ═══════════════════════════════════════════════
+//  JEWELLERY
+// ═══════════════════════════════════════════════
+const JWL_TYPES = ['Ring','Necklace','Bracelet','Brooch','Amulet','Pendant','Tiara','Torc','Medallion','Goblet','Earrings','Chain','Diadem','Locket','Clasp'];
+const JWL_MATS = {
+  low:  ['Copper','Bronze','Silver (plain)'],
+  mid:  ['Silver (ornate)','Gold (plain)'],
+  high: ['Gold','Gold (ornate)'],
+  fine: ['Gold (masterwork)','Gold (gem-set)'],
+};
+
+function rollJewellery() {
+  const value = roll(3, 6) * 100;
+  const type = pick(JWL_TYPES);
+  let mat;
+  if (value < 400) mat = pick(JWL_MATS.low);
+  else if (value < 900) mat = pick(JWL_MATS.mid);
+  else if (value < 1500) mat = pick(JWL_MATS.high);
+  else mat = pick(JWL_MATS.fine);
+  return { name: `${mat} ${type}`, value };
+}
+
+// ═══════════════════════════════════════════════
+//  MAGIC ITEMS
+// ═══════════════════════════════════════════════
+const POTIONS = [
+  'Clairvoyance','Control Animals','Control Giants','Control Plants','Control Undead',
+  'Delusion','Diminution','ESP','Fire Resistance','Flying','Gaseous Form','Giant Strength',
+  'Growth','Healing','Heroism','Invisibility','Invulnerability','Levitation','Longevity',
+  'Poison','Polymorph Self','Speed','Treasure Finding'
+];
+
+const RINGS = [
+  'Protection +1','Protection +2','Fire Resistance','Invisibility','Mammal Control',
+  'Plant Control','Poison Resistance','Regeneration','Spell Storing','Spell Turning',
+  'Telekinesis','Water Walking','Weakness (cursed)','Wishes','X-ray Vision'
+];
+
+const WANDS_STAVES = [
+  'Wand of Cold','Wand of Enemy Detection','Wand of Fear','Wand of Fire Balls',
+  'Wand of Illusion','Wand of Lightning Bolts','Wand of Magic Detection','Wand of Metal Detection',
+  'Wand of Negation','Wand of Paralyzation','Wand of Polymorphing','Wand of Secret Door Detection',
+  'Wand of Trap Detection','Staff of Commanding','Staff of Healing','Staff of Power',
+  'Staff of Snakes','Staff of Striking','Staff of Withering','Staff of Wizardry','Rod of Cancellation'
+];
+
+const MISC_MAGIC = [
+  'Bag of Devouring (cursed)','Bag of Holding','Boots of Levitation','Boots of Speed',
+  'Boots of Travelling & Leaping','Broom of Flying','Crystal Ball','Crystal Ball with Clairvoyance',
+  'Crystal Ball with ESP','Drums of Panic','Efreeti Bottle','Flying Carpet',
+  'Gauntlets of Ogre Power','Girdle of Giant Strength','Helm of Alignment Change (cursed)',
+  'Helm of Telepathy','Helm of Teleportation','Horn of Blasting','Medallion of ESP 30\'',
+  'Mirror of Life Trapping','Rope of Climbing','Scarab of Protection'
+];
+
+const MAGIC_TABLES = {
+  any: [
+    {w:10,cat:'Armour or Shield'},
+    {w:5, cat:'Misc. Weapon'},
+    {w:25,cat:'Potion'},
+    {w:5, cat:'Ring'},
+    {w:5, cat:'Rod, Staff, or Wand'},
+    {w:20,cat:'Scroll'},
+    {w:20,cat:'Sword'},
+    {w:10,cat:'Misc. Magic Item'},
+  ],
+  'no-weapons': [
+    {w:15,cat:'Armour or Shield'},
+    {w:30,cat:'Potion'},
+    {w:10,cat:'Ring'},
+    {w:10,cat:'Rod, Staff, or Wand'},
+    {w:25,cat:'Scroll'},
+    {w:10,cat:'Misc. Magic Item'},
+  ],
+  'sword-armour-weapon': [
+    {w:33,cat:'Sword'},
+    {w:34,cat:'Armour or Shield'},
+    {w:33,cat:'Misc. Weapon'},
+  ],
+  potion: [{w:1,cat:'Potion'}],
+  scroll: [{w:1,cat:'Scroll'}],
+};
+
+function pickFromTable(table) {
+  const total = table.reduce((s,e) => s+e.w, 0);
+  let r = Math.random() * total;
+  for (const e of table) { r -= e.w; if (r <= 0) return e.cat; }
+  return table[table.length-1].cat;
+}
+
+const SWORD_BONUS = () => { const r=d(10); return r<=6?'+1':r<=9?'+2':'+3'; };
+const ARMOUR_BONUS = () => { const r=d(10); return r<=6?'+1':r<=9?'+2':'+3'; };
+const WEAPON_BONUS = () => { const r=d(8); return r<=5?'+1':r<=8?'+2':'+3'; };
+
+function rollMagicItem(restriction) {
+  const cat = pickFromTable(MAGIC_TABLES[restriction] || MAGIC_TABLES.any);
+  switch(cat) {
+    case 'Potion':
+      return { cat, display: `Potion of ${pick(POTIONS)}` };
+    case 'Scroll': {
+      const numSpells = d(6) <= 2 ? 1 : d(6) <= 4 ? 2 : 3;
+      const levels = Array.from({length:numSpells}, () => `L${d(6)}`);
+      return { cat, display: `Scroll — ${numSpells} spell${numSpells>1?'s':''} (${levels.join(', ')})` };
+    }
+    case 'Sword':
+      return { cat, display: `Sword ${SWORD_BONUS()}`, note: 'Roll for special powers if +2 or +3' };
+    case 'Armour or Shield': {
+      const isShield = d(3) === 1;
+      if (isShield) return { cat, display: `Shield ${ARMOUR_BONUS()}` };
+      const armorType = pick(['Leather Armour','Chain Mail','Plate Mail']);
+      return { cat, display: `${armorType} ${ARMOUR_BONUS()}` };
+    }
+    case 'Misc. Weapon':
+      return { cat, display: `Weapon ${WEAPON_BONUS()}`, note: 'Roll type (dagger, bow, axe, etc.)' };
+    case 'Ring':
+      return { cat, display: `Ring of ${pick(RINGS).replace(/^Ring of /,'')}` };
+    case 'Rod, Staff, or Wand':
+      return { cat, display: pick(WANDS_STAVES) };
+    case 'Misc. Magic Item':
+      return { cat, display: pick(MISC_MAGIC) };
+    default:
+      return { cat, display: cat, note: 'Roll on tables' };
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  GENERATE
+// ═══════════════════════════════════════════════
+let selectedType = null;
+
+function selectType(key) {
+  selectedType = key;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + key).classList.add('active');
+  const T = TYPES[key];
+  document.getElementById('sel-type').textContent = `${T.label} — ${T.cat}`;
+  document.getElementById('sel-meta').innerHTML = `Average value: <span class="sel-avg">${T.avg} gp</span>`;
+  document.getElementById('gen-btn').disabled = false;
+}
+
+function generate() {
+  if (!selectedType) return;
+  const T = TYPES[selectedType];
+
+  // ── COINS ──────────────────────────────────────
+  let totalCp = 0, totalSp = 0, totalGp = 0;
+  const coinRows = [];
+
+  if (T.coins) {
+    for (const c of T.coins) {
+      if (!pct(c.p)) continue;
+      const amount = roll(c.n, c.s) * c.m;
+      if (c.t === 'cp') totalCp += amount;
+      else if (c.t === 'sp') totalSp += amount;
+      else totalGp += amount;
+
+      let label = `${fmt(amount)} cp`;
+      if (c.t === 'sp') label = `${fmt(amount)} sp`;
+      if (c.t === 'gp') label = `${fmt(amount)} gp`;
+
+      let converted = '';
+      if (c.from === 'EP') converted = `(converted from electrum)`;
+      if (c.from === 'PP') converted = `(converted from platinum)`;
+
+      let gpEq = '';
+      if (c.t === 'cp' && amount > 0) gpEq = `= ${fmt(amount/100)} gp`;
+      if (c.t === 'sp' && amount > 0) gpEq = `= ${fmt(amount/10)} gp`;
+
+      coinRows.push({ label, converted, gpEq });
+    }
+  }
+
+  const coinsGpEq = totalGp + totalSp/10 + totalCp/100;
+
+  // ── GEMS ───────────────────────────────────────
+  let gemsTotal = 0;
+  let gemsOutput = '';
+
+  if (T.gems && pct(T.gems.p)) {
+    const count = roll(T.gems.n, T.gems.s);
+    const gems = rollGems(count);
+    gemsTotal = gems.reduce((s,g) => s+g.value, 0);
+
+    if (count <= 15) {
+      // Show individually
+      const rows = gems.map(g =>
+        `<div class="gem-row"><span class="gem-name">${g.name}</span><span class="gem-val">${fmt(g.value)} gp</span></div>`
+      ).join('');
+      gemsOutput = `<div class="gem-list">${rows}</div>`;
+    } else {
+      // Group by tier
+      const tiers = {};
+      gems.forEach(g => {
+        if (!tiers[g.value]) tiers[g.value] = {count:0, names:[]};
+        tiers[g.value].count++;
+        if (!tiers[g.value].names.includes(g.name)) tiers[g.value].names.push(g.name);
+      });
+      const tierHtml = Object.entries(tiers).sort((a,b)=>Number(a[0])-Number(b[0])).map(([val,data]) => {
+        const subtotal = data.count * Number(val);
+        return `<div class="gem-tier-items">
+          <span>${data.count} × ${fmt(Number(val))} gp — <em style="color:var(--muted)">${data.names.slice(0,4).join(', ')}${data.names.length>4?' …':''}</em></span>
+          <span class="gem-val">${fmt(subtotal)} gp</span>
+        </div>`;
+      }).join('');
+      gemsOutput = `<div style="display:flex;flex-direction:column;gap:4px">${tierHtml}</div>`;
+    }
+  }
+
+  // ── JEWELLERY ─────────────────────────────────
+  let jwlTotal = 0;
+  let jwlOutput = '';
+
+  if (T.jwl && pct(T.jwl.p)) {
+    let count = roll(T.jwl.n, T.jwl.s);
+    if (T.jwl.jmult) count *= T.jwl.jmult; // Type H: 1d4×10
+    const pieces = Array.from({length:count}, () => rollJewellery());
+    jwlTotal = pieces.reduce((s,p) => s+p.value, 0);
+
+    if (count <= 12) {
+      jwlOutput = `<div class="jwl-list">${pieces.map(p =>
+        `<div class="jwl-row"><span class="jwl-name">${p.name}</span><span class="jwl-val">${fmt(p.value)} gp</span></div>`
+      ).join('')}</div>`;
+    } else {
+      // Summarise
+      const total = pieces.reduce((s,p) => s+p.value, 0);
+      const min = Math.min(...pieces.map(p=>p.value));
+      const max = Math.max(...pieces.map(p=>p.value));
+      const examples = pieces.slice(0,4).map(p=>p.name).join(', ');
+      jwlOutput = `<div style="font-size:0.85rem;color:var(--ink2);">
+        ${count} pieces — range ${fmt(min)}–${fmt(max)} gp<br>
+        <span style="color:var(--muted);font-style:italic">${examples} …</span>
+      </div>`;
+    }
+  }
+
+  // ── MAGIC ─────────────────────────────────────
+  const magicItems = [];
+
+  if (T.magic) {
+    for (const entry of T.magic) {
+      if (!pct(entry.p)) continue;
+      for (const slot of entry.items) {
+        const count = resolveCount(slot.n);
+        for (let i = 0; i < count; i++) {
+          magicItems.push(rollMagicItem(slot.r));
+        }
+      }
+    }
+  }
+
+  // ── TOTAL GP ──────────────────────────────────
+  const grandTotal = coinsGpEq + gemsTotal + jwlTotal;
+
+  // ── BUILD HTML ────────────────────────────────
+  const hasCoins = coinRows.length > 0;
+  const hasGems = gemsOutput !== '';
+  const hasJwl = jwlOutput !== '';
+  const hasMagic = magicItems.length > 0;
+  const hasAnything = hasCoins || hasGems || hasJwl || hasMagic;
+
+  if (!hasAnything) {
+    document.getElementById('result-area').innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <div class="rh-left">
+          <div class="rh-type">${T.label} — ${T.cat}</div>
+          <div class="rh-cat">Avg ${T.avg} gp</div>
+        </div>
+        <div class="rh-right">
+          <div class="rh-total-label">Total Value</div>
+          <div class="rh-total">0 gp</div>
+        </div>
+      </div>
+      <div class="nothing-found">No treasure found this roll. The lair is empty — or already looted.</div>
+    </div>`;
+    return;
+  }
+
+  let html = `
+  <div class="result-card">
+    <div class="result-header">
+      <div class="rh-left">
+        <div class="rh-type">${T.label} — ${T.cat}</div>
+        <div class="rh-cat">Avg ${T.avg} gp · ${hasMagic ? 'includes magic items' : 'no magic items'}</div>
+      </div>
+      <div class="rh-right">
+        <div class="rh-total-label">Coin + Gems + Jewellery</div>
+        <div class="rh-total">${fmt(grandTotal)} gp</div>
+      </div>
+    </div>
+    <div class="result-body">`;
+
+  // COINS SECTION
+  if (hasCoins) {
+    html += `<div class="res-section">
+      <div class="res-title">
+        Coins
+        <span class="res-title-total">${fmt(coinsGpEq)} gp equivalent</span>
+      </div>
+      <div class="coin-list">`;
+    for (const row of coinRows) {
+      html += `<div class="coin-row">
+        <span class="coin-name">${row.label} ${row.converted ? `<span class="coin-converted">${row.converted}</span>` : ''}</span>
+        <span class="coin-gp-eq">${row.gpEq}</span>
+      </div>`;
+    }
+    // Summary line
+    const parts = [];
+    if (totalCp > 0) parts.push(`${fmt(totalCp)} cp`);
+    if (totalSp > 0) parts.push(`${fmt(totalSp)} sp`);
+    if (totalGp > 0) parts.push(`${fmt(totalGp)} gp`);
+    html += `</div></div>`;
+  }
+
+  // GEMS SECTION
+  if (hasGems) {
+    html += `<div class="res-section">
+      <div class="res-title">
+        Gems <span style="font-family:var(--mono);font-size:0.72rem;color:var(--muted)"></span>
+        <span class="res-title-total">${fmt(gemsTotal)} gp</span>
+      </div>
+      ${gemsOutput}
+    </div>`;
+  }
+
+  // JEWELLERY SECTION
+  if (hasJwl) {
+    html += `<div class="res-section">
+      <div class="res-title">
+        Jewellery
+        <span class="res-title-total">${fmt(jwlTotal)} gp</span>
+      </div>
+      ${jwlOutput}
+    </div>`;
+  }
+
+  // MAGIC SECTION
+  if (hasMagic) {
+    html += `<div class="res-section">
+      <div class="res-title">Magic Items <span style="font-family:var(--mono);font-size:0.72rem;color:var(--muted)">(${magicItems.length} item${magicItems.length>1?'s':''})</span></div>
+      <div class="magic-list">`;
+    magicItems.forEach((item, i) => {
+      html += `<div class="magic-row">
+        <span class="magic-num">${i+1}</span>
+        <span class="magic-cat">${item.cat}</span>
+        <span class="magic-detail">${item.display}${item.note ? ` <span class="magic-note">— ${item.note}</span>` : ''}</span>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  html += `</div></div>`; // close result-body, result-card
+
+  document.getElementById('result-area').innerHTML = html;
+  document.getElementById('result-area').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ═══════════════════════════════════════════════
+//  INIT — BUILD TYPE BUTTONS
+// ═══════════════════════════════════════════════
+function buildButtons() {
+  const hoards   = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];
+  const individ  = ['P','Q','R','S','T'];
+  const group    = ['U','V'];
+
+  function makeBtn(key) {
+    const T = TYPES[key];
+    const avg = T.avg === '0' ? 'magic only' : T.avg + ' gp';
+    return `<button class="type-btn" id="btn-${key}" onclick="selectType('${key}')">
+      ${key}<span class="avg">${avg}</span>
+    </button>`;
+  }
+
+  document.getElementById('btns-hoard').innerHTML = hoards.map(makeBtn).join('');
+  document.getElementById('btns-indiv').innerHTML = individ.map(makeBtn).join('');
+  document.getElementById('btns-group').innerHTML = group.map(makeBtn).join('');
+}
+
+buildButtons();
+</script>
+</body>
+</html>
