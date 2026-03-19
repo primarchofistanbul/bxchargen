@@ -5,3 +5,4 @@
 * Scenario Generator: https://primarchofistanbul.github.io/bxchargen/bx_scenario_generator.html
 * Dungeon Stocker: https://primarchofistanbul.github.io/bxstocker/
 * Trap Generator: https://primarchofistanbul.github.io/bxtrapper/
+* Treasure Generator: https://primarchofistanbul.github.io/bxchargen/bx_treasure_generator.html
