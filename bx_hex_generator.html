@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B/X D&D — Hexcrawl Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#111;--ink2:#333;--muted:#666;
+  --rule:#ccc;--rule2:#e8e8e8;
+  --bg:#fff;--bg2:#f7f7f7;--bg3:#f0f0f0;
+  --red:#c0102a;--red-bg:#fdf2f4;
+  --gold:#7a5c00;--gold-bg:#fffbee;--gold-border:#e0c040;
+  --green:#1a5c2a;--green-bg:#f0f9f2;
+  --blue:#1a3a5c;--blue-bg:#f0f4f9;
+  --mono:'Share Tech Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Libre Baskerville',Georgia,serif;font-size:14px;line-height:1.65;min-height:100vh}
+.wrapper{max-width:980px;margin:0 auto;padding:0 20px 80px}
+
+/* HEADER */
+.site-header{border-bottom:3px solid var(--ink);padding:32px 0 22px;margin-bottom:32px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.header-left h1{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,3.5vw,2.1rem);font-weight:900;letter-spacing:-0.02em;line-height:1.05}
+.header-left .subtitle{font-size:0.71rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.btn{font-family:'Playfair Display',serif;font-size:0.78rem;font-weight:700;letter-spacing:0.04em;padding:8px 18px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--bg);transition:background 0.15s,color 0.15s;white-space:nowrap;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--red);border-color:var(--red)}
+.btn.outline{background:transparent;color:var(--ink)}
+.btn.outline:hover{background:var(--ink);color:var(--bg)}
+
+/* GENERATE */
+.gen-area{text-align:center;margin-bottom:36px}
+.btn-gen{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;letter-spacing:0.05em;padding:15px 42px;border:3px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer;transition:background 0.15s,border-color 0.15s;display:inline-flex;align-items:center;gap:10px}
+.btn-gen:hover{background:var(--red);border-color:var(--red)}
+.dice{display:inline-block;font-size:1.1rem}
+.spin{animation:spin 0.5s ease-out}
+@keyframes spin{0%{transform:rotate(0deg) scale(1.3)}100%{transform:rotate(360deg) scale(1)}}
+
+/* CARDS */
+.output{display:flex;flex-direction:column;gap:14px;animation:fadeIn 0.35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.empty-state{text-align:center;padding:48px;border:2px dashed var(--rule);color:var(--muted);font-style:italic}
+
+.card{border:2px solid var(--ink)}
+.card-header{background:var(--ink);color:var(--bg);padding:13px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-header.red{background:var(--red)}
+.card-header.gold{background:var(--gold)}
+.card-header.green{background:var(--green)}
+.card-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:900;line-height:1.1}
+.card-sub{font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.65;margin-top:2px}
+.card-badge{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:4px 10px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);white-space:nowrap}
+.card-body{padding:18px 20px}
+
+/* SUMMARY BANNER */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:0}
+.sum-box{padding:10px 12px;border:1px solid var(--rule2);background:var(--bg2);text-align:center}
+.sum-label{font-family:'Playfair Display',serif;font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.sum-val{font-family:var(--mono);font-size:0.95rem;font-weight:bold;color:var(--ink)}
+.sum-val.yes{color:var(--green)}
+.sum-val.no{color:var(--muted)}
+.sum-val.warn{color:var(--red)}
+
+/* TWO-COL DETAIL */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.detail-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 10px;background:var(--bg2);border:1px solid var(--rule2);font-size:0.84rem;gap:8px}
+.detail-key{color:var(--muted);flex-shrink:0}
+.detail-val{font-weight:bold;color:var(--ink);text-align:right;font-size:0.82rem}
+.detail-val.mono{font-family:var(--mono)}
+
+/* SECTION LABEL */
+.sec{margin-bottom:14px}
+.sec:last-child{margin-bottom:0}
+.sec-label{font-family:'Playfair Display',serif;font-size:0.62rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--red);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--rule2);display:flex;align-items:center;justify-content:space-between}
+.sec-label span{font-family:'Libre Baskerville',serif;font-style:italic;font-weight:normal;letter-spacing:0;text-transform:none;font-size:0.75rem;color:var(--muted)}
+.sec-text{font-size:0.86rem;color:var(--ink2);line-height:1.55}
+
+/* HOOK BOX */
+.hook{padding:10px 14px;border-left:3px solid var(--ink);background:var(--bg2);font-style:italic;font-size:0.85rem;color:var(--ink2);line-height:1.5;margin-top:10px}
+.hook strong{color:var(--ink);font-style:normal}
+
+/* SERVICES LIST */
+.service-grid{display:flex;flex-wrap:wrap;gap:5px}
+.service-pill{font-size:0.76rem;padding:3px 9px;border:1px solid var(--rule2);background:var(--bg2);color:var(--ink2)}
+.service-pill.economy{border-color:var(--gold-border);background:var(--gold-bg);color:var(--gold)}
+
+/* ENCOUNTER BLOCK */
+.enc-block{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--red-bg);border:1px solid var(--red)}
+.enc-monster{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:900;color:var(--red)}
+.enc-num{font-family:var(--mono);font-size:0.8rem;color:var(--muted)}
+.enc-situation{font-size:0.82rem;color:var(--ink2);font-style:italic;margin-top:2px}
+
+/* RESOURCE BLOCK */
+.res-block{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border:1px solid var(--gold-border);background:var(--gold-bg)}
+.res-type{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;color:var(--gold)}
+.res-income{font-family:var(--mono);font-size:1.1rem;font-weight:bold;color:var(--gold)}
+.res-note{font-size:0.78rem;color:var(--muted);font-style:italic;margin-top:2px}
+
+/* TERRAIN GLYPH */
+.terrain-glyph{font-size:2.2rem;line-height:1;margin-right:4px}
+
+/* FIX NOTE */
+.fix-note{font-size:0.68rem;color:var(--muted);font-style:italic;border-top:1px dashed var(--rule2);margin-top:10px;padding-top:8px}
+
+@media(max-width:600px){
+  .site-header{flex-direction:column}.header-right{align-items:flex-start}
+  .detail-grid{grid-template-columns:1fr}
+  .summary-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media print{
+  .gen-area,.header-right{display:none!important}
+  .card{border:1px solid #ccc;page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<header class="site-header">
+  <div class="header-left">
+    <h1>Hexcrawl Generator</h1>
+    <div class="subtitle">B/X Dungeons &amp; Dragons · Terrain · Encounters · Points of Interest</div>
+  </div>
+  <div class="header-right">
+    <a class="btn" href="index.html">⚔ Characters</a>
+    <a class="btn outline" href="bx_monster_reference.html">☠ Monsters</a>
+    <a class="btn outline" href="bx_scenario_generator.html">🗺 Scenarios</a>
+    <a class="btn outline" href="bx_treasure_generator.html">💰 Treasure</a>
+  </div>
+</header>
+
+<div class="gen-area">
+  <button class="btn-gen" onclick="generate()">
+    <span class="dice" id="dice">🎲</span> Generate Hex
+  </button>
+</div>
+
+<div id="output"><div class="empty-state">Press the button above to generate a hex.</div></div>
+
+</div>
+<script>
+// ═══════════════════════════
+//  DICE UTILITIES
+// ═══════════════════════════
+const r=n=>Math.floor(Math.random()*n)+1;
+const roll=(n,s)=>{let t=0;for(let i=0;i<n;i++)t+=r(s);return t;}
+const pct=c=>Math.random()*100<c;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const d6=()=>r(6);
+const d8=()=>r(8);
+
+// ═══════════════════════════
+//  TERRAIN
+// ═══════════════════════════
+const TERRAIN=[
+  {name:'Plains',glyph:'🌾',desc:'Clear grasslands, gentle hills, open sky. Visibility is excellent; ambushes are rare but marching armies are visible from miles away.',threshold:6,roll:'6'},
+  {name:'Marshes',glyph:'🌿',desc:'Swamp, jungle, or flooded lowland. Movement is halved. Disease is a constant concern. Navigation by stars is unreliable beneath the canopy.',threshold:4,roll:'4–6'},
+  {name:'Woodlands',glyph:'🌲',desc:'Forest, from sparse copse to deep old-growth. Direction is easily lost; sound travels strangely. The trees remember everything.',threshold:5,roll:'5–6'},
+  {name:'Water',glyph:'🌊',desc:'Ocean, lake, or river. The surface tells you nothing about what is below. Weather changes everything.',threshold:5,roll:'5–6'},
+  {name:'Barrens',glyph:'🏜',desc:'Tundra, desert, or blasted waste. Water is scarce. Temperature is extreme. The land does not want you here.',threshold:5,roll:'5–6'},
+  {name:'Highlands',glyph:'⛰',desc:'Mountains or steep hills. Altitude saps strength. Passes are bottlenecks. What lives here has evolved for it.',threshold:4,roll:'4–6'},
+];
+
+// ═══════════════════════════
+//  WANDERING MONSTERS (d8 per terrain)
+// ═══════════════════════════
+const ENCOUNTERS=[
+  // Plains
+  [{m:'Bandit',n:'2d6',s:'Ambush from tall grass; decoy cart on the road'},{m:'Gnoll',n:'2d6',s:'Raiding party heading toward the nearest settlement'},{m:'Herd Animal',n:'3d6',s:'Grazing; one old bull is eyeing the party'},{m:'Hobgoblin',n:'2d4',s:'Military patrol, banners lowered — this is their territory now'},{m:'Orc',n:'2d6',s:'Warband crossing the open ground at speed'},{m:'Nomad',n:'2d4',s:'Mounted; circling from a distance before approaching'},{m:'Griffon',n:'1d3',s:'Overhead, watching the party\'s horses'},{m:'Roc',n:'1',s:'Shadow falls over the hex — it is hunting, not yet focused'}],
+  // Marshes
+  [{m:'Giant Leech',n:'1d4',s:'Concealed in a shallow ford the party must cross'},{m:'Lizard Man',n:'2d4',s:'Fishing patrol; territorial, watching the party\'s weapons'},{m:'Crocodile',n:'1d3',s:'Submerged; only eyes visible above the waterline'},{m:'Troglodyte',n:'2d4',s:'Hunting band; stench arrives before they do'},{m:'Giant Toad',n:'1d3',s:'Half-submerged in a reed bed, motionless'},{m:'Insect Swarm',n:'2',s:'Triggered by movement through the thicket'},{m:'Wyvern',n:'1d2',s:'Circling overhead, choosing between the party and a boar carcass'},{m:'Dragon (Black)',n:'1',s:'Moving through the deepest channel — has not noticed the party yet'}],
+  // Woodlands
+  [{m:'Wolf',n:'2d6',s:'Pacing parallel to the party — pack behaviour, sizing up'},{m:'Kobold',n:'2d6',s:'The party walked into their trap; string-triggers everywhere'},{m:'Hobgoblin',n:'2d4',s:'Patrol in good order, following a road they consider theirs'},{m:'Bugbear',n:'1d4',s:'Perfectly silent; 2-in-6 surprise unless the party is actively listening'},{m:'Owlbear',n:'1d2',s:'Nesting season; encountered near cubs'},{m:'Dryad',n:'1d3',s:'At the tree line, watching — will speak if approached calmly'},{m:'Treant',n:'1d3',s:'Thought to be ancient oaks; begins moving when the party is between them'},{m:'Unicorn',n:'1',s:'Visible for a moment through the trees; gone if anyone runs'}],
+  // Water
+  [{m:'Giant Fish',n:'1d4',s:'Beneath the boat or below a fording point'},{m:'Mermen',n:'2d4',s:'Surface to demand explanation — this stretch of water is theirs'},{m:'Nixie',n:'2d4',s:'Visible just below the surface; singing'},{m:'Giant Octopus',n:'1',s:'Tentacle appears first; testing the weight of something wooden'},{m:'Shark',n:'2d4',s:'Circling since blood entered the water two minutes ago'},{m:'Sea Serpent (Lesser)',n:'1',s:'Following the party\'s vessel at a consistent distance'},{m:'Giant Squid',n:'1',s:'Surfaces at night; drawn by lantern light'},{m:'Dragon Turtle',n:'1',s:'The island the party landed on shifts slightly underfoot'}],
+  // Barrens
+  [{m:'Gnoll',n:'2d4',s:'Raiding band, water-hungry and desperate'},{m:'Nomad',n:'2d4',s:'Mounted, armed; watching from a ridge before approaching'},{m:'Giant Scorpion',n:'1d3',s:'Under a flat rock the party wants to use as shade'},{m:'Manticore',n:'1d2',s:'Gliding in from the sun direction, tail already raised'},{m:'Giant (Hill/Frost)',n:'1d2',s:'Crossing the open ground — has spotted the party from half a mile'},{m:'Basilisk',n:'1d2',s:'Among boulders; petrified figures nearby if the party looks'},{m:'Salamander (Fire)',n:'1d2',s:'Near volcanic or extreme heat feature; surprised by the party'},{m:'Efreeti (Lesser)',n:'1',s:'Manifesting from a heat shimmer; annoyed by the interruption'}],
+  // Highlands
+  [{m:'Orc',n:'2d6',s:'Holding a pass; they know the only route'},{m:'Ogre',n:'1d3',s:'Toll-keeper on the mountain road; boulder nearby'},{m:'Gnoll',n:'2d4',s:'Hunting party, skilled at altitude'},{m:'Griffon',n:'1d2',s:'Nesting on a cliff above the only good campsite'},{m:'Wyvern',n:'1d2',s:'Attacking from above; smelled livestock in the pack animals'},{m:'Manticore',n:'1',s:'At the cliff edge, firing tail spikes into the valley below at something'},{m:'Giant (Stone/Frost)',n:'1d2',s:'Hurling boulders down a slope for reasons of its own'},{m:'Roc',n:'1',s:'Has already taken a mule; is watching the rest of the party'}],
+];
+
+const SITUATIONS=['hunting','resting','feeding','fighting among themselves','on the move','guarding territory'];
+
+// ═══════════════════════════
+//  POI
+// ═══════════════════════════
+const POI_TYPE=['Settlement','Fortification','Religious','Landmark','Underworld','Lair'];
+const POI_GLYPH=['🏘','🏰','⛩','🗿','🕳','🐉'];
+const POI_SUB=[
+  ['Camp','Cottage','Hamlet','Village','Manor','Town'],
+  ['Outpost','Tower','Garrison','Keep','Barracks','Castle'],
+  ['Altar','Shrine','Chapel','Hermitage','Reliquary','Temple'],
+  ['Cairn','Totem','Obelisk','Pillar','Monolith','Statue'],
+  ['Cellar','Pit','Quarry','Mine','Cave','Dungeon'],
+  ['Beast Lair','Beast Lair','Humanoid Lair','Humanoid Lair','Undead Lair','Demonic Lair'],
+];
+const AGE=['Current — recently built','Recent — slightly aged','Old — worn','Historical — crumbling','Ancient — in ruins','Alien/Unknown — foundations only'];
+const STATUS=['Long abandoned','Recently abandoned','Partially in use','In use','Partially occupied','Occupied'];
+
+// Settlement
+const ECONOMY=['Agriculture','Husbandry / Fishery','Commerce','Mining','Crafts','Forestry'];
+const CULTURE=['Semi-nomadic','Religious','Artistic','Scholarly','Martial','Civic'];
+const GOVERNANCE=['No organisation','Warlords','Rich merchants','Council of priests','Noble families','Patriarch'];
+const ATTRACTION=['Memorial','Grove','Walls','Bazaar','Temple','Ruins'];
+const THREAT=['Raids','Weak ruler','New religion','Harsh climate','Political intrigue','Immigration'];
+const SIZE_NAME=['Tiny','Small','Medium','Large','Huge','Gargantuan'];
+const SIZE_FAMILIES=[()=>roll(1,3)*10,()=>roll(1,3)*10,()=>roll(1,6)*10,()=>roll(2,6)*10,()=>roll(3,6)*10,()=>roll(4,6)*10];
+
+// Services
+const SVC_LODGING=['Almshouse','Boarding house','Provisioner','Hostel','Inn','Tavern'];
+const SVC_CRAFTS=['Blacksmith','Merchant','Leatherworker','Miller','Potter','Weaver'];
+const SVC_TRANSPORT=['Carter','Messenger','Porter','Saddler','Stable','Boat/Coach hire'];
+const SVC_RELIGIOUS=['Mortuary','Infirmary','Library','Cemetery','School','Basilica'];
+const SVC_ADMIN=['Prison','Court','Watchpost','Tax office','Town hall','Marketplace'];
+
+const ECON_TABLES={
+  'Agriculture':['Carpenter','Bakery','Farm','Olive farm','Orchard','Vine farm'],
+  'Husbandry':['Cartwright','Cattle ranch','Dairy','Hunter\'s lodge','Livery','Tannery'],
+  'Fishery':['Boatyard','Sailmaker','Smokery','Tradepost','Netmaker','Wharf'],
+  'Forestry':['Falconer\'s hut','Timberyard','Trapper\'s hut','Reed gatherer','Apiary','Cooper'],
+  'Crafts':['Brewery','Papyrus workshop','Glass workshop','Mason\'s lodge','Olive press','Winery'],
+  'Mining':['Clay pit','Quarry','Mine','Foundry','Coal mine','Brickyard'],
+  'Commerce':['Slave market','Goldsmith','Jeweller','Weaponsmith','Armourer','Marketplace'],
+};
+
+// NPC titles per governance
+const NPC_TITLES={
+  'No organisation':['Elder','Oldest resident','De facto headman','Village drunk who knows everything'],
+  'Warlords':['Warlord','Warband captain','Champion','War-chief\'s lieutenant'],
+  'Rich merchants':['Merchant prince','Trade factor','Guild master','Caravan lord'],
+  'Council of priests':['High priest','Temple warden','Oracle','Keeper of the rites'],
+  'Noble families':['Lord','Lady','Seneschal','Estate manager'],
+  'Patriarch':['Patriarch','Matriarch','Eldest heir','The Voice'],
+};
+
+// Settlement hooks per threat
+const SETTLEMENT_HOOKS={
+  'Raids':['The raids began three months ago. No one has seen who carries them out — only what they leave.','A child was taken in the last raid. Her father offers everything he has for her return.'],
+  'Weak ruler':['The current lord has not been seen publicly in six weeks. His advisors give conflicting explanations.','Power is contested. Two factions both claim the governing seat and neither will act against the other — yet.'],
+  'New religion':['A new faith arrived with a single preacher eight months ago. Half the settlement has converted. The other half is afraid.','The old shrine was defaced last month. No one admits to it.'],
+  'Harsh climate':['The weather has been wrong for two years. Crops fail, animals sicken. The elders blame something old.','A pass has become impassable. The supply route is gone and winter is coming.'],
+  'Political intrigue':['Someone is passing information to the enemy. Everyone suspects their neighbour.','An alliance is being negotiated. The party arrives as witnesses — or as leverage.'],
+  'Immigration':['A wave of refugees arrived last season. The settlement cannot feed them but cannot turn them away.','New arrivals have brought something with them. No one knows what yet.'],
+};
+
+// Religious
+const REL_MATERIAL=['Straw','Mud','Wood','Field stone','Brick','Cut stone'];
+const REL_SHAPE=['Triangular','Square','Kite','Cross','Rectangular','Circular'];
+const REL_CEREMONY=['Night','Dusk','Noon','Noon','Morn','Dawn'];
+const REL_OFFERING=['Incense','Grain','Fruit','Wine','Sheep','Cattle'];
+const REL_TREASURE=['J','K','L','C','B','E']; // fixed: was "5 B, 5 E"
+
+const REL_HOOKS=[
+  'The ceremony has not been performed in years. Something has been getting worse ever since.',
+  'The offering was rejected. A sign appeared on the altar that no one can read.',
+  'A pilgrim arrived three days ago and has not left. She says the god told her to wait.',
+  'The last priest died without naming a successor. The faith is drifting.',
+  'Something has moved into the holy site. The faithful still approach — and do not return.',
+  'The site was lost and has just been rediscovered. Two groups claim it.',
+];
+
+// Fortification — FIXED: huge was 1d8×10 (less than large). Now 1d6×100.
+const FORT_STRUCTURE=['Thin wood','Thick wood','Earth rampart','Brick','Soft stone','Hard stone'];
+const FORT_SIZE_NAME=['Tiny','Small','Medium','Large','Huge','Gargantuan'];
+const FORT_TROOPS=[()=>roll(2,6),()=>roll(2,10),()=>roll(1,4)*10,()=>roll(3,6)*10,()=>roll(1,6)*100,()=>roll(2,6)*100];
+const FORT_TROOP_DESC=['A squad — a guard post','A platoon — a frontier outpost','A company — a small garrison','A regiment — a proper garrison','An army division — a major fortress','A full army — a military headquarters'];
+
+const FORT_HOOKS=[
+  'The garrison has gone quiet. No dispatches in two weeks. The road there is still open.',
+  'A deserter was found at the nearest settlement. He won\'t say what he saw.',
+  'The fortification has been sold — to someone no one has heard of.',
+  'Someone inside is sending out signals at night. No one knows to whom.',
+  'The commanding officer is dead. Two lieutenants each claim succession.',
+  'Supply wagons have been turned back. The garrison is feeding itself somehow.',
+];
+
+// Landmark
+const LAND_MATERIAL=['Earth','Wood','Brick','Stone','Marble','Granite']; // fixed: "grate" → "granite"
+const LAND_ARTEFACT=['Sword','Weapon or armour','Potion','Scroll','Ring','Wand / Staff / Rod'];
+const LAND_GEM_NAME=['Tiny','Small','Medium','Large','Huge','Gargantuan'];
+const LAND_GEM_VAL=[10,50,100,500,1000,5000];
+
+const LAND_HOOKS=[
+  'It was not here last year. The ground around it shows no signs of construction.',
+  'Pilgrims come to this place. What they are praying to is not obvious.',
+  'Someone has been leaving offerings at its base. Recently.',
+  'Local lore says it marks a boundary. What it marks the boundary of is disputed.',
+  'The artefact at its peak is gone. A gap and two broken brackets are all that remain.',
+  'It is wrong in some way the party cannot immediately identify — scale, proportion, material.',
+];
+
+// Underworld
+const UNDER_LEVEL=[1,2,2,3,3,6]; // cellar=1, pit=2, quarry=2, mine=3, cave=3, dungeon=6
+const UNDER_NOTES=['Shallow, single room below ground','Open pit, 1–3 levels','Worked quarry, 1–3 levels','Multi-level worked shafts, 2–4 levels','Natural cave system, 2–4 levels','Full dungeon complex, 3–6+ levels'];
+const UNDER_HOOKS=[
+  'Someone bricked up the access point from the inside.',
+  'A smell comes up from below that no one can identify. Animals will not approach.',
+  'Fresh tracks go in. None come out.',
+  'A local child claims to have been inside. Her description is geographically impossible.',
+  'Equipment was found nearby — dropped, not cached. Including a light source, still lit.',
+  'It has a door. The door has a lock. The lock is on the outside.',
+];
+
+// Lair
+const LAIR_HOOKS=[
+  'The lair is older than anything nearby. It predates the current occupant.',
+  'Something kept in the lair got out. The occupant is looking for it.',
+  'The occupant has been collecting things. Specific things. A pattern is visible if examined.',
+  'Two rival groups both claim this lair. The current occupant is one of them.',
+  'Local people leave offerings outside and call it something. They do not know what lives inside.',
+  'The lair is connected to another location by a passage no one has mapped.',
+];
+
+// Woodland
+const WOOD_TYPE=['Cool coniferous','Temperate mixed','Warm temperate moist','Tropical moist evergreen','Tropical moist deciduous','Dry'];
+const WOOD_DENSITY_TABLE=()=>{const v=r(6);return v<=2?'Open':v<=5?'Dense':'Very dense';};
+
+// Water / River
+const RIVER_TYPE_TABLE=()=>{const v=r(6);return v===1?'Episodic':v<=3?'Periodic':'Permanent';};
+const RIVER_NAV=['Easy','Novice','Intermediate','Advanced','Expert','Extreme'];
+const RIVER_CROSS_TABLE=()=>{const v=r(6);return v<=2?'Ford':v<=4?'Bridge':'Ferry';};
+
+// Resources
+const RESOURCE_TYPES=['Plants','Plants','Plants','Animals','Animals','Minerals'];
+const RESOURCE_GP=[1,1,1,2,2,3];
+
+// ═══════════════════════════
+//  GENERATE
+// ═══════════════════════════
+function generate(){
+  const dice=document.getElementById('dice');
+  dice.classList.remove('spin');
+  void dice.offsetWidth;
+  dice.classList.add('spin');
+
+  const terrIdx=r(6)-1;
+  const terr=TERRAIN[terrIdx];
+
+  // Monster check
+  const monsterRoll=r(6);
+  const hasMonster=monsterRoll>=terr.threshold;
+  let encounter=null;
+  if(hasMonster){
+    const mIdx=r(8)-1;
+    const mData=ENCOUNTERS[terrIdx][mIdx];
+    encounter={...mData,situation:pick(SITUATIONS),reaction:reactionRoll()};
+  }
+
+  // POI check
+  const poiRoll=r(6);
+  const hasPOI=poiRoll===1;
+  let poi=null;
+  if(hasPOI) poi=buildPOI(terrIdx);
+
+  // Resources
+  const resIdx=r(6)-1;
+  const resType=RESOURCE_TYPES[resIdx];
+  const resGpPerFamily=RESOURCE_GP[resIdx];
+  const resFamilies=poi&&poi.type===0?poi.settlement.families:null;
+  const resTaxIncome=resFamilies?resFamilies*resGpPerFamily:null;
+
+  // Woodland extra
+  let woodland=null;
+  if(terrIdx===2){
+    woodland={type:WOOD_TYPE[r(6)-1],density:WOOD_DENSITY_TABLE()};
+  }
+
+  // Water extra
+  let waterRiver=null;
+  if(terrIdx===3){
+    // 50% chance it's a river rather than open water
+    if(r(2)===1){
+      waterRiver={type:RIVER_TYPE_TABLE(),nav:RIVER_NAV[r(6)-1],crossing:RIVER_CROSS_TABLE()};
+    }
+  }
+
+  renderOutput({terr,terrIdx,encounter,hasPOI,poi,resType,resGpPerFamily,resFamilies,resTaxIncome,woodland,waterRiver,monsterRoll});
+}
+
+function reactionRoll(){
+  const v=roll(2,6);
+  if(v<=2) return 'Hostile — attacks immediately';
+  if(v<=5) return 'Unfriendly — may attack';
+  if(v<=8) return 'Uncertain — cautious';
+  if(v<=11) return 'Indifferent — ignores party';
+  return 'Friendly — may offer aid';
+}
+
+function rollServices(count,table){
+  const result=[];const used=new Set();
+  for(let i=0;i<count;i++){let v;let t=0;do{v=r(6)-1;t++;}while(used.has(v)&&t<20);used.add(v);result.push(table[v]);}
+  return result;
+}
+
+function buildPOI(terrIdx){
+  const typeIdx=r(6)-1;
+  const subIdx=r(6)-1;
+  const ageIdx=r(6)-1;
+  const statusIdx=r(6)-1;
+  const poi={type:typeIdx,typeName:POI_TYPE[typeIdx],glyph:POI_GLYPH[typeIdx],sub:POI_SUB[typeIdx][subIdx],age:AGE[ageIdx],status:STATUS[statusIdx]};
+
+  if(typeIdx===0){ // Settlement
+    const econIdx=r(6)-1;
+    const econName=ECONOMY[econIdx];
+    // Husbandry/Fishery split
+    let econTable=econName;
+    if(econName==='Husbandry / Fishery') econTable=r(2)===1?'Husbandry':'Fishery';
+    const sizeIdx=r(6)-1;
+    const families=SIZE_FAMILIES[sizeIdx]();
+    const svcRolls=sizeIdx<=1?1:sizeIdx<=3?2:3;
+    const bigEnough=sizeIdx>=4;
+    const lodging=rollServices(svcRolls,SVC_LODGING);
+    const crafts=rollServices(svcRolls,SVC_CRAFTS);
+    const transport=rollServices(svcRolls,SVC_TRANSPORT);
+    const religious=bigEnough?rollServices(svcRolls,SVC_RELIGIOUS):[];
+    const admin=bigEnough?rollServices(svcRolls,SVC_ADMIN):[];
+    const econServices=rollServices(svcRolls,ECON_TABLES[econTable]||ECON_TABLES['Agriculture']);
+    const govIdx=r(6)-1;
+    const gov=GOVERNANCE[govIdx];
+    const threatName=THREAT[r(6)-1];
+    const npcTitles=NPC_TITLES[gov]||['Elder'];
+    const npc=pick(npcTitles);
+    const hooks=SETTLEMENT_HOOKS[threatName]||SETTLEMENT_HOOKS['Raids'];
+    poi.settlement={
+      econ:econName,econTable,culture:CULTURE[r(6)-1],
+      gov,attraction:ATTRACTION[r(6)-1],threat:threatName,
+      sizeName:SIZE_NAME[sizeIdx],families,pop:families*5,
+      lodging,crafts,transport,religious,admin,econServices,npc,hook:pick(hooks)
+    };
+  }
+  else if(typeIdx===1){ // Fortification
+    const fortSizeIdx=r(6)-1;
+    const troops=FORT_TROOPS[fortSizeIdx]();
+    poi.fort={structure:FORT_STRUCTURE[r(6)-1],sizeName:FORT_SIZE_NAME[fortSizeIdx],troops,troopDesc:FORT_TROOP_DESC[fortSizeIdx],hook:pick(FORT_HOOKS)};
+  }
+  else if(typeIdx===2){ // Religious
+    poi.rel={material:REL_MATERIAL[r(6)-1],shape:REL_SHAPE[r(6)-1],ceremony:REL_CEREMONY[r(6)-1],offering:REL_OFFERING[r(6)-1],treasure:REL_TREASURE[r(6)-1],hook:pick(REL_HOOKS)};
+  }
+  else if(typeIdx===3){ // Landmark
+    const gemIdx=r(6)-1;
+    poi.land={material:LAND_MATERIAL[r(6)-1],artefact:LAND_ARTEFACT[r(6)-1],gemName:LAND_GEM_NAME[gemIdx],gemVal:LAND_GEM_VAL[gemIdx],hook:pick(LAND_HOOKS)};
+  }
+  else if(typeIdx===4){ // Underworld
+    const underIdx=subIdx; // 0=cellar ... 5=dungeon
+    poi.under={levels:UNDER_LEVEL[underIdx]||1,note:UNDER_NOTES[underIdx]||UNDER_NOTES[0],hook:pick(UNDER_HOOKS)};
+  }
+  else if(typeIdx===5){ // Lair
+    poi.lair={hook:pick(LAIR_HOOKS)};
+  }
+  return poi;
+}
+
+// ═══════════════════════════
+//  RENDER
+// ═══════════════════════════
+function renderOutput({terr,terrIdx,encounter,hasPOI,poi,resType,resGpPerFamily,resFamilies,resTaxIncome,woodland,waterRiver,monsterRoll}){
+  let html='<div class="output">';
+
+  // ── SUMMARY ──
+  html+=`<div class="card">
+  <div class="card-header">
+    <div><div class="card-title"><span class="terrain-glyph">${terr.glyph}</span>${terr.name}</div>
+    <div class="card-sub">Encounter check: ${monsterRoll} (triggers on ${terr.roll})</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div class="card-badge">${encounter?'⚠ ENCOUNTER':'No encounter'}</div>
+      <div class="card-badge">${hasPOI?'◆ POI FOUND':'No POI'}</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="sec-text" style="margin-bottom:14px">${terr.desc}</div>
+    <div class="summary-grid">
+      <div class="sum-box"><div class="sum-label">Encounter</div><div class="sum-val ${encounter?'warn':'no'}">${encounter?encounter.m:'None'}</div></div>
+      <div class="sum-box"><div class="sum-label">Point of Interest</div><div class="sum-val ${hasPOI?'yes':'no'}">${hasPOI?poi.glyph+' '+poi.typeName:'None'}</div></div>
+      <div class="sum-box"><div class="sum-label">Resource</div><div class="sum-val">${resType}</div></div>
+      <div class="sum-box"><div class="sum-label">GP / family / season</div><div class="sum-val mono">${resGpPerFamily} gp</div></div>
+      ${resTaxIncome!==null?`<div class="sum-box"><div class="sum-label">Settlement Income</div><div class="sum-val mono" style="color:var(--gold)">${resTaxIncome.toLocaleString()} gp / season</div></div>`:''}
+      ${woodland?`<div class="sum-box"><div class="sum-label">Forest type</div><div class="sum-val" style="font-size:0.72rem">${woodland.type}</div></div><div class="sum-box"><div class="sum-label">Density</div><div class="sum-val">${woodland.density}</div></div>`:''}
+      ${waterRiver?`<div class="sum-box"><div class="sum-label">River type</div><div class="sum-val">${waterRiver.type}</div></div><div class="sum-box"><div class="sum-label">Navigability</div><div class="sum-val">${waterRiver.nav}</div></div><div class="sum-box"><div class="sum-label">Crossing</div><div class="sum-val">${waterRiver.crossing}</div></div>`:''}
+      ${!waterRiver&&terrIdx===3?`<div class="sum-box"><div class="sum-label">Water type</div><div class="sum-val">Open water</div></div>`:''}
+    </div>
+  </div></div>`;
+
+  // ── ENCOUNTER ──
+  if(encounter){
+    html+=`<div class="card">
+    <div class="card-header red"><div><div class="card-title">⚠ Wandering Encounter</div><div class="card-sub">${terr.name} — roll ${monsterRoll}</div></div></div>
+    <div class="card-body">
+      <div class="enc-block">
+        <div><div class="enc-monster">${encounter.m}</div><div class="enc-num">Appearing: ${encounter.n}</div></div>
+        <div style="flex:1"><div class="enc-situation">${encounter.s}</div></div>
+      </div>
+      <div class="detail-grid" style="margin-top:10px">
+        <div class="detail-row"><span class="detail-key">Situation</span><span class="detail-val">${encounter.situation}</span></div>
+        <div class="detail-row"><span class="detail-key">Reaction (2d6)</span><span class="detail-val">${encounter.reaction}</span></div>
+      </div>
+    </div></div>`;
+  }
+
+  // ── POI ──
+  if(hasPOI&&poi){
+    html+=`<div class="card">
+    <div class="card-header green"><div><div class="card-title">${poi.glyph} ${poi.sub} &mdash; ${poi.typeName}</div><div class="card-sub">${poi.age} · ${poi.status}</div></div></div>
+    <div class="card-body">
+    <div class="detail-grid" style="margin-bottom:16px">
+      <div class="detail-row"><span class="detail-key">Type</span><span class="detail-val">${poi.sub}</span></div>
+      <div class="detail-row"><span class="detail-key">Category</span><span class="detail-val">${poi.typeName}</span></div>
+      <div class="detail-row"><span class="detail-key">Age</span><span class="detail-val">${poi.age}</span></div>
+      <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val">${poi.status}</span></div>
+    </div>`;
+
+    // Settlement
+    if(poi.type===0&&poi.settlement){
+      const s=poi.settlement;
+      html+=`<div class="sec">
+        <div class="sec-label">Settlement Details <span>${s.sizeName} — ${s.families} families, ~${s.pop.toLocaleString()} people</span></div>
+        <div class="detail-grid">
+          <div class="detail-row"><span class="detail-key">Economy</span><span class="detail-val">${s.econ}</span></div>
+          <div class="detail-row"><span class="detail-key">Culture</span><span class="detail-val">${s.culture}</span></div>
+          <div class="detail-row"><span class="detail-key">Governance</span><span class="detail-val">${s.gov}</span></div>
+          <div class="detail-row"><span class="detail-key">Attraction</span><span class="detail-val">${s.attraction}</span></div>
+          <div class="detail-row"><span class="detail-key">Threat</span><span class="detail-val">${s.threat}</span></div>
+          <div class="detail-row"><span class="detail-key">Notable NPC</span><span class="detail-val">${s.npc}</span></div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-label">Available Services</div>
+        <div style="margin-bottom:6px;font-size:0.72rem;color:var(--muted);font-style:italic">Lodging &amp; Food</div>
+        <div class="service-grid">${s.lodging.map(x=>`<span class="service-pill">${x}</span>`).join('')}</div>
+        <div style="margin:8px 0 4px;font-size:0.72rem;color:var(--muted);font-style:italic">Crafts &amp; Trades</div>
+        <div class="service-grid">${s.crafts.map(x=>`<span class="service-pill">${x}</span>`).join('')}</div>
+        <div style="margin:8px 0 4px;font-size:0.72rem;color:var(--muted);font-style:italic">Transport</div>
+        <div class="service-grid">${s.transport.map(x=>`<span class="service-pill">${x}</span>`).join('')}</div>
+        ${s.religious.length?`<div style="margin:8px 0 4px;font-size:0.72rem;color:var(--muted);font-style:italic">Religious</div><div class="service-grid">${s.religious.map(x=>`<span class="service-pill">${x}</span>`).join('')}</div>`:''}
+        ${s.admin.length?`<div style="margin:8px 0 4px;font-size:0.72rem;color:var(--muted);font-style:italic">Administrative</div><div class="service-grid">${s.admin.map(x=>`<span class="service-pill">${x}</span>`).join('')}</div>`:''}
+        <div style="margin:8px 0 4px;font-size:0.72rem;color:var(--gold);font-style:italic">Economy — ${s.econTable}</div>
+        <div class="service-grid">${s.econServices.map(x=>`<span class="service-pill economy">${x}</span>`).join('')}</div>
+      </div>
+      <div class="hook"><strong>Hook:</strong> ${s.hook}</div>`;
+    }
+
+    // Fortification
+    else if(poi.type===1&&poi.fort){
+      const f=poi.fort;
+      html+=`<div class="sec">
+        <div class="sec-label">Fortification Details</div>
+        <div class="detail-grid">
+          <div class="detail-row"><span class="detail-key">Structure</span><span class="detail-val">${f.structure}</span></div>
+          <div class="detail-row"><span class="detail-key">Garrison size</span><span class="detail-val">${f.sizeName}</span></div>
+          <div class="detail-row"><span class="detail-key">Troops</span><span class="detail-val mono">${f.troops.toLocaleString()}</span></div>
+          <div class="detail-row"><span class="detail-key">Classification</span><span class="detail-val">${f.troopDesc}</span></div>
+        </div>
+        <div class="fix-note">Note: garrison "Huge" corrected from original 1d8×10 (which was less than Large) to 1d6×100.</div>
+      </div>
+      <div class="hook"><strong>Hook:</strong> ${f.hook}</div>`;
+    }
+
+    // Religious
+    else if(poi.type===2&&poi.rel){
+      const rel=poi.rel;
+      html+=`<div class="sec">
+        <div class="sec-label">Religious Details</div>
+        <div class="detail-grid">
+          <div class="detail-row"><span class="detail-key">Material</span><span class="detail-val">${rel.material}</span></div>
+          <div class="detail-row"><span class="detail-key">Shape</span><span class="detail-val">${rel.shape}</span></div>
+          <div class="detail-row"><span class="detail-key">Ceremony</span><span class="detail-val">${rel.ceremony}</span></div>
+          <div class="detail-row"><span class="detail-key">Offering</span><span class="detail-val">${rel.offering}</span></div>
+          <div class="detail-row"><span class="detail-key">Treasure type</span><span class="detail-val mono">${rel.treasure}</span></div>
+        </div>
+        <div class="fix-note">Note: treasure table corrected — original had duplicate entry 5; corrected to B=5, E=6.</div>
+      </div>
+      <div class="hook"><strong>Hook:</strong> ${rel.hook}</div>`;
+    }
+
+    // Landmark
+    else if(poi.type===3&&poi.land){
+      const l=poi.land;
+      html+=`<div class="sec">
+        <div class="sec-label">Landmark Details</div>
+        <div class="detail-grid">
+          <div class="detail-row"><span class="detail-key">Material</span><span class="detail-val">${l.material}</span></div>
+          <div class="detail-row"><span class="detail-key">Artefact</span><span class="detail-val">${l.artefact}</span></div>
+          <div class="detail-row"><span class="detail-key">Trophy gem</span><span class="detail-val">${l.gemName} (${l.gemVal.toLocaleString()} gp)</span></div>
+        </div>
+        <div class="fix-note">Note: material "grate" corrected to "granite".</div>
+      </div>
+      <div class="hook"><strong>Hook:</strong> ${l.hook}</div>`;
+    }
+
+    // Underworld
+    else if(poi.type===4&&poi.under){
+      const u=poi.under;
+      html+=`<div class="sec">
+        <div class="sec-label">Underworld Details</div>
+        <div class="detail-grid">
+          <div class="detail-row"><span class="detail-key">Sub-type</span><span class="detail-val">${poi.sub}</span></div>
+          <div class="detail-row"><span class="detail-key">Depth estimate</span><span class="detail-val">${u.levels} level${u.levels>1?'s':''}</span></div>
+        </div>
+        <div style="margin-top:8px;font-size:0.82rem;color:var(--muted);font-style:italic">${u.note}</div>
+      </div>
+      <div class="hook"><strong>Hook:</strong> ${u.hook}</div>`;
+    }
+
+    // Lair
+    else if(poi.type===5&&poi.lair){
+      html+=`<div class="sec">
+        <div class="sec-label">Lair Details</div>
+        <div class="detail-grid">
+          <div class="detail-row"><span class="detail-key">Type</span><span class="detail-val">${poi.sub}</span></div>
+          <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val">${poi.status}</span></div>
+        </div>
+      </div>
+      <div class="hook"><strong>Hook:</strong> ${poi.lair.hook}</div>`;
+    }
+
+    html+=`</div></div>`; // close card-body, card
+  }
+
+  // ── RESOURCES ──
+  html+=`<div class="card">
+  <div class="card-header gold"><div><div class="card-title">💰 Hex Resources</div><div class="card-sub">Domain play — seasonal income</div></div></div>
+  <div class="card-body">
+    <div class="res-block">
+      <div>
+        <div class="res-type">${resType}</div>
+        <div class="res-note">${resType==='Plants'?'Timber, herbs, grain, fibre crops':resType==='Animals'?'Livestock, game, hides, wool':'Stone, ore, clay, coal'}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="res-income">${resGpPerFamily} gp<span style="font-size:0.7rem;font-weight:normal;color:var(--muted)"> / family / season</span></div>
+        ${resTaxIncome!==null?`<div style="font-size:0.78rem;color:var(--gold);margin-top:4px">${resTaxIncome.toLocaleString()} gp total (${resFamilies} families)</div>`:'<div style="font-size:0.78rem;color:var(--muted);margin-top:4px;font-style:italic">No settlement — resource available but not yet taxed</div>'}
+      </div>
+    </div>
+  </div></div>`;
+
+  html+='</div>';
+  document.getElementById('output').innerHTML=html;
+  document.getElementById('output').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>
