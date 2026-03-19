@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B/X D&D — Scenario Seed Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#111;--ink2:#333;--muted:#666;
+  --rule:#ccc;--rule2:#e8e8e8;
+  --bg:#fff;--bg2:#f7f7f7;--bg3:#f0f0f0;
+  --red:#c0102a;--red2:#e01030;--red-bg:#fdf2f4;
+  --mono:'Share Tech Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Libre Baskerville',Georgia,serif;font-size:15px;line-height:1.7;min-height:100vh}
+.wrapper{max-width:860px;margin:0 auto;padding:0 20px 80px}
+
+/* HEADER */
+.site-header{border-bottom:3px solid var(--ink);padding:36px 0 24px;margin-bottom:40px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.header-left h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,4vw,2.2rem);font-weight:900;letter-spacing:-0.02em;line-height:1.05}
+.header-left .subtitle{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.btn{font-family:'Playfair Display',serif;font-size:0.8rem;font-weight:700;letter-spacing:0.04em;padding:9px 22px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--bg);transition:background 0.15s,color 0.15s;white-space:nowrap;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--red);border-color:var(--red)}
+.btn.outline{background:transparent;color:var(--ink)}
+.btn.outline:hover{background:var(--ink);color:var(--bg)}
+
+/* GENERATE BUTTON */
+.generate-area{text-align:center;margin-bottom:44px}
+.btn-generate{
+  font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;
+  letter-spacing:0.06em;padding:16px 44px;
+  border:3px solid var(--ink);background:var(--ink);color:var(--bg);
+  cursor:pointer;transition:background 0.15s,color 0.15s,border-color 0.15s;
+  display:inline-flex;align-items:center;gap:10px;
+}
+.btn-generate:hover{background:var(--red);border-color:var(--red)}
+.btn-generate:active{transform:translateY(1px)}
+.dice-spin{display:inline-block;font-size:1.2rem;transition:transform 0.4s}
+.spinning{animation:spin 0.5s ease-out}
+@keyframes spin{0%{transform:rotate(0deg) scale(1.3)}100%{transform:rotate(360deg) scale(1)}}
+
+/* ROLL DISPLAY */
+.roll-strip{
+  display:flex;justify-content:center;gap:28px;
+  margin-bottom:32px;flex-wrap:wrap;
+}
+.roll-box{
+  text-align:center;padding:14px 24px;
+  border:2px solid var(--ink);background:var(--bg2);
+  min-width:130px;
+}
+.roll-label{font-family:'Playfair Display',serif;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.roll-num{
+  font-family:var(--mono);font-size:2rem;color:var(--red);font-weight:bold;
+  line-height:1;transition:opacity 0.1s;
+}
+.roll-num.rolling{opacity:0.3}
+
+/* SEED CARD */
+.seed-card{
+  border:2px solid var(--ink);
+  animation:cardIn 0.4s ease;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.seed-band{
+  background:var(--ink);color:var(--bg);
+  padding:18px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;
+}
+.seed-roll-label{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.1em;opacity:0.55}
+.seed-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;line-height:1.1}
+.seed-setting-line{font-size:0.8rem;opacity:0.7;margin-top:2px;font-style:italic}
+.seed-badge{
+  font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;
+  padding:5px 12px;border:1px solid rgba(255,255,255,0.3);white-space:nowrap;
+  background:rgba(255,255,255,0.06);
+}
+
+.seed-body{padding:24px}
+
+/* SECTIONS */
+.seed-section{margin-bottom:22px}
+.seed-section:last-child{margin-bottom:0}
+.sec-label{
+  font-family:'Playfair Display',serif;font-size:0.62rem;font-weight:700;
+  letter-spacing:0.22em;text-transform:uppercase;color:var(--red);
+  margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--rule2);
+  display:flex;align-items:center;gap:8px;
+}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--rule2)}
+.sec-text{font-size:0.9rem;color:var(--ink2);line-height:1.65}
+.sec-text em{color:var(--ink);font-style:normal;font-weight:bold}
+
+/* MONSTER BLOCK */
+.monster-block{
+  background:var(--red-bg);border:1px solid var(--red);
+  padding:14px 18px;
+}
+.monster-name{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--red);margin-bottom:4px}
+.monster-why{font-size:0.85rem;color:var(--ink2);line-height:1.6}
+
+/* ROOM SEEDS */
+.room-list{display:flex;flex-direction:column;gap:6px}
+.room-item{
+  display:flex;gap:12px;align-items:baseline;
+  padding:7px 10px;background:var(--bg2);border:1px solid var(--rule2);
+  font-size:0.85rem;
+}
+.room-num{font-family:var(--mono);font-size:0.72rem;color:var(--red);min-width:20px;flex-shrink:0}
+.room-text{color:var(--ink2);line-height:1.45}
+
+/* HOOK */
+.hook-box{
+  background:var(--bg3);border-left:4px solid var(--ink);
+  padding:14px 18px;font-style:italic;font-size:0.88rem;color:var(--ink2);line-height:1.6;
+}
+.hook-box strong{color:var(--ink);font-style:normal}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--rule2);margin:22px 0}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);font-style:italic;border:2px dashed var(--rule);font-size:0.9rem}
+
+/* FOOTER NOTE */
+.footer-note{font-size:0.72rem;color:var(--muted);text-align:center;margin-top:28px;font-style:italic}
+
+@media(max-width:600px){
+  .roll-strip{gap:14px}
+  .roll-box{min-width:100px;padding:10px 14px}
+  .seed-band{flex-direction:column;align-items:flex-start}
+  .site-header{flex-direction:column}
+  .header-right{align-items:flex-start}
+}
+@media print{
+  .generate-area,.header-right,.roll-strip{display:none!important}
+  .seed-card{border:1px solid #ccc}
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<header class="site-header">
+  <div class="header-left">
+    <h1>Scenario Seed Generator</h1>
+    <div class="subtitle">B/X Dungeons &amp; Dragons · Moldvay Basic / Old School Essentials</div>
+  </div>
+  <div class="header-right">
+    <a class="btn" href="index.html">⚔ Characters</a>
+    <a class="btn outline" href="bx_monster_reference.html">☠ Monsters</a>
+  </div>
+</header>
+
+<div class="generate-area">
+  <button class="btn-generate" onclick="generateSeed()">
+    <span class="dice-spin" id="dice-icon">🎲</span>
+    Roll Scenario Seed
+  </button>
+</div>
+
+<div class="roll-strip" id="roll-strip" style="display:none">
+  <div class="roll-box">
+    <div class="roll-label">Scenario — d10</div>
+    <div class="roll-num" id="roll-scenario">—</div>
+  </div>
+  <div class="roll-box">
+    <div class="roll-label">Setting — d6</div>
+    <div class="roll-num" id="roll-setting">—</div>
+  </div>
+</div>
+
+<div id="seed-output"><div class="empty-state">Press the button above to generate a scenario seed.</div></div>
+
+<div class="footer-note">Each result is randomly generated. Re-roll as many times as you like — the same numbers may suggest a different monster and room seeds each time.</div>
+
+</div><!-- .wrapper -->
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+
+const SCENARIOS = [
+  {
+    n: 1,
+    title: 'Exploring the Unknown',
+    glyph: '🗺',
+    summary: 'The party is hired to map unknown or lost territory. The area may once have been familiar but is now overrun or destroyed — or something strange has appeared overnight where nothing stood before.',
+    dm_note: 'The drive here is <em>discovery</em>. Players should encounter signs of what came before (old carvings, ruined furniture, scattered bones) alongside what has moved in since. Leave open questions they want to answer.',
+    hooks: [
+      'A merchant guild pays 50 gp per mapped room — and doubles it if the party brings back the cause of the disappearances.',
+      'A tower appeared on the hill three nights ago. The village elder has not slept since.',
+      'The old road beyond the pass has been "wrong" for a season. Caravans that take it do not arrive.',
+    ],
+  },
+  {
+    n: 2,
+    title: 'Investigating a Chaotic Outpost',
+    glyph: '⚔',
+    summary: 'A Chaotic invasion is in progress or imminent. The characters must infiltrate the enemy outpost, determine the strength and plans of the invaders, and destroy the outpost if possible.',
+    dm_note: 'This is a <em>military intelligence</em> scenario. The emphasis should be on tension, information-gathering, and the risk of being discovered. Not every encounter needs to end in a fight — eavesdropping, disguise, and bribery are valid tactics.',
+    hooks: [
+      'Goblin raiding parties have grown bolder. Someone is organising them — but who, and from where?',
+      'The town watch captured a scout who spoke only of "the Eye" before dying. Find it.',
+      'A Lawful NPC has gone silent. She was the only spy the Duke had inside the enemy lines.',
+    ],
+  },
+  {
+    n: 3,
+    title: 'Recovering Ruins',
+    glyph: '🏚',
+    summary: 'The party scouts old ruins before permanent settlers move in. The ruins are overrun by a specific kind of monster which must be cleared. The ruins could be part of — or beneath — a living town.',
+    dm_note: 'The scenario goal is <em>clearance</em>: the monsters must go. This gives the party a clear objective and a reason to be thorough. The settlers are waiting — there is a human cost to failure and a reward for speed.',
+    hooks: [
+      'The new Duke has promised land grants to anyone who can certify the old keep is safe. The party certifies it.',
+      'The village was evacuated two years ago. A farmer wants his home back. He will pay in kind.',
+      'An ancient granary sits beneath the market square. The town wants it restored before winter.',
+    ],
+  },
+  {
+    n: 4,
+    title: 'Destroying an Ancient Evil',
+    glyph: '💀',
+    summary: 'An evil — usually a monster or powerful NPC — must be found and destroyed. It has often been dormant for centuries and was recently reawakened. The players may not know its exact nature when they begin.',
+    dm_note: 'Restraint is key: do not reveal the evil too early. Let the <em>evidence</em> precede the encounter — withered plants, mad animals, villagers with the same nightmare. Build dread before confrontation.',
+    hooks: [
+      'Recent excavations beneath the mill uncovered a sealed vault. Three workers have since died without wounds.',
+      'The priest says the old words of warding must be spoken in the deep chamber before the new moon. No one knows where the deep chamber is.',
+      'Something old is dreaming beneath the hill. The druids say it is waking up.',
+    ],
+  },
+  {
+    n: 5,
+    title: 'Visiting a Lost Shrine',
+    glyph: '⛩',
+    summary: 'To remove a curse, heal an affliction, or recover a sacred item, the players must travel to a shrine lost for generations. Its location is approximate at best. An oracle or seer may need to be consulted.',
+    dm_note: 'This scenario rewards <em>investigation before exploration</em>. The party should have to learn where the shrine is, not simply stumble upon it. Include at least one clue source — an old map, a dying scholar, a spirit that knows the way.',
+    hooks: [
+      'The lord\'s heir is cursed and will not live another month. The only cure lies at the Shrine of the Silver Moon, lost since the Purge.',
+      'A cleric receives a vision: a sacred relic has been profaned. It must be cleansed at its original altar — wherever that is.',
+      'An ancient pilgrim\'s journal describes the route. Half the pages are missing.',
+    ],
+  },
+  {
+    n: 6,
+    title: 'Fulfilling a Quest',
+    glyph: '👑',
+    summary: 'A king, noble, or deity provides the reason for adventuring — a specific mission with a clear objective and a promised reward. Often involves recovering a sacred object or a powerful magic item.',
+    dm_note: 'The patron matters as much as the quest. A king who sends the party into danger owes them something — and the party should feel that tension. <em>What happens if they succeed and the king does not pay?</em> Build the patron as a character.',
+    hooks: [
+      'The king\'s ancestral sword was stolen by the usurper\'s general. Recover it before the coronation in eight days.',
+      'A god speaks through a Cleric: a profaned holy symbol must be returned to its vault before the equinox.',
+      'The Duke\'s daughter has been missing for three weeks. Her father will deed the party a tower if she is returned alive.',
+    ],
+  },
+  {
+    n: 7,
+    title: 'Escaping from Enemies',
+    glyph: '🔓',
+    summary: 'The player characters begin this adventure as prisoners and must escape. The stakes are clear — imprisonment is to be followed by execution. The DM must make escape genuinely possible, if not easy.',
+    dm_note: 'This scenario demands careful balance: too easy and it feels trivial, too hard and it feels unfair. Begin by taking <em>most</em> of the party\'s equipment — leaving one or two items is a gift the players will treasure. The layout of the dungeon is the puzzle.',
+    hooks: [
+      'The party wakes in a cell. Their gear is piled in the guard room two doors down. Execution is at dawn.',
+      'A fellow prisoner offers to show the way out — but she has her own agenda.',
+      'The cell door has a flaw. One of the party noticed it during transport. They have one chance to use it.',
+    ],
+  },
+  {
+    n: 8,
+    title: 'Rescuing Prisoners',
+    glyph: '⛓',
+    summary: 'Important persons are held by bandits, a humanoid tribe, or an evil mage. The party sets out to rescue them — for reward, for honour, or because they were hired to negotiate a ransom.',
+    dm_note: 'The prisoners are a <em>resource and a liability</em>. Freed captives slow the party down, may be wounded, and are not fighters. Plan for what happens when they are found — do they cooperate? Are any of them compromised? Does one know something important?',
+    hooks: [
+      'The merchant\'s son was taken three days ago. The ransom note says the family has one week.',
+      'A Cleric of the party\'s patron faith has been taken by the Hobgoblin war-band. The temple will owe a significant favour.',
+      'The prisoners are not who they appear to be — one of them is a spy who chose to be captured.',
+    ],
+  },
+  {
+    n: 9,
+    title: 'Using a Magic Portal',
+    glyph: '✦',
+    summary: 'A magical device sends creatures from one place to another — a door into another dimension, a gate between worlds. Portals may be used for invasion, for travel, or may be secret traps.',
+    dm_note: 'The portal is both a <em>location and a problem</em>. Where does it go? Who built it? Who controls it now? The party may need to destroy it, reopen it, guard it, or simply survive it. Make sure the destination is at least sketched — the players will want to go through.',
+    hooks: [
+      'Something has been coming through the old mirror in the cellar at night. The family has barricaded themselves upstairs.',
+      'The enemy army has vanished. No retreat, no bodies. A scholar believes they found a gate.',
+      'The guild will pay handsomely to reopen the trade portal sealed during the last war. No one knows why it was sealed.',
+    ],
+  },
+  {
+    n: 10,
+    title: 'Finding a Lost Race',
+    glyph: '👁',
+    summary: 'The players discover a once-human race that has lived underground so long it has begun to change — developing infravision, altered pigmentation, or feral behaviour. Often entangled with an Ancient Evil.',
+    dm_note: 'This scenario requires the most preparation: the Lost Race must be <em>invented</em>. Decide their origin, how they changed, what they worship, and whether they can be communicated with. They are the most interesting encounter if treated as people — not just monsters.',
+    hooks: [
+      'The deep miners broke through into a carved gallery. They found footprints — and something took two of them.',
+      'A survivor of the lost colony has been found, speaking a dialect two hundred years old. He is terrified of light.',
+      'The old records describe an expedition that went below the third level and never came back. Their lanterns did, carried by pale hands.',
+    ],
+  },
+];
+
+const SETTINGS = [
+  {
+    n: 1,
+    name: 'Castle or Tower',
+    glyph: '🏰',
+    desc: 'A fortified structure — ruined keep, abandoned watchtower, or crumbling noble seat. Multiple levels, defensible chokepoints, and the ghost of a former hierarchy: throne rooms, guard posts, dungeons beneath.',
+    layout: 'Think vertically. Ground floor: gatehouse, great hall, barracks. Upper floors: private chambers, battlements, a signal fire. Below: storerooms, a well, and the old dungeon.',
+  },
+  {
+    n: 2,
+    name: 'Caves or Cavern',
+    glyph: '🪨',
+    desc: 'A natural underground complex — organic, asymmetric, and dangerous. Passages may flood, collapse, or simply dead-end. The dungeon grew rather than being built, which makes it feel genuinely alien.',
+    layout: 'Irregular chamber clusters connected by narrow passages. Include one large central cavern that opens unexpectedly. Water is common — underground streams, flooded sections, and dripping ceilings.',
+  },
+  {
+    n: 3,
+    name: 'Abandoned Mine',
+    glyph: '⛏',
+    desc: 'A worked excavation — shored tunnels, cart tracks, collapsed sections, and the bones of a failed enterprise. The mine followed a vein of something valuable, and the shape of the dungeon reflects that obsession.',
+    layout: 'Long straight corridors following the vein. Side chambers for equipment, ore sorting, and rest. A central shaft going down. At least one catastrophic collapse that blocks an obvious route.',
+  },
+  {
+    n: 4,
+    name: 'Crypt or Tomb',
+    glyph: '⚰',
+    desc: 'A place built for the dead — sealed chambers, alcoved bones, and the accumulated wealth of several generations interred with their owners. The architecture is meant to last, and to keep something in.',
+    layout: 'Radial or processional: a main corridor leading to a central burial chamber, with lesser crypts branching off. Include an antechamber where the living once performed rites, and a sealed inner sanctum.',
+  },
+  {
+    n: 5,
+    name: 'Ancient Temple',
+    glyph: '🛕',
+    desc: 'A place of worship, now abandoned or corrupted. The architecture serves the deity — everything is intentional, symbolic, and designed to direct attention toward something. That something may still be listening.',
+    layout: 'Axial: entrance forecourt, public worship hall, restricted inner sanctum, and a hidden lower level for the true rites. Altar, font, reliquary. Every room should feel like it had a purpose.',
+  },
+  {
+    n: 6,
+    name: 'Stronghold or Town',
+    glyph: '🏘',
+    desc: 'A fortified settlement — a bandit camp built in old ruins, a goblin-held village, or an outpost that has grown beyond its original purpose. There are civilians (or near-civilians) here, which changes everything.',
+    layout: 'Think horizontally: a defensible perimeter, a central command structure, quarters for different groups, and the place they keep prisoners and treasure. Civilians means leverage — and complications.',
+  },
+];
+
+// Monster recommendations: [scenarioIndex][settingIndex] = array of options
+// Pick one randomly on each generation for variety on re-rolls
+const MONSTERS = [
+  // 1. Exploring the Unknown
+  [
+    ['Doppelganger', 'Something in the tower is impersonating whoever entered first. Their notes are in the wrong handwriting.'],
+    ['Gelatinous Cube', 'The previous survey team is still here, suspended in the thing that cleaned out their chambers.'],
+    ['Gargoyle', 'They were carved as sentinels. They are still doing their job.'],
+    ['Invisible Stalker', 'Something has been following the party since they crossed the first threshold.'],
+    ['Basilisk', 'The last explorers are still here. They are just very, very still.'],
+    ['Living Statue', 'Built to record intruders. One of them is awake.'],
+  ],
+  // 2. Investigating a Chaotic Outpost
+  [
+    ['Hobgoblin', 'Disciplined, organised, and waiting for reinforcements that arrive in three days.'],
+    ['Bugbear', 'The Goblins below answer to something large and quiet that moves without sound.'],
+    ['Orc', 'A war-band with a chieftain who has received orders from someone smarter than himself.'],
+    ['Gnoll', 'Mercenaries hired for a specific job — and they do not know who hired them.'],
+    ['Hobgoblin', 'A garrison holding the outpost for a larger force. The map they carry is the real prize.'],
+    ['Ogre', 'The Orcs here are organised. Something large and feared keeps them that way.'],
+  ],
+  // 3. Recovering Ruins
+  [
+    ['Ghoul', 'The former inhabitants. They remember the place better than anyone — and they are hungry.'],
+    ['Troglodyte', 'They moved in when the people moved out. The smell has kept rescuers away for years.'],
+    ['Kobold', 'A colony that has booby-trapped every room. The ruins are more dangerous empty than occupied.'],
+    ['Ghoul', 'What became of the miners who found the old crypt beneath the cellar.'],
+    ['Stirge', 'The colony in the upper levels has made the whole structure uninhabitable. They are unnaturally large.'],
+    ['Orc', 'A war-band that has claimed the town as a base. They have been there long enough to feel like owners.'],
+  ],
+  // 4. Destroying an Ancient Evil
+  [
+    ['Vampire', 'Old. Patient. It was sealed in the lowest level and the seals are cracking.'],
+    ['Medusa', 'The petrified figures in the entrance hall were the last adventuring party sent here.'],
+    ['Wight', 'The founder of this place, still at his post, still protecting something that must not leave.'],
+    ['Mummy', 'The high priest refused to die. He is still in his sanctum, waiting for worshippers who will never come.'],
+    ['Spectre', 'The god this temple served is dead. Its high priest is not.'],
+    ['Vampire', 'The Lord of this stronghold signed a pact centuries ago. The other party has come to collect.'],
+  ],
+  // 5. Visiting a Lost Shrine
+  [
+    ['Harpy', 'They nest in the upper towers, their song audible from the approach road.'],
+    ['Cockatrice', 'Nesting in the cave system above the shrine entrance. The petrified figures mark the path.'],
+    ['Gargoyle', 'The shrine\'s original guardians. They test the worthy before allowing passage.'],
+    ['Mummy', 'The shrine\'s last keeper refused to leave. He refuses now as well.'],
+    ['Sprite', 'They have guarded the shrine in the god\'s absence. They are not friendly to those who approach without reverence.'],
+    ['Shadow', 'The shrine\'s desecration created them. They are what faith looks like when it curdles.'],
+  ],
+  // 6. Fulfilling a Quest
+  [
+    ['Griffon', 'The item is on the top floor. The Griffon that nests there considers it part of its hoard.'],
+    ['Manticore', 'It guards the pass. It has always guarded the pass. It is not interested in why the party is there.'],
+    ['Dragon', 'The sacred object was taken by a Dragon three centuries ago. It is still in the hoard.'],
+    ['Wyvern', 'Nesting in the tomb\'s entrance shaft. The quest item is in the burial chamber below.'],
+    ['Chimera', 'The temple\'s divine guardian, now mad with centuries of solitude.'],
+    ['Cyclops', 'The stronghold\'s current lord. He has the item. He does not know what it is.'],
+  ],
+  // 7. Escaping from Enemies
+  [
+    ['Hobgoblin', 'The guards. Disciplined, regular patrols, and one of them has the cell keys.'],
+    ['Bugbear', 'The warden. It patrols alone, silently, and enjoys its work.'],
+    ['Orc', 'The garrison. Numerous, disorganised, and dangerous in a corridor.'],
+    ['Troglodyte', 'The prison itself is in their territory. They are not employed here — they are the reason for the bars.'],
+    ['Gargoyle', 'The temple prison\'s original guards. They cannot be bribed.'],
+    ['Lycanthrope', 'The guard captain. The party will learn what he is at the worst possible moment.'],
+  ],
+  // 8. Rescuing Prisoners
+  [
+    ['Bandit', 'Organised, with a leader who prefers negotiation — from a position of strength.'],
+    ['Bugbear', 'Holding the prisoners for reasons the party does not yet understand.'],
+    ['Hobgoblin', 'The war-band that took the prisoners as leverage in a conflict the party is only now learning about.'],
+    ['Ghoul', 'The original captors have been replaced. Something worse has the prisoners now.'],
+    ['Harpy', 'The prisoners are alive because they are useful. If rescue is attempted, that calculation changes.'],
+    ['Lycanthrope', 'The leader of the stronghold. The prisoners know what he is. That is why they were taken.'],
+  ],
+  // 9. Using a Magic Portal
+  [
+    ['Doppelganger', 'It came through the portal. It has been here for three months. It has had time to establish itself.'],
+    ['Invisible Stalker', 'Summoned to guard the portal against passage in either direction.'],
+    ['Elemental', 'The portal connects to an elemental plane. Its guardian is loyal to the other side.'],
+    ['Djinni', 'Bound to the portal\'s operation. It will help — for a price.'],
+    ['Shadow', 'The portal was opened once before, briefly. These are what came through.'],
+    ['Warp Beast', 'It followed something through the portal. It is still looking for it. The party has arrived at an unfortunate moment.'],
+  ],
+  // 10. Finding a Lost Race
+  [
+    ['Living Statue', 'The Lost Race built these to protect themselves. They still obey the last command given.'],
+    ['Troglodyte', 'What the Lost Race has become: pale, eyeless, and something that only distantly remembers being human.'],
+    ['Ghoul', 'The Lost Race\'s dead do not stay dead. This is how the change started.'],
+    ['Gargoyle', 'Carved by the Lost Race as gods. Worshipped long enough that they became something that deserved it.'],
+    ['Medusa', 'The matriarch of the Lost Race, changed beyond recognition, still queening over her people.'],
+    ['Spectre', 'The Lost Race\'s former leaders: those who could not change and could not die.'],
+  ],
+];
+
+// Room seeds: [scenarioIndex][settingIndex] = array of 4 room seeds
+const ROOM_SEEDS = [
+  // 1. Exploring the Unknown
+  [
+    ['A room with a door that was locked from the inside — but no body inside.','A half-finished map pinned to the wall, hand-drawn, ending abruptly mid-corridor.','A patrol that does not respond to noise — they are moving but not aware.','A room that smells of habitation: a cold fire, a bedroll, food recently eaten.'],
+    ['A wide cavern with a bridge across a flooded lower section — the bridge is new.','Scratch marks on a wall at descending height, as if made by something learning to crawl.','A camp site: three bedrolls, equipment still packed, no sign of struggle.','A passage that reverberates strangely — sound travels further than it should.'],
+    ['A mine office with papers still on the desk, quill still in the inkwell.','A sealed shaft with fresh marks around the seal — someone tried to open it recently.','A rest station with food that has not fully rotted, suggesting recent use.','A track running to a dead end. The cart is still there. It is full.'],
+    ['A sealed vault with claw marks on the inside of the door.','A burial alcove with the plaque recently re-chiselled — the new name is unfamiliar.','A chamber where the sarcophagi have been opened and resealed.','A memorial room with candles that are still warm.'],
+    ['An antechamber with a mural of the temple in its glory — and a crowd of worshippers who have no faces.','A priest\'s cell with a journal whose last entry is mid-sentence.','The offering room: still receiving offerings, though no one living has left them.','The inner sanctum door, sealed, with light visible under it.'],
+    ['A market stall still set up, goods laid out, no merchant.','A guardhouse with fresh food on the table and warm ashes.','A command room with a map on the wall, still pinned with current intelligence.','A prison cell recently vacated — the lock was opened from the inside.'],
+  ],
+  // 2. Investigating a Chaotic Outpost
+  [
+    ['A war council room with a battle plan still on the table — the party can read it if they reach it.','A messenger about to leave with a sealed letter — intercept it.','An armoury being loaded: this outpost is preparing to move.','The commander\'s chamber, locked, with sounds of a heated argument inside.'],
+    ['A sentry post with tired guards who have not been rotated.','A deep cave used as a prison for captured scouts — one is still alive.','A natural shaft used as a refuse dump — it also connects to the command level.','A cave where a shaman is performing a ritual that must not be completed.'],
+    ['A foreman\'s office converted to a command post, maps now mixed with ore surveys.','A collapsed shaft the enemy uses as a pit prison.','The main shaft: a bucket elevator now used to move supplies.','A sealed lower level the current occupants have not yet opened.'],
+    ['A crypt repurposed as a barracks — the original occupants share the space now.','A burial vault being looted, the contents used for cult rituals.','The inner sanctum, now a commander\'s chamber.','A sealed door the enemy has been unable to open — and something behind it has been trying to get out.'],
+    ['The great altar, converted for a different purpose. The old god\'s symbols have been defaced.','A reliquary stripped of its contents — but one item remains and cannot be moved.','The confession chambers, now used for interrogation.','The lower ritual level: the enemy found it, does not understand it, and is afraid of it.'],
+    ['The market square, now a parade ground.','The tavern, now a mess hall — and the barkeep is still there.','The old lord\'s hall, now a command centre.','The town jail, now a prison for anyone who objects.'],
+  ],
+  // 3. Recovering Ruins
+  [
+    ['The great hall: the table is still set.','The tower\'s top floor: something has been nesting there for years.','The stables: empty, but the smell suggests they were used recently.','The dungeon level beneath the keep: the original inmates are long gone; something else moved in.'],
+    ['The largest cavern: it was used as shelter once. The fire pit is ancient but the bones around it are not.','A collapsed passage with signs that something dug it out — from the other side.','An underground pool with bones at the bottom, visible from the bank.','A secondary cave complex branching off the main system, sealed with a crude rock barrier.'],
+    ['The foreman\'s office: the wage ledger is still there, names and dates legible.','The emergency exit shaft — sealed from below.','The ore-breaking room: equipment still in place, and something living in the hopper.','The lower level, flooded to the ankle, with something moving in the deeper sections.'],
+    ['The family crypt: generations interred, but the newest occupants were not family.','The sealed inner vault: the party was told the treasure is inside. The door has been opened before.','The antechamber: pillaged, but one thing was left behind. Conspicuously.','The memorial alcoves: each tells a story; one story does not match the others.'],
+    ['The great worship hall: something has built a nest in the old font.','The priests\' cells: one is locked and something is inside, trying to get out quietly.','The lower rites chamber: the party wasn\'t told this level existed.','The roof: collapsed in one section, open to the sky, and something comes in at night.'],
+    ['The inn: the innkeeper stayed. She knows where everything is hidden.','The guildhouse: the monster leader is using it as a headquarters.','The granary: the prisoners are being held here, and the grain has been eating them.','The sewers: the real entrance the players weren\'t told about.'],
+  ],
+  // 4. Destroying an Ancient Evil
+  [
+    ['The old throne room: something sits in the throne at night.','A wing of the castle where the stonework is wrong — older, deeper, not matching.','The portrait gallery: every portrait has had the eyes gouged out. Except the most recent one.','The sealed tower: the original builders bricked up the door. Something on the other side added a second layer.'],
+    ['The shrine cave: offerings have been left here recently. Not by anything human.','A deep fissure from which warm air rises, smelling of old things.','A cave where all sound stops. The silence has weight.','The lowest cavern: the evil is not hiding here — it is sleeping here.'],
+    ['The sealed lower shaft: marked DANGER on the foreman\'s map, dated fifty years ago.','The ore chamber where the vein was cut — and the wrong thing was found at the end.','The equipment room: the tools of the last crew are here. They dropped everything and ran.','The deepest level: the mine did not make it. The digging stopped here for a reason.'],
+    ['The original burial vault: what was interred here was not meant to stay dead.','The sealed inner tomb: the warnings on the door are in a language no one speaks anymore.','The preparation chamber: the body was readied here. Something has been using the preparation table since.','The lower ossuary: bones arranged deliberately, and the arrangement has changed since the map was drawn.'],
+    ['The inner sanctum: the doors cannot be opened by normal means. They opened themselves last night.','The reliquary: the holy items stored here are what binds the evil. They must not be removed.','The lower rite chamber: the ceremony that sealed the evil was performed here. It is being undone.','The god-pit: below even the lower level, not on any map, but the party will find it.'],
+    ['The old lord\'s hall: his portrait moves when no one is looking.','The cells beneath the stronghold: something old has been in one of them long before the stronghold was built.','The keep\'s foundation chamber: built over something that should have stayed buried.','The command room: the evil is already here. It has been making decisions.'],
+  ],
+  // 5. Visiting a Lost Shrine
+  [
+    ['The approach road: marked by standing stones, each one engraved. The last one has been defaced.','The gatehouse: the original guardian left a test. The test is still active.','The upper chapel: the shrine\'s secondary place of worship, now a ruined outer chamber.','The inner sanctum: sealed by divine means. The party must prove worthiness to enter.'],
+    ['The sacred spring: its waters are the source of the shrine\'s power. Something has fouled it.','The votive cave: filled with offerings from pilgrims long dead. One offering is recent.','The oracle chamber: the answers are here, but the asking has a price.','The deepest grotto: the shrine\'s heart, protected by a guardian who tests devotion.'],
+    ['The carved passage: the route to the shrine is marked in the old mine\'s lower tunnels.','The holy seam: the miners stopped here. The ore turns into something else.','The shrine antechamber: built by miners who found the holy site, converted for worship.','The sacred depth: further down than any mine should go.'],
+    ['The memorial vault: the shrine\'s relics were entombed when the faith was suppressed.','The sealed offering chamber: the old faithful left their gifts here before the doors closed.','The divine sepulchre: a priest of the lost faith is buried here. She will speak to the worthy.','The relic vault: the sacred item is here, but so is its guardian — faithful beyond death.'],
+    ['The outer court: every surface carved with the god\'s story.','The inner sanctuary: the air here is different. Torches burn without consuming.','The reliquary: the sacred items are still here. The shrine protected them.','The god-presence: the innermost chamber, where those with faith will feel they are not alone.'],
+    ['The shrine square: the town was built around it. The shrine\'s foundation is the oldest structure.','The undercroft: the original shrine, below the town, still intact.','The sacred well: the source of the town\'s founding blessing, now blocked.','The hidden sanctum: accessible only through a route that is not on any map.'],
+  ],
+  // 6. Fulfilling a Quest
+  [
+    ['The trophy room: the lord\'s collection includes items that were never his to keep.','The high chamber: the quest item is visible from the door. The room between is not safe.','The treasury: heavily guarded, the item is in there, and so is everything else of value.','The dungeon: the current lord\'s prisoners include one who knows where the item is.'],
+    ['The deep cave: the item fell here generations ago and the cave reshaped around it.','The guardian\'s lair: the item is held by a creature that accepted it as tribute long ago.','The crystal chamber: the item is visible, encased in something. Getting it out is the challenge.','The underground road: the item was being transported when the carrier was ambushed. It is still there.'],
+    ['The sealed lower shaft: the item was being taken out when the shaft was flooded. It sank.','The ore processing floor: the item was mistaken for raw ore and is in the sorting pile.','The foreman\'s safe: locked, the item is clearly visible through the grate.','The lowest level: the item was carried down by the last survivor and left there.'],
+    ['The principal tomb: the item was buried with the deceased. It was put there for a reason.','The reliquary vault: the item is one of several holy objects stored here together.','The preparation chamber: the item was placed on the body during preparation and went down with it.','The sealed inner sanctum: the item is on the altar. Something is on the altar with it.'],
+    ['The high altar: the item is the altar piece. It has not moved in three hundred years.','The reliquary: the item is one of many. Identifying the correct one requires knowledge the party may lack.','The inner sanctum: the item is here, and so is the reason it was left here.','The god-chamber: the item was taken from this place. Returning it may have consequences.'],
+    ['The lord\'s private chamber: the item is there. So is the lord.','The treasury: the item was submitted as tribute and is now just part of the hoard.','The command vault: the item was used as collateral for an arrangement. That arrangement is still active.','The old cellar: the item was hidden here before the stronghold was occupied. It is still there.'],
+  ],
+  // 7. Escaping from Enemies
+  [
+    ['The guard room: between the cell and freedom. Two guards, one set of keys, one window.','The armory: the party\'s equipment is here, locked in a chest.','The commander\'s chamber: empty for the next hour. The window faces the outside.','The postern gate: unguarded at shift change. Shift change is in twenty minutes.'],
+    ['The cave mouth: open, but clearly visible from the sentry post on the ridge.','The underground river: it exits somewhere outside. The current is strong.','The natural chimney: it vents to the surface. Someone small might fit.','The old collapse: the cave-in created a passage the guards don\'t know about.'],
+    ['The ventilation shaft: large enough to crawl through, if the grate can be removed quietly.','The ore cart track: the track leads outside. The cart is heavy enough to coast down the grade.','The lower level: flooded, but it connects to the drainage ditch that exits the property.','The collapsed section: unstable, but passable, and the guards don\'t go near it.'],
+    ['The preparation niche: an alcove with equipment for the burial rite, including tools.','The drainage channel: it leads outside. It was designed for water, not people, but it is large enough.','The undisturbed crypt: the guards don\'t enter this section. It connects to the old entrance.','The memorial shaft: a vertical passage used for lowering coffins. It goes up.'],
+    ['The priest\'s exit: a hidden door behind the altar, used for ceremonial entrances.','The confession booth: it has a second exit that was never documented.','The roof: accessible from the upper gallery, not guarded.','The old crypt below: the temple has a lower level the current occupants don\'t use.'],
+    ['The sewer: it exits outside the perimeter. It is horrible but it works.','The market tunnel: built for deliveries, forgotten by the current occupants.','The inn basement: the innkeeper knows about the old passage. She may be persuaded.','The old wall: partially collapsed in one section, apparently impassable. Apparently.'],
+  ],
+  // 8. Rescuing Prisoners
+  [
+    ['The watchtower cell: the prisoners are visible from the road, which is why they are there.','The dungeon: below the main floor, accessible through the kitchen.','The commander\'s tent: one prisoner is being held separately, for reasons.','The stable: the prisoners will be moved at dawn. The horses are already saddled.'],
+    ['The deep cave cell: a natural pit, covered by a grate, guarded at the rim.','The cave system beyond the main camp: the prisoners are further in than the party expected.','The underground camp: the main captors live on the surface. The prisoners are below.','The flooded lower cave: the water level rises at high tide. The prisoners know this.'],
+    ['The old foreman\'s office: repurposed as a holding cell.','The sealed lower shaft: the prisoners were put here to be forgotten.','The cage on the main level: in full view of the workforce, as an object lesson.','The lower level: accessible only through the main shaft bucket, under constant observation.'],
+    ['The sarcophagus: sealed, air-limited, the prisoner is running out of time.','The preparation chamber: the prisoner is being readied for something.','The reliquary vault: locked, the prisoner was put there because it could not be opened from inside.','The burial alcove: sealed but shallow — the prisoner can communicate through the wall.'],
+    ['The confession chamber: isolated, soundproofed, the prisoner has been there for days.','The reliquary: the prisoner was caught trying to recover the sacred item. They are still in there with it.','The lower chamber: the prisoner knows something about this level. That is why they were taken.','The priest\'s cell: the prisoner is being held by someone who believes they are doing the right thing.'],
+    ['The stockade: in the centre of the stronghold, maximally visible.','The inn cellar: the safest room in the building, from everyone\'s perspective.','The lord\'s private chamber: one prisoner is being held there. The lord\'s intentions are unclear.','The old jail: still functional, still locked, and the key is on a hook in the guardhouse.'],
+  ],
+  // 9. Using a Magic Portal
+  [
+    ['The tower\'s top room: the portal is here, active, and something has been stepping through.','The mirror gallery: each mirror shows a different place. One of them is not a reflection.','The sealed chamber: the portal is the door. You enter the room by stepping through.','The basement: the portal opened into the foundations. The tower was built around it.'],
+    ['The glowing fissure: not geological. It opens wider at certain hours.','The underground pool: its surface does not reflect. It shows somewhere else.','The crystal formation: it resonates when the portal activates. The whole cave shakes.','The deepest chamber: the portal is natural, or at least it is old enough that no one built it.'],
+    ['The sealed level: the miners stopped here and bricked it up. The portal is why.','The ore chamber: the vein ends at the portal. The miners followed it through and did not come back.','The equipment room: the foreman\'s notes describe "the door at the seam" — incoherently.','The lower level: a systematic grid of chambers, artificially regular, surrounding the portal.'],
+    ['The burial vault: the deceased was interred with a portal key. The portal is also in the vault.','The inner sanctum: the portal was used for the burial rite. It still functions.','The preparation chamber: the body was sent through the portal, not buried. The sarcophagus is empty.','The crypt\'s lowest level: the portal opens once a generation. It opened last week.'],
+    ['The god-room: the portal is how the god communicated with worshippers. It has started working again.','The inner sanctum: the portal is behind the altar. It was opened during the last rite performed here.','The reliquary: one of the "relics" is a portal key. The others are decoys.','The lower rite chamber: the portal requires a specific ceremony to operate. The instructions are on the wall.'],
+    ['The old gatehouse: the portal was used as a supply line. It still functions.','The lord\'s vault: the portal connects to another vault in a location the party does not know yet.','The central square: the portal is public. Everyone knows it is there. No one uses it because of what comes through.','The command room: the enemy is using the portal to receive orders. The other end is what matters.'],
+  ],
+  // 10. Finding a Lost Race
+  [
+    ['The servants\' quarters: still furnished, still maintained, by people who no longer need furniture.','The original entrance: sealed from the outside. Opened from the inside, recently.','The old hall: adapted for beings that no longer walk upright, or who walk differently.','The deep level: the Lost Race lives entirely below. What is above is their outer perimeter.'],
+    ['The main gallery: carved, deliberate, ancient — but the carvings have been modified recently.','The deep settlement: a cave system beyond the party\'s map, lit by bioluminescence and inhabited.','The underground farm: they have been growing things down here for generations.','The ritual cave: the Lost Race still performs ceremonies here, adapted from something recognisable.'],
+    ['The original lower level: the miners found the Lost Race, not the other way around.','The inhabited section: beyond the worked mine, the tunnels continue, different in character.','The underground settlement: built in the mine\'s deepest section, using mine infrastructure.','The deep gallery: the Lost Race\'s elders live furthest down. The party is being led there.'],
+    ['The inhabited crypt: the Lost Race lives among its own dead.','The sealed tomb: the Lost Race\'s progenitor is interred here. The annual rite is about to occur.','The burial practices: the Lost Race buries its dead in a way that tells the party where they came from.','The memorial alcove: one name is legible and matches a historical record the party may know.'],
+    ['The converted temple: the original faith has evolved into something no longer recognisable.','The inner sanctum: the Lost Race still worships here, though the god they call on has changed.','The reliquary: the original sacred items are here, repurposed.','The priest\'s cell: the Lost Race\'s spiritual leader lives here and may be willing to communicate.'],
+    ['The outer perimeter: the Lost Race uses the stronghold\'s outer defences for their own purposes.','The inhabited district: a section of the town is occupied by the Lost Race. The rest is theirs in name only.','The market: the Lost Race has been watching the party through the windows since they arrived.','The lord\'s hall: the Lost Race\'s current leader occupies the highest-status room.'],
+  ],
+];
+
+// ═══════════════════════════════════════════════
+//  GENERATOR
+// ═══════════════════════════════════════════════
+const d = n => Math.floor(Math.random() * n);
+const pick = arr => arr[d(arr.length)];
+
+function generateSeed() {
+  // Animate dice icon
+  const icon = document.getElementById('dice-icon');
+  icon.classList.remove('spinning');
+  void icon.offsetWidth;
+  icon.classList.add('spinning');
+
+  // Roll
+  const si = d(10); // scenario index 0–9
+  const ti = d(6);  // setting index 0–5
+  const scenario = SCENARIOS[si];
+  const setting = SETTINGS[ti];
+  const monster = MONSTERS[si][ti];
+  const rooms = ROOM_SEEDS[si][ti];
+
+  // Animate roll displays
+  document.getElementById('roll-strip').style.display = 'flex';
+  animateRoll('roll-scenario', si + 1, 10);
+  animateRoll('roll-setting', ti + 1, 6);
+
+  // Hook
+  const hook = pick(scenario.hooks);
+
+  // Build card
+  setTimeout(() => {
+    document.getElementById('seed-output').innerHTML = `
+<div class="seed-card">
+
+  <div class="seed-band">
+    <div>
+      <div class="seed-roll-label">d10 — Scenario ${si + 1}</div>
+      <div class="seed-title">${scenario.glyph} ${scenario.title}</div>
+      <div class="seed-setting-line">${setting.glyph} ${setting.name}</div>
+    </div>
+    <div class="seed-badge">d6 — Setting ${ti + 1}</div>
+  </div>
+
+  <div class="seed-body">
+
+    <div class="seed-section">
+      <div class="sec-label">The Scenario</div>
+      <div class="sec-text">${scenario.summary}</div>
+    </div>
+
+    <div class="seed-section">
+      <div class="sec-label">The Setting</div>
+      <div class="sec-text">${setting.desc}</div>
+    </div>
+
+    <div class="seed-section">
+      <div class="sec-label">Hook — Give Your Players a Reason</div>
+      <div class="hook-box">${hook}</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="seed-section">
+      <div class="sec-label">Special Monster</div>
+      <div class="monster-block">
+        <div class="monster-name">${monster[0]}</div>
+        <div class="monster-why">${monster[1]}</div>
+      </div>
+    </div>
+
+    <div class="seed-section">
+      <div class="sec-label">Room &amp; Area Seeds</div>
+      <div class="room-list">
+        ${rooms.map((r, i) => `<div class="room-item"><span class="room-num">${i + 1}</span><span class="room-text">${r}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="seed-section">
+      <div class="sec-label">Dungeon Shape — Layout Guidance</div>
+      <div class="sec-text">${setting.layout}</div>
+    </div>
+
+    <div class="seed-section">
+      <div class="sec-label">DM Note</div>
+      <div class="sec-text">${scenario.dm_note}</div>
+    </div>
+
+  </div>
+</div>`;
+  }, 400);
+}
+
+function animateRoll(id, finalVal, sides) {
+  const el = document.getElementById(id);
+  el.classList.add('rolling');
+  let count = 0;
+  const ticks = 12;
+  const iv = setInterval(() => {
+    el.textContent = Math.floor(Math.random() * sides) + 1;
+    count++;
+    if (count >= ticks) {
+      clearInterval(iv);
+      el.textContent = finalVal;
+      el.classList.remove('rolling');
+    }
+  }, 50);
+}
+</script>
+</body>
+</html>
