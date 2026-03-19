@@ -6,3 +6,4 @@
 * Dungeon Stocker: https://primarchofistanbul.github.io/bxstocker/
 * Trap Generator: https://primarchofistanbul.github.io/bxtrapper/
 * Treasure Generator: https://primarchofistanbul.github.io/bxchargen/bx_treasure_generator.html
+* Hex Generator:https://primarchofistanbul.github.io/bxchargen/bx_hex_generator.html
