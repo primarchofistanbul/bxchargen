@@ -131,12 +131,44 @@ body{background:var(--bg);color:var(--ink);font-family:'Libre Baskerville',Georg
 /* FOOTER NOTE */
 .footer-note{font-size:0.72rem;color:var(--muted);text-align:center;margin-top:28px;font-style:italic}
 
+/* WANDERING TABLE */
+.wander-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.wander-table th{
+  font-family:'Playfair Display',serif;font-size:0.62rem;letter-spacing:0.15em;
+  text-transform:uppercase;color:var(--muted);padding:6px 10px;
+  border-bottom:2px solid var(--rule);text-align:left;background:var(--bg2);
+}
+.wander-table th:first-child{text-align:center;width:44px}
+.wander-table td{padding:6px 10px;border-bottom:1px solid var(--rule2);vertical-align:top}
+.wander-table td:first-child{
+  font-family:var(--mono);font-size:0.88rem;font-weight:bold;
+  text-align:center;color:var(--muted);
+}
+.wander-table td.wm-name{font-weight:bold;color:var(--ink);white-space:nowrap}
+.wander-table td.wm-note{color:var(--ink2);font-style:italic;font-size:0.82rem}
+.wander-row-common td{background:var(--bg2)}
+.wander-row-common td:first-child{color:var(--red)}
+.wander-row-peak td{background:var(--red-bg)}
+.wander-row-peak td:first-child{color:var(--red);font-size:1rem}
+.wander-row-peak td.wm-name{color:var(--red)}
+.wander-row-rare td{opacity:0.65}
+.wander-label{
+  display:inline-block;font-family:var(--mono);font-size:0.56rem;letter-spacing:0.06em;
+  text-transform:uppercase;padding:1px 5px;border:1px solid var(--red);
+  color:var(--red);margin-left:6px;vertical-align:middle;
+}
+.wander-prob{
+  font-family:var(--mono);font-size:0.68rem;color:var(--muted);
+  display:block;margin-top:1px;
+}
+
 @media(max-width:600px){
   .roll-strip{gap:14px}
   .roll-box{min-width:100px;padding:10px 14px}
   .seed-band{flex-direction:column;align-items:flex-start}
   .site-header{flex-direction:column}
   .header-right{align-items:flex-start}
+  .wander-table td.wm-note{display:none}
 }
 @media print{
   .generate-area,.header-right,.roll-strip{display:none!important}
@@ -153,7 +185,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Libre Baskerville',Georg
     <div class="subtitle">B/X Dungeons &amp; Dragons · Moldvay Basic / Old School Essentials</div>
   </div>
   <div class="header-right">
-    <a class="btn" href="index.html">⚔ Characters</a>
+    <a class="btn" href="bx_character_generator.html">⚔ Characters</a>
     <a class="btn outline" href="bx_monster_reference.html">☠ Monsters</a>
   </div>
 </header>
@@ -545,6 +577,108 @@ const ROOM_SEEDS = [
 ];
 
 // ═══════════════════════════════════════════════
+//  WANDERING MONSTER TABLES
+//  [scenarioIdx][settingIdx] = 11 entries for rolls 2–12
+//  Each entry: [monsterName, note]
+//  Bell curve: 7 = most common (~17%), 6&8 (~14%), 5&9 (~11%), 4&10 (~8%), 3&11 (~6%), 2&12 (~3%)
+// ═══════════════════════════════════════════════
+const WANDERING=[
+/* 0: Exploring the Unknown */
+[
+/* Castle */[['Vampire','solitary — watching from the shadows'],['Wight','2d4, risen from forgotten servants\' quarters'],['Gargoyle','2d4, original sentinels still functional'],['Ghoul','2d4, former inhabitants'],['Doppelganger','has taken the form of a previous explorer'],['Zombie','3d6, drifting the halls aimlessly'],['Skeleton','2d6, still following their last patrol route'],['Giant Spider','1d3, nested in upper floors'],['Giant Rat','2d8, in the walls and cellars'],['Normal Human','sole survivor of a previous expedition — barely sane'],['NPC Party','rival mapping expedition, 1d6+2 members']],
+/* Caves */[['Purple Worm','solitary ancient specimen — apex of this system'],['Troll','solitary, territorial, nesting near water'],['Ogre','1d3, scavenging'],['Giant Spider (Crab)','1d4, semi-transparent in webs'],['Gelatinous Cube','1, occupying a full corridor'],['Giant Bat','2d6, disturbed from roost'],['Troglodyte','2d6, territorial patrol'],['Stirge','3d6, hungry'],['Cave Locust','1d8, will shriek if threatened'],['Gray Ooze','1, indistinguishable from wet rock'],['NPC Party','rival explorers, 1d6 members — after the same prize']],
+/* Mine */[['Troll','solitary, in the deepest worked section'],['Ochre Jelly','1, drawn to organic residue in the shafts'],['Ogre','1d2, living in the foreman\'s quarters'],['Giant Spider (Crab)','1d4, web spans the corridor'],['Gargoyle','1d3, original sentinels from before the mine was built'],['Goblin','2d6, scavengers who moved in recently'],['Giant Rat','3d6, infested every level'],['Giant Centipede','2d6, in the lower tunnels'],['Gray Ooze','1, looks like a puddle of mine water'],['Stirge','2d6, roosting in the ventilation shafts'],['NPC Party','survey team from the original company, impossibly still alive']],
+/* Crypt */[['Vampire','the last occupant of the principal tomb'],['Spectre','2d4, former nobles, furious at disturbance'],['Wight','1d4, from secondary burials'],['Ghoul','2d4, violated their own graves'],['Shadow','2d4, in the memorial corridors'],['Skeleton','2d8, risen from all periods of the crypt\'s use'],['Zombie','1d8, most recent interments'],['Giant Spider','1d3, in undisturbed alcoves'],['Gray Ooze','1, growing over a disturbed sarcophagus'],['Normal Human','a grave robber who has been here too long — changed'],['NPC Party','adventurers exploring the same, 1d6+1']],
+/* Temple */[['Medusa','the last priest, transformed by the god\'s abandonment'],['Gargoyle','2d4, original guardians — still faithful'],['Shadow','2d4, what the faith became in the dark'],['Ghoul','2d4, former worshippers who stayed too long'],['Basilisk','1d2, nesting in the outer court'],['Skeleton','2d8, animated temple guards'],['Zombie','1d6, former priests who refused to leave'],['Giant Spider','1d3, in the ceiling of the great hall'],['Green Slime','1, growing on the old altar'],['Stirge','2d6, roosting in the bell tower'],['NPC Party','pilgrims who came before — now confused']],
+/* Stronghold */[['Dragon','has claimed the whole structure as a lair'],['Troll','1d3, occupying the great hall'],['Ogre','1d4, squatting in the barracks'],['Hobgoblin','2d6, recent occupying force'],['Living Statue','1d3, automated guardians still active'],['Orc','2d8, current residents'],['Goblin','2d6, servants of the Orcs'],['Giant Rat','3d6, in every storeroom'],['Doppelganger','been here for weeks — already established'],['Normal Human','original resident, hiding in the cellars'],['NPC Party','liberation force, 2d6 Veterans']],
+],
+/* 1: Investigating a Chaotic Outpost */
+[
+/* Castle */[['Hobgoblin Captain','1, 4HD — on inspection rounds'],['Troll','1d2, kept as a guard beast below'],['Ogre','1d3, heavy muscle at key chokepoints'],['Bugbear','2d4, elite guards — surprise on 1–3'],['Hobgoblin','2d6, combat patrol, armed and alert'],['Hobgoblin','3d6, standard garrison patrol'],['Orc','2d8, common soldiers'],['Goblin','2d6, runners and servants'],['Normal Human','1d4, collaborators or prisoners being moved'],['Giant Rat','2d8, infestation in the stores'],['Hobgoblin Messenger','1, carrying sealed orders — alone and fast']],
+/* Caves */[['Troll','1, the inner compound\'s guard beast'],['Ogre','1d2, gate guards for the main passage'],['Bugbear','2d4, elite cave patrol — silent hunters'],['Gnoll','2d6, mercenary warband on rotation'],['Hobgoblin','2d6, disciplined patrol'],['Goblin','3d6, common grunt patrol'],['Orc','2d6, mixed patrol'],['Giant Spider','1d2, not under control — opportunistic'],['Cave Locust','1d6, shrieking alerts the whole camp'],['Giant Bat','2d6, disturbed from the roof cave'],['Orc Scout','1d3, returning from outside with a report']],
+/* Mine */[['Troll','1, working alone in the deep shaft'],['Ogre','1d2, overseers for the lower level'],['Bugbear','2d4, enforcer patrol'],['Hobgoblin','2d4, officer patrol'],['Gnoll','2d4, overseers guarding workers'],['Orc','3d6, labourers-turned-soldiers'],['Goblin','2d8, pressed labour, armed with tools'],['Kobold','2d8, mine workers — may be sympathetic'],['Giant Rat','3d6, in every tunnel'],['Giant Spider','1d2, in an unworked section'],['Goblin Messenger','1, carrying ore reports upward — knows the layout']],
+/* Crypt */[['Spectre','1d4, bound by the cult — guarding the inner sanctum'],['Wight','1d4, reanimated as undead officers'],['Ogre','1d2, brute force muscle'],['Bugbear','2d4, using crypts as barracks'],['Ghoul','2d4, under chaotic control — shock troops'],['Hobgoblin','2d6, using crypts as their base'],['Orc','2d6, rank and file — uncomfortable here'],['Goblin','2d6, very uncomfortable, jumpy'],['Skeleton','2d6, reanimated by the cult leader'],['Giant Spider','1d2, not under control'],['Zombie Courier','1, carrying orders between levels — raised from a previous occupant']],
+/* Temple */[['Medusa','1, the outpost\'s high priest — transformed by dark rites'],['Harpy','1d3, sacred animals of the new faith'],['Bugbear','2d4, enforcers'],['Gnoll','2d6, cult soldiers — true believers'],['Hobgoblin','2d6, patrol — professional, not religious'],['Orc','3d6, converted worshippers — fanatical'],['Goblin','2d6, initiates — more scared than dangerous'],['Skeleton','2d4, reanimated temple guardians'],['Giant Spider','1d2, sacred — do not attack them'],['Normal Human','1d4, cultists performing maintenance'],['Cult Leader\'s Aide','1 Medium 3rd level with 1d4 Orc bodyguards']],
+/* Stronghold */[['Cyclops','1, the warlord\'s champion — on personal patrol'],['Troll','1d2, kept below as an ultimate threat'],['Ogre','1d4, officers, carrying themselves like lords'],['Bugbear','2d4, elite garrison guard'],['Hobgoblin','2d6, main garrison patrol'],['Orc','3d6, occupation force'],['Goblin','2d8, servants and runners'],['Normal Human','2d6, occupied population, cowed'],['Giant Rat','2d8, in storage areas'],['Hobgoblin Officer','1, 3HD, on inspection — has a map of the whole structure'],['Hobgoblin Courier','1, carrying the invasion timetable — alone, nervous, fast']],
+],
+/* 2: Recovering Ruins */
+[
+/* Castle */[['Vampire','1, the original lord — never left'],['Wight','1d4, former family members, still in their chambers'],['Ghoul','2d6, former servants, changed over generations'],['Shadow','2d4, everywhere the sun doesn\'t reach'],['Ghoul','2d4, hungry patrol'],['Zombie','3d6, drifting through the halls'],['Skeleton','2d6, on ancient patrols'],['Giant Spider','1d3'],['Giant Rat','3d6'],['Stirge','2d6, roosting in the towers'],['NPC Party','also hired to clear this place — they are ahead of the party']],
+/* Caves */[['Troll','1, alpha of the cave system'],['Ogre','1d2, living near the entrance'],['Troglodyte','2d6, large territorial patrol'],['Bugbear','1d4, hunters — unrelated to the Troglodytes'],['Troglodyte','2d8, primary infestation — actively hunting'],['Troglodyte','3d6, full patrol'],['Goblin','2d6, secondary occupants fighting the Troglodytes'],['Giant Spider','1d3'],['Cave Locust','1d8'],['Giant Bat','2d6'],['Troglodyte Shaman','1, 3HD, with 1d4 guards — the real leader']],
+/* Mine */[['Troll','1, owns the deepest level'],['Ochre Jelly','1, in the main shaft — why no one descends'],['Gray Ooze','1d2, in the lower tunnels'],['Goblin','2d4, scouts from the primary colony'],['Kobold','2d8, the main infestation — this corridor is trapped'],['Kobold','3d6, main body, doing mine work'],['Goblin','2d6, fighting the Kobolds over territory'],['Giant Spider (Crab)','1d3, in the worked sections'],['Giant Rat','3d6'],['Giant Centipede','2d6'],['Kobold Chief','1, 2HD, with 1d6 guards — will negotiate from strength']],
+/* Crypt */[['Vampire','1, the founding family\'s last heir'],['Spectre','1d4, former notables, furious at disturbance'],['Wight','1d6, noble dead risen'],['Wraith','1d3, from the oldest section'],['Ghoul','2d4, the more recent dead'],['Skeleton','2d8, risen from all eras'],['Zombie','1d8, the most recently interred'],['Shadow','2d4'],['Giant Spider','1d3'],['Normal Human','1, a grave robber who has been here far too long'],['Wight','1, the oldest — an ancient noble who runs the crypt']],
+/* Temple */[['Medusa','1, last high priest, transformed by isolation'],['Harpy','1d4, a mated colony in the bell tower'],['Giant Spider (Black Widow)','1d3, the most dangerous infestation'],['Stirge','3d6, a large hungry colony'],['Stirge','2d8, hunting in the main hall'],['Stirge','3d6, primary problem — why settlers haven\'t moved in'],['Giant Bat','2d8, sharing the space with the Stirge'],['Giant Spider','1d3'],['Giant Snake','1d2, in the lower areas'],['Giant Rat','2d6'],['Harpy','1d3, two nesting pairs — the settlers\' real reason for abandonment']],
+/* Stronghold */[['Troll','1, has been here longest — owns it in every practical sense'],['Ogre','1d3, sub-lieutenants of the occupying band'],['Hobgoblin','2d4, enforcers'],['Bugbear','2d4, elite of the occupying force'],['Orc','2d8, the bulk of the occupying force'],['Orc','3d6, main patrol'],['Orc','2d6, off-duty but armed'],['Goblin','2d8'],['Giant Rat','3d6'],['Normal Human','1d4, surviving residents, in hiding'],['Orc War Chief','1, 4HD, with 1d6 Bugbear bodyguards — the one who must die']],
+],
+/* 3: Destroying an Ancient Evil */
+[
+/* Castle */[['Vampire','1, the ancient evil — or its chosen vessel'],['Spectre','1d4, former lords consumed by the evil'],['Wight','1d6, knights who swore the wrong oath'],['Wraith','1d3, drawn from the surrounding land'],['Shadow','2d6, everywhere the evil\'s influence reaches'],['Skeleton','2d8, animated by residual evil'],['Zombie','1d8, more recent victims'],['Ghoul','2d4, drawn to the power'],['Giant Spider','1d3'],['Stirge','2d6'],['Vampire','1, a second manifestation — the evil has many faces']],
+/* Caves */[['Dragon','1, ancient — drawn by the evil\'s aura long ago, changed by it'],['Troll','1d3, servants of the evil — marked by it'],['Medusa','1, former priest now transformed'],['Wraith','1d3, the evil\'s heralds'],['Ghoul','2d6, drawn from the wider area'],['Troglodyte','2d8, corrupted — more aggressive, faintly glowing eyes'],['Giant Spider (Black Widow)','1d3'],['Ochre Jelly','1'],['Shadow','2d4, the caves are full of them'],['Cave Locust','1d8, the only normal thing left — but wrong somehow'],['The Evil\'s Herald','unique — the DM\'s creation, sent ahead of the boss']],
+/* Mine */[['Medusa','1, something the digging awakened'],['Troll','1, drawn by the smell of the evil'],['Wight','1d4, miners who dug too deep'],['Wraith','1d3, former foremen, still supervising in death'],['Shadow','2d4'],['Ghoul','2d6, drawn from the surface'],['Giant Spider','1d3'],['Gray Ooze','1d2'],['Zombie','1d8, former workers'],['Skeleton','2d6, animated by the dig\'s dark energy'],['Ancient Thing','unique — what the miners found at the bottom of the shaft']],
+/* Crypt */[['Vampire','1, the highest form the ancient evil takes here'],['Spectre','2d4, the evil\'s courtiers'],['Wight','1d6'],['Wraith','1d4'],['Mummy','1d3, bound guardians — fighting for the evil'],['Ghoul','2d8, the common undead'],['Skeleton','2d10, ground troops'],['Zombie','1d10'],['Shadow','2d6'],['Giant Spider','1d3'],['The Awakened','1, the ancient evil itself — barely contained']],
+/* Temple */[['Vampire','1, the evil has taken root in the high priest\'s body'],['Spectre','1d4, the inner circle of priests'],['Wight','1d6, the outer clergy'],['Medusa','1, the evil\'s chosen prophet — transformed'],['Mummy','1d3, divine guardians corrupted by the evil'],['Ghoul','2d8, former worshippers'],['Skeleton','2d10, original guards, reanimated'],['Shadow','2d6, everywhere the light doesn\'t reach'],['Harpy','1d4, sacred animals twisted by the evil'],['Giant Spider','1d2'],['The God\'s Wrath','1, unique undead entity — the evil given divine form']],
+/* Stronghold */[['Vampire','1, the lord of the stronghold — the evil\'s primary vessel'],['Spectre','1d4, former officers, still at their posts'],['Wight','1d6, the guard captains'],['Wraith','1d3, ranging the outer walls'],['Shadow','2d8, filling every dark corner'],['Zombie','3d6, former garrison'],['Skeleton','2d8, former guards'],['Ghoul','2d6, those who served willingly'],['Giant Rat','3d6, the only living things left'],['Normal Human','1, somehow still alive — but why? And for how long?'],['Vampire','1, the evil\'s second manifestation — awake longer']],
+],
+/* 4: Visiting a Lost Shrine */
+[
+/* Castle */[['Dragon','1, final guardian — tests the worthy, destroys the unworthy'],['Griffon','1d3, nesting in the towers — aggressive to armed groups'],['Gargoyle','2d4, the shrine\'s outer guardians'],['Harpy','2d4, drawn to sacred ground — corrupted'],['Harpy','1d4, blocking the main approach'],['Skeleton','2d6, former knights of the shrine\'s order'],['Zombie','1d6, priests who failed the test'],['Giant Spider','1d3'],['Stirge','2d6'],['Normal Human','1, a failed pilgrim — has been here weeks, losing hope'],['NPC Party','rival seekers, 1d4+2 — arrived yesterday']],
+/* Caves */[['Dragon','1, nesting above the cave entrance'],['Basilisk','1d2, the shrine\'s stone guardians — petrified figures mark the path'],['Cockatrice','1d3, nesting near the approach'],['Gargoyle','2d4'],['Harpy','1d4, singing at the cave mouth'],['Giant Spider (Crab)','1d4, semi-transparent'],['Cave Locust','1d8'],['Stirge','2d6'],['Giant Bat','2d6'],['Troglodyte','2d4, territorial — unaware of the shrine\'s significance'],['Oracle','1 Medusa — will answer one question before attacking']],
+/* Mine */[['Basilisk','1, nesting at the end of the holy passage'],['Cockatrice','1d2, the petrified forms lining the route were pilgrims'],['Gargoyle','2d4, still guarding after centuries'],['Doppelganger','1, testing the party\'s faith and intentions'],['Ghoul','2d4, drawn to sacred ground but unable to reach the shrine'],['Skeleton','2d6, former pilgrims who came and never left'],['Giant Spider','1d3'],['Gray Ooze','1'],['Giant Centipede','2d6'],['Stirge','2d6'],['Guardian Spirit','1, treat as Spectre — will not attack Lawful characters who speak the blessing']],
+/* Crypt */[['Vampire','1, the shrine\'s last keeper — refused to die, became something else'],['Spectre','1d4, former priests who failed in their duty'],['Wight','1d6, pilgrims who died trying'],['Wraith','1d3, the most recent failures'],['Mummy','1d2, the shrine\'s appointed guardian-dead'],['Ghoul','2d4, drawn to sacred ground — they cannot reach the shrine'],['Skeleton','2d8, former pilgrims — centuries of them'],['Shadow','2d4'],['Giant Spider','1d3'],['Normal Human','1, a genuine pilgrim who arrived before the party'],['Shrine\'s Defender','1, ancient high-level undead — tests the worthy']],
+/* Temple */[['Dragon','1, the ultimate test of this shrine — speaks before acting'],['Medusa','1, former head priest, transformed by centuries of isolation'],['Gargoyle','2d6, the god\'s guardians — will let Lawful characters pass'],['Harpy','1d4, drawn to the divine resonance, corrupted'],['Sprite','2d6, testing worthiness through riddles'],['Skeleton','2d6, former priests, still doing their duties'],['Ghost Priest','1, treat as Spectre — speaks first, offers guidance to the worthy'],['Giant Spider','1d2'],['Shadow','2d4, residue of failed pilgrims'],['Pixie','1d6, tricksters — may guide or mislead'],['The God\'s Test','1 Golem (Stone) — activated by the unworthy']],
+/* Stronghold */[['Dragon','1, the shrine\'s ultimate guardian and final test'],['Lycanthrope (Werewolf)','1d3, hiding among the population'],['Ogre','1d4, hired roadblocks'],['Hobgoblin','2d6, guards blocking approach'],['Normal Human','2d6, false pilgrims — thieves sent to steal the relic'],['Normal Human','3d6, genuine pilgrims also seeking the shrine'],['Doppelganger','1d2, have replaced key personnel'],['Bandit','2d6, opportunists following the pilgrims'],['Thoul','1d3, disguised as pilgrims — nature hidden'],['Giant Rat','2d6'],['NPC Party','hostile rival seekers, 1d4+3 — will fight for sole access']],
+],
+/* 5: Fulfilling a Quest */
+[
+/* Castle */[['Dragon','1, guards the quest objective in the highest tower'],['Wyvern','1d2, nesting on the battlements'],['Griffon','1d3, loyal to the former lord — stabled in the upper ward'],['Gargoyle','2d4, original sentinels'],['Ghoul','2d4, former inhabitants'],['Hobgoblin','2d6, current garrison'],['Orc','2d6, soldiers'],['Zombie','1d8, augmenting the garrison'],['Giant Spider','1d3'],['Giant Rat','2d6'],['NPC Party','also pursuing the quest, 1d4+2 — half a day ahead']],
+/* Caves */[['Dragon','1, the cave system\'s true master — quest item is in its hoard'],['Manticore','1, territorial — claims the middle levels'],['Troll','1d3, hunting'],['Ogre','1d2, living near the entrance'],['Griffon','1d2, using a high cave as a nest'],['Giant Spider (Black Widow)','1d3'],['Troglodyte','2d8'],['Ochre Jelly','1'],['Cave Locust','1d8'],['Giant Bat','2d6'],['NPC Party','hunters after the same prize, 1d6 — hostile if close to the goal']],
+/* Mine */[['Dragon','1, found the deepest chamber and adopted it'],['Manticore','1, hunts in the upper levels'],['Troll','1, lives in the lower shaft'],['Ogre','1d2'],['Gargoyle','2d4, pre-mine ancient guardians'],['Dwarf','2d6, hostile — claim lawful ownership of mine and everything in it'],['Goblin','2d6, scavengers'],['Giant Spider','1d3'],['Gray Ooze','1'],['Stirge','2d6'],['Dwarven Reclamation Party','2d6 Dwarves, Fighter 4th level leader — legal claim in hand']],
+/* Crypt */[['Vampire','1, occupant of the principal tomb — quest item was buried with them'],['Spectre','1d4'],['Wight','1d6'],['Wraith','1d3'],['Mummy','1d2, guardians of the burial goods'],['Ghoul','2d6'],['Skeleton','2d8'],['Zombie','1d8'],['Shadow','2d4'],['Giant Spider','1d3'],['NPC Party','tomb raiders — they know exactly what they\'re here for']],
+/* Temple */[['Dragon','1, the sacred guardian — has been here since the temple was built'],['Golem (Iron)','1, final guardian of the inner sanctum'],['Medusa','1, last priest — transformed'],['Gargoyle','2d6, the god\'s servants — react to alignment'],['Harpy','1d4'],['Skeleton','2d8, original guardians'],['Zombie','1d6, former priests'],['Giant Spider','1d3'],['Shadow','2d4'],['Normal Human','1d4, surviving temple guardians'],['Golem (Stone)','1, the true guardian of the quest item']],
+/* Stronghold */[['Dragon','1, has claimed the stronghold as territory'],['Cyclops','1, the warlord\'s champion'],['Troll','1d3'],['Ogre','1d4, officers'],['Hobgoblin','2d6, garrison — well-organised'],['Orc','3d6, main force'],['Hobgoblin','2d4, elite guards near the objective'],['Goblin','2d6'],['Normal Human','2d4, guards'],['Giant Rat','2d6'],['Hobgoblin Commander','1, 4HD, with 2d4 Bugbear elite — guarding the objective directly']],
+],
+/* 6: Escaping from Enemies */
+[
+/* Castle */[['Bugbear','1, the warden — patrols alone, silently'],['Troll','1, in the lower level — the reason the dungeons are feared'],['Ogre','1d2, stationed at key chokepoints'],['Hobgoblin','2d6, alert — the escape has been discovered'],['Hobgoblin','2d4, standard patrol — not yet aware'],['Hobgoblin','1d6+2, regular patrol — jailer has the keys'],['Orc','2d6, guards'],['Normal Human','1d4, human guards — may be bribed'],['Giant Rat','2d6, in the dungeon level'],['Goblin','1d6, runner — knows the whole layout'],['Hobgoblin Captain','1, 4HD, with 2d4 guards — specifically hunting the escaped prisoners']],
+/* Caves */[['Troll','1, inner compound\'s guardian beast'],['Bugbear','1d4, silent elite hunters on the party\'s trail'],['Troglodyte','2d4, territorial — the captors\' unwilling neighbours'],['Gnoll','2d4, patrol'],['Goblin','2d6, slower patrol — may not have the alert yet'],['Goblin','2d8, primary guards'],['Orc','2d6'],['Giant Spider','1d2, independent — not controlled'],['Cave Locust','1d8, shrieking brings more guards'],['Giant Bat','2d6, disturbed by the flight'],['Gnoll Hunting Pack','2d4 Gnolls + 1d4 tracking wolves — specifically in pursuit']],
+/* Mine */[['Troll','1, in the deep shaft — the ultimate hazard'],['Bugbear','1d4, elite hunters'],['Ogre','1, guarding the main shaft winch'],['Hobgoblin','2d4, alert patrol'],['Orc','2d6, working patrol — armed with mine tools'],['Goblin','2d8, workers who will raise the alarm'],['Kobold','2d8, scurrying miners — will scream for help'],['Giant Rat','3d6, in the lower tunnels'],['Giant Spider','1d2, in an unused side-shaft'],['Giant Centipede','2d6, in the ventilation passage'],['Guard Captain','1 Hobgoblin 3HD, 2d4 Orcs, 2 war dogs — on the party\'s scent']],
+/* Crypt */[['Wight','1d4, the prison\'s most powerful jailers'],['Wraith','1d2, free-ranging guardian spirits'],['Ghoul','2d4, the things in the lower cells'],['Zombie','2d6, automated patrol — always the same route'],['Skeleton','2d8, primary patrol'],['Zombie','1d8, guard post sentinels'],['Normal Human','1d4, human jailers — the only ones who can operate the locks'],['Giant Spider','1d3, in the unguarded passages'],['Giant Rat','2d6'],['Stirge','2d6, in the ventilation'],['Wight','1, the warden — has the master key, has been told to find the party']],
+/* Temple */[['Medusa','1, the high priest — avoid this encounter at all costs'],['Gargoyle','2d4, guardians of all exits'],['Harpy','1d4, above the main hall'],['Hobgoblin','2d4, cult soldiers, alerted to the escape'],['Orc','2d6, cult members — armed and fanatical'],['Normal Human','2d8, cult guards — numerous, not elite'],['Skeleton','2d6, animated guardians at the doors'],['Giant Spider','1d2'],['Stirge','2d6, in the roof'],['Giant Rat','2d6'],['Cult High Priest','1 Medium 5th level, 1d6 Hobgoblin guards — furious']],
+/* Stronghold */[['Ogre','1d3, gate guards — very hard to pass'],['Troll','1, in the lower level — party will hear it first'],['Hobgoblin','2d4, elite pursuit squad'],['Hobgoblin','2d6, alerted patrol'],['Orc','2d8, main garrison — the escape has been announced'],['Normal Human','2d6, town watch — armed, numerous'],['Orc','2d4, off-duty but armed'],['Normal Human','1d6, civilian — will scream for help'],['Giant Rat','2d6'],['Guard Dogs','2d4, tracking hounds'],['Posse','1 Veteran leader + 2d8 Normal Humans — torches, pitchforks, very motivated']],
+],
+/* 7: Rescuing Prisoners */
+[
+/* Castle */[['Wyvern','1, the warlord\'s guard beast — chained at the gate, barely'],['Troll','1d2, heavy muscle'],['Ogre','1d3, stationed at key points'],['Bugbear','2d4, elite guards near the cells'],['Hobgoblin','2d6, garrison patrol'],['Hobgoblin','1d6+2, standard patrol — jailer has the cell keys'],['Orc','2d6, common guards'],['Goblin','2d6, runners and servants'],['Normal Human','1d4, human collaborators — potentially bribeable'],['Giant Rat','2d6, in the dungeon level'],['Bugbear Warden','1, 5HD — specifically alerted that something is wrong']],
+/* Caves */[['Troll','1, the chieftain\'s personal guard beast'],['Ogre','1d2, blocking the main tunnel'],['Bugbear','2d4, elite hunters'],['Gnoll','2d4, mercenary guards'],['Hobgoblin','2d4, disciplined patrol'],['Goblin','2d8, primary guards — numerous and loud'],['Orc','1d8, secondary patrol'],['Cave Locust','1d6, shrieking alerts the whole complex'],['Giant Spider','1d2, also a threat to the prisoners'],['Giant Bat','2d6'],['Gnoll Chief','1, 3HD, with 2d4 Gnoll bodyguards — the one who took the prisoners']],
+/* Mine */[['Troll','1, in the lowest worked level'],['Ogre','1d2, overseers for the prisoner gang'],['Bugbear','2d4, enforcers'],['Hobgoblin','2d4, officer patrol'],['Orc','2d8, guard overseers — prisoners work for them'],['Goblin','2d8, workers alongside the prisoners — may help if bribed'],['Kobold','2d8, also prisoners — may join the escape'],['Giant Rat','3d6'],['Giant Spider','1d2'],['Giant Centipede','2d6'],['Orc Overseer','1, 3HD, has the prisoner manifest and cell assignments']],
+/* Crypt */[['Vampire','1, the necromancer\'s master — the true power here'],['Spectre','1d4'],['Wight','1d4, undead officers'],['Ghoul','2d4, shock troops near the cells'],['Zombie','2d4, automated cell guards'],['Skeleton','2d6, patrol guards'],['Normal Human','1d4, the necromancer\'s human assistants'],['Giant Spider','1d2'],['Shadow','2d4'],['Giant Rat','2d6'],['Necromancer','1 Medium 6th level, with 1d4 Wight bodyguards']],
+/* Temple */[['Medusa','1, the cult\'s high priest — ordered the capture'],['Gargoyle','1d4, cult guardians'],['Harpy','1d3, sacred animals'],['Ghoul','2d4, used as prison guards'],['Hobgoblin','2d4, cult soldiers'],['Orc','2d6, cult members — fanatical'],['Normal Human','2d6, cultists — true believers, will fight to the death'],['Skeleton','2d4'],['Giant Spider','1d2'],['Stirge','2d6'],['Cult Matriarch','1 Cleric 6th level, with 1d6 Hobgoblin guards']],
+/* Stronghold */[['Cyclops','1, the warlord\'s champion — visible from across the yard'],['Troll','1d2'],['Ogre','1d4, officers'],['Bugbear','2d4, elite garrison'],['Hobgoblin','2d6, main patrol'],['Orc','2d8, garrison soldiers'],['Goblin','2d6, servants'],['Normal Human','2d4, collaborators — potentially bribeable'],['Giant Rat','2d6'],['Guard Dogs','1d4+2, trained war dogs'],['Hobgoblin Warlord','1, 5HD, 2d4 Bugbear elite — the one the prisoners were taken to impress']],
+],
+/* 8: Using a Magic Portal */
+[
+/* Castle */[['Efreeti (Lesser)','1, came through the portal — the real threat from the other side'],['Salamander (Fire)','1d2, leaked through — burning everything they touch'],['Invisible Stalker','1, assigned to guard the portal against use'],['Djinni (Lesser)','1, trying to get back through the portal'],['Doppelganger','1d3, scouts from the other side — established for weeks'],['Zombie','2d6, sent through in advance'],['Skeleton','2d6, animated by portal energy'],['Giant Spider','1d3'],['Giant Rat','2d6'],['Normal Human','1, a lost traveller from the other side — disoriented, afraid'],['Efreeti Captain','1, leading a patrol from the other side — the invasion is imminent']],
+/* Caves */[['Elemental (Earth)','1, the cave on the other side is elemental — leaks through'],['Invisible Stalker','1, assigned to deny access from this side'],['Troll','1d2, from a different cave system on the other side'],['Doppelganger','1d3, reconnoitering'],['Warp Beast','1d2, followed someone through — still hunting them'],['Troglodyte','2d8, native cave-dwellers — unaware of the portal'],['Goblin','2d6, sent through as expendable advance scouts'],['Giant Spider','1d2'],['Cave Locust','1d8'],['Shadow','2d4, residual portal energy taking form'],['Elemental (Earth)','1, full manifestation — portal has destabilized the cave wall']],
+/* Mine */[['Elemental (Earth)','1, the portal opens into a mine on the elemental plane'],['Invisible Stalker','1, the portal\'s dedicated guardian'],['Salamander (Fire)','1, leaked through — attracted to the mine machinery'],['Doppelganger','1d2, scouts sent in advance'],['Gargoyle','2d4, activated by the portal\'s disturbance'],['Dwarf','2d4, from the other side — strange dialect, strange equipment'],['Goblin','2d6, infiltrators sent through'],['Giant Spider','1d3'],['Shadow','2d4, portal residue'],['Giant Rat','2d6'],['Stone Golem','1, constructed to guard the portal room — last command: deny passage']],
+/* Crypt */[['Vampire','1, from the other side — older and stranger than the local variety'],['Spectre','1d4, drawn through by the portal\'s necromantic resonance'],['Wight','1d6, sent through as troops'],['Wraith','1d3, native to neither side'],['Shadow','2d6, portal residue — accumulate near it'],['Skeleton','2d8, animated by the portal\'s energies'],['Zombie','1d8, sent through from the other side'],['Ghoul','2d4'],['Giant Spider','1d3'],['Normal Human','1, came through by accident — utterly lost'],['Portal Architect','1 Spectre of the portal\'s builder — still here, still watching']],
+/* Temple */[['Djinni (Lesser)','1, bound to operate the portal — imprisoned here for centuries'],['Efreeti (Lesser)','1, the power on the other side — will destroy the portal if it can'],['Elemental (Fire)','1, sent by the god on the other side'],['Invisible Stalker','1, denying access to unworthy visitors'],['Shadow','2d6, residue of every soul the portal has taken'],['Skeleton','2d6, guardians of the portal room — operated for millennia'],['Normal Human','2d4, cultists maintaining the portal through weekly rites'],['Giant Spider','1d2'],['Ghoul','2d4'],['Stirge','2d6'],['Efreeti + Servants','1 Efreeti, 2d4 Fire Salamanders — the portal is opening fully']],
+/* Stronghold */[['Djinni (Lesser)','1, the portal\'s operator — trapped here, wants to leave'],['Efreeti (Lesser)','1, military commander from the other side'],['Invisible Stalker','1d2, perimeter guards assigned by the other side'],['Hobgoblin','2d6, advance troops already through'],['Doppelganger','1d3, have replaced key stronghold personnel'],['Orc','3d6, the main invasion force pouring through'],['Goblin','2d8, first wave — disoriented'],['Normal Human','2d6, local collaborators facilitating the portal'],['Giant Rat','2d6'],['Kobold','2d8, scouts from the other side'],['Ogre + Orc Warband','1d2 Ogres + 3d6 Orcs — combat unit that just came through']],
+],
+/* 9: Finding a Lost Race */
+[
+/* Castle */[['Vampire','1, what their lord became — still rules in all practical terms'],['Spectre','1d4, rulers who could not change and could not die'],['Wight','1d6, those who refused transformation, ended up undead'],['Ghoul','2d4, members who fell the furthest'],['Lost Race Scout','1d4, pale, eyeless, fearful of light — treat as Neanderthal'],['Lost Race Patrol','2d6, armed — treat as Berserker in their own territory'],['Lost Race Warrior','1d6+2, armed with repurposed castle weaponry'],['Giant Spider','1d3, their pest control has failed'],['Giant Rat','3d6, their symbiotic companions'],['Normal Human','1, a captive kept as a curiosity'],['Lost Race Elder','1, treat as Medium 4th level — speaks broken Old Common, may parley']],
+/* Caves */[['Purple Worm','1, the thing the Lost Race fears most — their fleeing tells the party something'],['Troll','1d2, the Lost Race worships these as gods'],['Troglodyte','2d4, territorial neighbours, in conflict with the Lost Race'],['Ghoul','2d4, members who degenerated furthest'],['Lost Race Scout','1d4, hunting party — treat as Neanderthal'],['Lost Race Hunting Group','2d8 — treat as Berserker in their territory'],['Lost Race Gatherers','2d6, less aggressive, carrying food — treat as Normal Human'],['Giant Spider','1d3'],['Cave Locust','1d8'],['Giant Bat','2d6, semi-domesticated animals kept by the Lost Race'],['Lost Race Shaman','1, treat as Medium 4th level — knows the history, willing to talk']],
+/* Mine */[['Troll','1, something the Lost Race unleashed to guard a level they no longer use'],['Ochre Jelly','1, their waste management has broken down'],['Gray Ooze','1d2, in the lower passages'],['Ghoul','2d4, the fallen ones'],['Lost Race Worker','2d8, maintaining the mine as ancestors did — same motions, lost meaning'],['Lost Race Patrol','2d8, armed — treat as Berserker in their warrens'],['Lost Race Guard','1d6, at a formal checkpoint'],['Giant Rat','3d6, their companions and food animals'],['Giant Spider','1d2'],['Giant Centipede','2d6'],['Lost Race Elder','1, in a carved chamber — keeping records in unrecognisable script, will communicate']],
+/* Crypt */[['Vampire','1, their ancient lord — the bargain that set this all in motion'],['Wight','1d6, ancestral dead who still exercise authority'],['Spectre','1d4'],['Ghoul','2d4, failed transformations'],['Zombie','2d4, maintained by the Lost Race to guard ancestral tombs'],['Lost Race Priest','2d4, performing burial rites in a language no one speaks'],['Lost Race Guard','2d6, protecting the tombs with their lives'],['Skeleton','2d6, older dead, animated'],['Giant Spider','1d3'],['Shadow','2d4, residue of their ancient magic'],['The Ancient One','1, unique — the first of them, entombed but not dead — DM\'s creation']],
+/* Temple */[['Medusa','1, what their high priests became after centuries of dark prayer'],['Harpy','1d4, what the god\'s blessing became over time'],['Gargoyle','2d4, former statues given life by accumulated faith'],['Ghoul','2d4, worshippers who went too far in their devotion'],['Lost Race Priest','2d4, in ritual vestments — mid-ceremony'],['Lost Race Worshipper','2d8, at prayer — interrupt at your peril'],['Lost Race Scout','2d4'],['Giant Spider','1d3, the god\'s sacred animal'],['Stirge','2d6, also sacred — the god values things that take blood'],['Normal Human','1, a missionary who arrived a decade ago and converted'],['The God\'s Avatar','1, unique — Medusa, Gargoyle, or DM\'s creation — speaks first']],
+/* Stronghold */[['Vampire','1, their lord — old enough to have been human once'],['Troll','1d2, the lord\'s personal enforcers'],['Ogre','1d3, the lord\'s allied muscle'],['Ghoul','2d4, the outcasts, living in the walls'],['Lost Race Patrol','2d6, armed maintenance of order'],['Lost Race Civilian','2d8, going about daily life — not hostile by default'],['Lost Race Guard','1d8, formal armed patrol'],['Lost Race Child','1d6, non-combatant — their presence will complicate any fight'],['Normal Human','1d3, hostages maintained as guests — leverage'],['Giant Rat','2d6, kept as pets and food'],['Lost Race Council','1d4 Elders + Leader — parley is possible here']],
+],
+];
+
+// Probability labels for each roll (2–12)
+const WANDER_PROB=['3%','6%','8%','11%','14%','17%','14%','11%','8%','6%','3%'];
+
+// ═══════════════════════════════════════════════
 //  GENERATOR
 // ═══════════════════════════════════════════════
 const d = n => Math.floor(Math.random() * n);
@@ -564,6 +698,7 @@ function generateSeed() {
   const setting = SETTINGS[ti];
   const monster = MONSTERS[si][ti];
   const rooms = ROOM_SEEDS[si][ti];
+  const wander = WANDERING[si][ti];
 
   // Animate roll displays
   document.getElementById('roll-strip').style.display = 'flex';
@@ -612,6 +747,24 @@ function generateSeed() {
         <div class="monster-name">${monster[0]}</div>
         <div class="monster-why">${monster[1]}</div>
       </div>
+    </div>
+
+    <div class="seed-section">
+      <div class="sec-label">Wandering Monster Table — 2d6</div>
+      <table class="wander-table">
+        <thead><tr><th>Roll</th><th>Encounter</th><th>Notes</th></tr></thead>
+        <tbody>
+        ${wander.map((entry,i)=>{
+          const roll=i+2;
+          const isPeak=roll===7;
+          const isCommon=roll===6||roll===8;
+          const isRare=roll===2||roll===12;
+          const rowClass=isPeak?'wander-row-peak':isCommon?'wander-row-common':isRare?'wander-row-rare':'';
+          const badge=isPeak?'<span class="wander-label">most common</span>':'';
+          return `<tr class="${rowClass}"><td>${roll}<span class="wander-prob">${WANDER_PROB[i]}</span></td><td class="wm-name">${entry[0]}${badge}</td><td class="wm-note">${entry[1]}</td></tr>`;
+        }).join('')}
+        </tbody>
+      </table>
     </div>
 
     <div class="seed-section">
