@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HEXOGRAPHER · OSR Hex Map Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0905;
+  --panel: #17110a;
+  --panel2: #201810;
+  --border: #3d2c1a;
+  --border-hi: #6a4820;
+  --gold: #c8932a;
+  --gold-lt: #e8c060;
+  --cream: #ddd0a8;
+  --dim: #7a6a4a;
+  --danger: #8a2010;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--cream); font-family: 'EB Garamond', 'Georgia', serif; font-size: 14px; }
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ── TOP BAR ── */
+#topbar {
+  background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 0 12px;
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0; height: 50px; overflow: hidden;
+}
+#logo { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--gold); letter-spacing: .2em; white-space: nowrap; text-shadow: 0 0 30px rgba(200,147,42,.35); }
+.sep { width: 1px; height: 26px; background: var(--border); flex-shrink: 0; }
+.cg { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.cl { font-size: 10px; color: var(--dim); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.ci {
+  background: var(--panel2); border: 1px solid var(--border); color: var(--cream);
+  font-family: 'EB Garamond', serif; font-size: 13px; padding: 3px 5px;
+  border-radius: 3px; width: 50px; text-align: center;
+}
+.ci:focus { outline: none; border-color: var(--gold); }
+.cb {
+  background: var(--panel2); border: 1px solid var(--border); color: var(--cream);
+  font-family: 'EB Garamond', serif; font-size: 12px; padding: 4px 9px;
+  border-radius: 3px; cursor: pointer; letter-spacing: .05em; white-space: nowrap;
+  transition: all .12s;
+}
+.cb:hover { border-color: var(--gold); color: var(--gold); }
+.cb.primary { background: #38200a; border-color: var(--gold); color: var(--gold-lt); font-weight: 600; }
+.cb.primary:hover { background: #542e12; }
+#title-in {
+  background: transparent; border: none; border-bottom: 1px solid var(--border);
+  color: var(--gold-lt); font-family: 'Cinzel', serif; font-size: 13px;
+  padding: 3px 6px; width: 190px; text-align: center; letter-spacing: .1em;
+}
+#title-in:focus { outline: none; border-bottom-color: var(--gold); }
+.tg { font-size: 12px; color: var(--dim); cursor: pointer; user-select: none; white-space: nowrap; }
+.tg input { margin-right: 4px; accent-color: var(--gold); }
+.spacer { flex: 1; }
+
+/* ── WORKSPACE ── */
+#workspace { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+#sidebar {
+  width: 175px; background: var(--panel); border-right: 2px solid var(--border);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto;
+}
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.ss { padding: 9px 9px 7px; border-bottom: 1px solid var(--border); }
+.st { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .15em; color: var(--gold); text-transform: uppercase; margin-bottom: 7px; }
+
+/* Tool buttons */
+.tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+.tbtn {
+  background: var(--panel2); border: 1px solid var(--border); color: var(--cream);
+  font-family: 'EB Garamond', serif; font-size: 12px; padding: 6px 3px;
+  border-radius: 3px; cursor: pointer; text-align: center; transition: all .1s; line-height: 1.3;
+}
+.tbtn:hover { border-color: var(--border-hi); color: var(--gold); }
+.tbtn.active { background: #38200a; border-color: var(--gold); color: var(--gold-lt); }
+
+/* Terrain palette */
+.ti {
+  display: flex; align-items: center; gap: 7px; padding: 4px 5px;
+  border-radius: 3px; cursor: pointer; border: 1px solid transparent; margin-bottom: 2px; transition: all .1s;
+}
+.ti:hover { background: var(--panel2); }
+.ti.active { border-color: var(--gold); background: #28180a; }
+.tsw { width: 20px; height: 20px; border-radius: 2px; flex-shrink: 0; border: 1px solid rgba(0,0,0,.35); }
+.tn { font-size: 12px; color: var(--cream); }
+
+/* Marker buttons */
+.mgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+.mbtn {
+  background: var(--panel2); border: 1px solid var(--border); color: var(--cream);
+  font-size: 11px; padding: 5px 3px; border-radius: 3px; cursor: pointer;
+  text-align: center; transition: all .1s; line-height: 1.4;
+}
+.mbtn:hover { border-color: var(--border-hi); }
+.mbtn.active { background: #38200a; border-color: var(--gold); color: var(--gold-lt); }
+
+/* Misc sidebar */
+.help-text { font-size: 11px; color: var(--dim); line-height: 1.55; margin-bottom: 6px; }
+.wide-btn { width: 100%; margin-bottom: 3px; font-size: 12px; }
+.dbtn {
+  background: #1a0808; border: 1px solid #5a1010; color: #c04040;
+  font-size: 11px; padding: 4px 8px; border-radius: 3px; cursor: pointer;
+  width: 100%; font-family: 'EB Garamond', serif; transition: all .15s; margin-top: 3px;
+}
+.dbtn:hover { background: #2a1010; border-color: #8a2020; }
+
+/* ── CANVAS AREA ── */
+#canvas-wrap {
+  flex: 1; overflow: auto; background: #080503;
+  background-image: radial-gradient(ellipse at center, #100d07 0%, #040302 100%);
+  display: flex; align-items: flex-start; justify-content: flex-start; padding: 20px;
+}
+#canvas-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+#canvas-wrap::-webkit-scrollbar-track { background: #080503; }
+#canvas-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+#hexmap { cursor: crosshair; display: block; box-shadow: 0 6px 40px rgba(0,0,0,.85), 0 0 80px rgba(200,147,42,.04); }
+
+/* ── STATUS BAR ── */
+#statusbar {
+  background: var(--panel); border-top: 1px solid var(--border);
+  padding: 3px 12px; font-size: 11px; color: var(--dim);
+  display: flex; align-items: center; gap: 20px; flex-shrink: 0; height: 22px;
+}
+#hex-info { color: var(--cream); min-width: 160px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TOP BAR -->
+<header id="topbar">
+  <span id="logo">⬡ HEXOGRAPHER</span>
+  <div class="sep"></div>
+  <input type="text" id="title-in" value="The Untamed Lands" title="Map Title (click to edit)">
+  <div class="sep"></div>
+  <div class="cg">
+    <span class="cl">Rows</span>
+    <input type="number" class="ci" id="in-rows" value="10" min="1" max="26" title="Rows (A–Z, max 26)">
+    <span class="cl">Cols</span>
+    <input type="number" class="ci" id="in-cols" value="15" min="1" max="60">
+    <span class="cl">Col#</span>
+    <input type="number" class="ci" id="in-colstart" value="100" min="0" max="999" style="width:58px">
+    <button class="cb" onclick="applyGrid()">Apply</button>
+  </div>
+  <div class="sep"></div>
+  <div class="cg">
+    <span class="cl">Hex px</span>
+    <input type="number" class="ci" id="in-size" value="40" min="18" max="110">
+    <button class="cb" onclick="applySize()">Set</button>
+  </div>
+  <div class="sep"></div>
+  <label class="tg"><input type="checkbox" id="tog-labels" checked onchange="render()"> Labels</label>
+  <label class="tg"><input type="checkbox" id="tog-grid" checked onchange="render()"> Grid</label>
+  <label class="tg"><input type="checkbox" id="tog-title" checked onchange="render()"> Title</label>
+  <div class="sep"></div>
+  <div class="cg">
+    <button class="cb" onclick="undo()" title="Ctrl+Z">↩ Undo</button>
+    <button class="cb" onclick="redo()" title="Ctrl+Y">↪ Redo</button>
+  </div>
+  <div class="spacer"></div>
+  <button class="cb" onclick="exportPNG(1)" title="Export at current resolution">⬇ PNG</button>
+  <button class="cb primary" onclick="exportPNG(2)" title="Export at 2× resolution for print">⬇ PNG 2×</button>
+</header>
+
+<!-- WORKSPACE -->
+<div id="workspace">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+
+    <div class="ss">
+      <div class="st">Tools</div>
+      <div class="tgrid">
+        <button class="tbtn active" id="tbtn-paint"  onclick="setTool('paint')">✏ Paint</button>
+        <button class="tbtn"        id="tbtn-fill"   onclick="setTool('fill')">⬡ Fill</button>
+        <button class="tbtn"        id="tbtn-road"   onclick="setTool('road')">— Road</button>
+        <button class="tbtn"        id="tbtn-river"  onclick="setTool('river')">〜 River</button>
+        <button class="tbtn"        id="tbtn-marker" onclick="setTool('marker')">★ Mark</button>
+        <button class="tbtn"        id="tbtn-erase"  onclick="setTool('erase')">✕ Erase</button>
+      </div>
+    </div>
+
+    <div class="ss" id="sec-terrain">
+      <div class="st">Terrain <span style="color:var(--dim);font-size:9px">(1–8)</span></div>
+      <div id="terrain-pal"></div>
+    </div>
+
+    <div class="ss" id="sec-marker" style="display:none">
+      <div class="st">Marker</div>
+      <div class="mgrid">
+        <button class="mbtn active" id="mbtn-village" onclick="setMarker('village')">● Village</button>
+        <button class="mbtn"        id="mbtn-town"    onclick="setMarker('town')">◆ Town</button>
+        <button class="mbtn"        id="mbtn-city"    onclick="setMarker('city')">★ City</button>
+        <button class="mbtn"        id="mbtn-dungeon" onclick="setMarker('dungeon')">▼ Dungeon</button>
+        <button class="mbtn"        id="mbtn-ruins"   onclick="setMarker('ruins')">⌂ Ruins</button>
+        <button class="mbtn"        id="mbtn-temple"  onclick="setMarker('temple')">✚ Temple</button>
+        <button class="mbtn"        id="mbtn-tower"   onclick="setMarker('tower')">◉ Tower</button>
+        <button class="mbtn"        id="mbtn-lair"    onclick="setMarker('lair')">☠ Lair</button>
+      </div>
+    </div>
+
+    <div class="ss" id="sec-path" style="display:none">
+      <div class="st">Drawing</div>
+      <p class="help-text">Drag across hexes to draw. Release to save. Right-click to cancel.</p>
+      <button class="cb wide-btn" onclick="clearRoads()">Clear Roads</button>
+      <button class="cb wide-btn" onclick="clearRivers()">Clear Rivers</button>
+    </div>
+
+    <div class="ss">
+      <div class="st">Map</div>
+      <button class="dbtn" onclick="clearTerrain()">Clear Terrain</button>
+      <button class="dbtn" onclick="clearMarkers()">Clear Markers</button>
+      <button class="dbtn" onclick="clearAll()">Clear All</button>
+    </div>
+
+    <div class="ss">
+      <div class="st">Legend</div>
+      <div style="font-size:10px;color:var(--dim);line-height:1.9">
+        <div style="color:#a06030">— Road</div>
+        <div style="color:#4080c0">〜 River</div>
+        <div>★ Settlement markers</div>
+        <div style="margin-top:4px;font-size:9px">Keys: P paint · F fill<br>R road · V river · E erase<br>1–8 terrain · Ctrl+Z/Y undo/redo<br>Ctrl+scroll to zoom</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- CANVAS -->
+  <div id="canvas-wrap">
+    <canvas id="hexmap"></canvas>
+  </div>
+
+</div><!-- workspace -->
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+  <span id="hex-info">Hover a hex</span>
+  <span>Drag to paint · Ctrl+Z undo · Ctrl+scroll zoom</span>
+</div>
+
+</div><!-- app -->
+<script>
+// ═══════════════════════════════════════════════════════
+//   HEXOGRAPHER v1.0 — OSR Flat-Top Hex Map Editor
+// ═══════════════════════════════════════════════════════
+
+const SQRT3 = Math.sqrt(3);
+const MARGIN = 28;
+
+// ── TERRAIN DEFINITIONS ──────────────────────────────
+const TERRAIN = {
+  plains:       { color: '#ddb8a6', sym: '#7a4f28', label: 'Plains' },
+  farmlands:    { color: '#979f8a', sym: '#3d4a22', label: 'Farmlands' },
+  woodlands:    { color: '#7d876e', sym: '#243018', label: 'Woodlands' },
+  hills:        { color: '#c68044', sym: '#5a2c0c', label: 'Hills' },
+  mountains:    { color: '#8a3f05', sym: '#f0c07a', label: 'Mountains' },
+  barrens:      { color: '#d49b7e', sym: '#6a3018', label: 'Barrens' },
+  shallowwater: { color: '#ccdee2', sym: '#2870a8', label: 'Shallow Water' },
+  deepwater:    { color: '#4b9ab4', sym: '#102844', label: 'Deep Water' },
+};
+const TERRAIN_KEYS = Object.keys(TERRAIN);
+
+const MARKERS = {
+  village: { label: 'Village',  draw: (c,x,y,s) => drawCircleMarker(c,x,y,s,0.14,'#301000') },
+  town:    { label: 'Town',     draw: (c,x,y,s) => drawDiamondMarker(c,x,y,s,0.18,'#301000') },
+  city:    { label: 'City',     draw: (c,x,y,s) => drawStarMarker(c,x,y,s,0.22,'#301000') },
+  dungeon: { label: 'Dungeon',  draw: (c,x,y,s) => drawTriangleMarker(c,x,y,s,0.18,'#200808','down') },
+  ruins:   { label: 'Ruins',    draw: (c,x,y,s) => drawRuinsMarker(c,x,y,s) },
+  temple:  { label: 'Temple',   draw: (c,x,y,s) => drawCrossMarker(c,x,y,s) },
+  tower:   { label: 'Tower',    draw: (c,x,y,s) => drawCircleMarker(c,x,y,s,0.18,'#301000',true) },
+  lair:    { label: 'Lair',     draw: (c,x,y,s) => drawSkullMarker(c,x,y,s) },
+};
+
+// ── STATE ─────────────────────────────────────────────
+let S = {
+  rows: 10, cols: 15, colStart: 100, hexSize: 40,
+  terrain: {},   // "r,c" → terrain key
+  markers: {},   // "r,c" → marker key
+  roads: [],     // [ [[r,c],...], ... ]
+  rivers: [],    // [ [[r,c],...], ... ]
+  tool: 'paint',
+  selTerrain: 'plains',
+  selMarker: 'village',
+  history: [], histIdx: -1,
+};
+
+let hoverHex = null;
+let isPainting = false;
+let pathIP = null;  // path in progress
+let pathType = null;
+
+// ── CANVAS ────────────────────────────────────────────
+const canvas = document.getElementById('hexmap');
+const ctx = canvas.getContext('2d');
+
+function updateCanvasSize(hs) {
+  const s = hs || S.hexSize;
+  canvas.width  = Math.ceil(S.cols * s * 1.5 + s * 0.5 + MARGIN * 2);
+  canvas.height = Math.ceil(S.rows * s * SQRT3 + s * SQRT3 * 0.5 + MARGIN * 2);
+}
+
+// ── HEX GEOMETRY ──────────────────────────────────────
+function hexCenter(row, col, hs) {
+  const s = hs || S.hexSize;
+  return [
+    MARGIN + col * s * 1.5 + s,
+    MARGIN + row * s * SQRT3 + s * SQRT3 / 2 + (col % 2 === 1 ? s * SQRT3 / 2 : 0)
+  ];
+}
+
+function hexVerts(cx, cy, s) {
+  const pts = [];
+  for (let i = 0; i < 6; i++) {
+    const a = i * Math.PI / 3;
+    pts.push([cx + s * Math.cos(a), cy + s * Math.sin(a)]);
+  }
+  return pts;
+}
+
+function tracePath(ctx, cx, cy, s) {
+  ctx.beginPath();
+  const v = hexVerts(cx, cy, s);
+  ctx.moveTo(v[0][0], v[0][1]);
+  for (let i = 1; i < 6; i++) ctx.lineTo(v[i][0], v[i][1]);
+  ctx.closePath();
+}
+
+function pixelToHex(px, py, hs) {
+  const s = hs || S.hexSize;
+  const colEst = Math.round((px - MARGIN - s) / (s * 1.5));
+  let bestD = Infinity, result = null;
+  const c0 = Math.max(0, colEst - 1), c1 = Math.min(S.cols - 1, colEst + 2);
+  for (let c = c0; c <= c1; c++) {
+    const yOff = c % 2 === 1 ? s * SQRT3 / 2 : 0;
+    const rEst = Math.round((py - MARGIN - s * SQRT3 / 2 - yOff) / (s * SQRT3));
+    const r0 = Math.max(0, rEst - 1), r1 = Math.min(S.rows - 1, rEst + 1);
+    for (let r = r0; r <= r1; r++) {
+      const [cx, cy] = hexCenter(r, c, s);
+      const d = (px - cx) ** 2 + (py - cy) ** 2;
+      if (d < bestD) { bestD = d; result = { row: r, col: c }; }
+    }
+  }
+  return (result && bestD < s * s * 1.15) ? result : null;
+}
+
+function hexLabel(row, col) {
+  return String.fromCharCode(65 + row) + (S.colStart + col);
+}
+
+function getNeighbors(r, c) {
+  const offs = c % 2 === 0
+    ? [[-1,0],[1,0],[-1,-1],[0,-1],[-1,1],[0,1]]
+    : [[-1,0],[1,0],[0,-1],[1,-1],[0,1],[1,1]];
+  return offs.map(([dr,dc]) => [r+dr,c+dc])
+    .filter(([nr,nc]) => nr>=0 && nr<S.rows && nc>=0 && nc<S.cols);
+}
+
+// ── TERRAIN SYMBOL RENDERERS ──────────────────────────
+function symMountains(ctx, cx, cy, s) {
+  const h = s * 0.42, w = s * 0.28;
+  const peaks = [[-s*.22,s*.1,0.8],[s*.22,s*.1,0.8],[0,-s*.06,1.0]];
+  peaks.forEach(([ox,oy,a]) => {
+    ctx.globalAlpha = a;
+    ctx.beginPath();
+    ctx.moveTo(cx+ox, cy+oy + h*0.48);
+    ctx.lineTo(cx+ox - w, cy+oy + h*0.48);
+    ctx.lineTo(cx+ox, cy+oy - h*0.52);
+    ctx.lineTo(cx+ox + w, cy+oy + h*0.48);
+    ctx.closePath();
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+}
+
+function symHills(ctx, cx, cy, s) {
+  const bumps = [[-s*.22,s*.14,0.65,0.19],[s*.22,s*.14,0.65,0.19],[0,s*.02,0.9,0.23]];
+  bumps.forEach(([ox,oy,a,r]) => {
+    ctx.globalAlpha = a;
+    ctx.beginPath();
+    ctx.arc(cx+ox, cy+oy, s*r, Math.PI, 0);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+}
+
+function symWoodlands(ctx, cx, cy, s) {
+  const trees = [[-s*.22,s*.12],[s*.22,s*.12],[0,-s*.1]];
+  trees.forEach(([ox,oy]) => {
+    const tr = s*0.155, th = s*0.14;
+    ctx.globalAlpha = 0.82;
+    ctx.beginPath(); ctx.arc(cx+ox, cy+oy-th*.3, tr, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx+ox, cy+oy-th*.3+tr);
+    ctx.lineTo(cx+ox, cy+oy+th);
+    ctx.lineWidth = s*.04; ctx.stroke();
+  });
+}
+
+function symPlains(ctx, cx, cy, s) {
+  const pts = [[-s*.28,s*.1],[0,s*.1],[s*.28,s*.1],[-s*.14,-s*.1],[s*.14,-s*.1]];
+  pts.forEach(([ox,oy]) => {
+    const h = s * .16;
+    ctx.lineWidth = s*.04;
+    ctx.beginPath(); ctx.moveTo(cx+ox, cy+oy); ctx.lineTo(cx+ox, cy+oy-h); ctx.stroke();
+    ctx.lineWidth = s*.03;
+    ctx.beginPath();
+    ctx.moveTo(cx+ox, cy+oy-h*.55); ctx.lineTo(cx+ox-h*.38, cy+oy-h);
+    ctx.moveTo(cx+ox, cy+oy-h*.55); ctx.lineTo(cx+ox+h*.38, cy+oy-h);
+    ctx.stroke();
+  });
+}
+
+function symFarmlands(ctx, cx, cy, s) {
+  ctx.lineWidth = s*.03; ctx.globalAlpha = .55;
+  for (let i = -1; i <= 1; i++) {
+    ctx.beginPath();
+    ctx.moveTo(cx-s*.42, cy+i*s*.18); ctx.lineTo(cx+s*.42, cy+i*s*.18); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx+i*s*.18, cy-s*.38); ctx.lineTo(cx+i*s*.18, cy+s*.38); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function symBarrens(ctx, cx, cy, s) {
+  const dots = [[-s*.28,-s*.1],[s*.28,-s*.1],[0,-s*.24],[-s*.16,s*.14],[s*.16,s*.14],[0,s*.04],[-s*.28,s*.02],[s*.28,s*.02]];
+  dots.forEach(([ox,oy]) => {
+    ctx.globalAlpha = .65;
+    ctx.beginPath(); ctx.arc(cx+ox, cy+oy, s*.042, 0, Math.PI*2); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+}
+
+function symWaves(ctx, cx, cy, s, count) {
+  const ext = s*.38, sp = s*.17, amp = s*.07;
+  const startY = cy - (count-1)*sp/2;
+  ctx.lineWidth = s*.042; ctx.globalAlpha = .68;
+  for (let i = 0; i < count; i++) {
+    const y = startY + i*sp;
+    ctx.beginPath(); ctx.moveTo(cx-ext, y);
+    let x = cx - ext;
+    while (x < cx+ext) {
+      ctx.bezierCurveTo(x+s*.08, y-amp, x+s*.13, y+amp, x+s*.2, y);
+      x += s*.2;
+    }
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawTerrainSym(ctx, type, cx, cy, s) {
+  ctx.save();
+  ctx.fillStyle = TERRAIN[type].sym;
+  ctx.strokeStyle = TERRAIN[type].sym;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.lineWidth = Math.max(1, s*.04);
+  switch(type) {
+    case 'mountains':   symMountains(ctx,cx,cy,s); break;
+    case 'hills':       symHills(ctx,cx,cy,s); break;
+    case 'woodlands':   symWoodlands(ctx,cx,cy,s); break;
+    case 'plains':      symPlains(ctx,cx,cy,s); break;
+    case 'farmlands':   symFarmlands(ctx,cx,cy,s); break;
+    case 'barrens':     symBarrens(ctx,cx,cy,s); break;
+    case 'shallowwater':symWaves(ctx,cx,cy,s,2); break;
+    case 'deepwater':   symWaves(ctx,cx,cy,s,3); break;
+  }
+  ctx.restore();
+}
+
+// ── MARKER RENDERERS ──────────────────────────────────
+function drawCircleMarker(ctx, cx, cy, s, r, col, outline) {
+  ctx.save();
+  const rad = s*r;
+  ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI*2);
+  if (outline) { ctx.strokeStyle = col; ctx.lineWidth = s*.05; ctx.stroke(); }
+  else { ctx.fillStyle = col; ctx.fill(); }
+  // White dot center
+  ctx.beginPath(); ctx.arc(cx, cy, rad*.35, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fill();
+  ctx.restore();
+}
+
+function drawDiamondMarker(ctx, cx, cy, s, r, col) {
+  ctx.save();
+  const d = s*r;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy-d); ctx.lineTo(cx+d*.7, cy); ctx.lineTo(cx, cy+d); ctx.lineTo(cx-d*.7, cy);
+  ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+  ctx.restore();
+}
+
+function drawStarMarker(ctx, cx, cy, s, r, col) {
+  ctx.save();
+  const pts = 5, outer = s*r, inner = outer*.45;
+  ctx.beginPath();
+  for (let i = 0; i < pts*2; i++) {
+    const a = (i * Math.PI / pts) - Math.PI/2;
+    const dist = i%2===0 ? outer : inner;
+    const x = cx + dist*Math.cos(a), y = cy + dist*Math.sin(a);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+  ctx.restore();
+}
+
+function drawTriangleMarker(ctx, cx, cy, s, r, col, dir) {
+  ctx.save();
+  const h = s*r*1.5, w = s*r*1.2;
+  ctx.beginPath();
+  if (dir==='down') {
+    ctx.moveTo(cx, cy+h*.6); ctx.lineTo(cx-w, cy-h*.4); ctx.lineTo(cx+w, cy-h*.4);
+  } else {
+    ctx.moveTo(cx, cy-h*.6); ctx.lineTo(cx-w, cy+h*.4); ctx.lineTo(cx+w, cy+h*.4);
+  }
+  ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+  ctx.restore();
+}
+
+function drawRuinsMarker(ctx, cx, cy, s) {
+  ctx.save(); ctx.strokeStyle = '#302010'; ctx.lineWidth = s*.045; ctx.lineCap='square';
+  const b = s*.15;
+  // broken wall shape
+  ctx.beginPath();
+  ctx.moveTo(cx-b*1.2, cy+b); ctx.lineTo(cx-b*1.2, cy-b*.8); ctx.lineTo(cx-b*.4, cy-b*.8);
+  ctx.moveTo(cx-b*.4, cy-b*1.4); ctx.lineTo(cx-b*.4, cy+b);
+  ctx.moveTo(cx+b*.4, cy+b); ctx.lineTo(cx+b*.4, cy-b*.5);
+  ctx.moveTo(cx+b*.4, cy-b*1.2); ctx.lineTo(cx+b*.4, cy-b*1.2); ctx.lineTo(cx+b*1.2, cy-b*1.2); ctx.lineTo(cx+b*1.2, cy+b);
+  ctx.stroke(); ctx.restore();
+}
+
+function drawCrossMarker(ctx, cx, cy, s) {
+  ctx.save(); ctx.strokeStyle = '#302010'; ctx.lineWidth = s*.07; ctx.lineCap='round';
+  const a = s*.18, b = s*.1;
+  ctx.beginPath(); ctx.moveTo(cx, cy-a); ctx.lineTo(cx, cy+a); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx-a*.65, cy-b); ctx.lineTo(cx+a*.65, cy-b); ctx.stroke();
+  ctx.restore();
+}
+
+function drawSkullMarker(ctx, cx, cy, s) {
+  ctx.save();
+  ctx.font = `bold ${s*.35}px serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#301008'; ctx.fillText('☠', cx, cy);
+  ctx.restore();
+}
+
+// ── DRAW ROAD / RIVER PATH ────────────────────────────
+function drawLinePath(ctx, path, type, preview, hs) {
+  if (!path || path.length < 2) return;
+  const s = hs || S.hexSize;
+  const river = type === 'river';
+  ctx.save();
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.globalAlpha = preview ? .55 : (river ? .82 : .88);
+
+  if (river) {
+    // Outer river
+    ctx.strokeStyle = '#1e5898'; ctx.lineWidth = s*.09;
+    drawSmoothPath(ctx, path, hs);
+    ctx.stroke();
+    // Inner highlight
+    ctx.strokeStyle = '#78b8e8'; ctx.lineWidth = s*.03;
+    drawSmoothPath(ctx, path, hs);
+    ctx.stroke();
+  } else {
+    // Road shadow
+    ctx.strokeStyle = '#3a1a06'; ctx.lineWidth = s*.09;
+    drawSmoothPath(ctx, path, hs);
+    ctx.stroke();
+    // Road surface
+    ctx.strokeStyle = '#a06030'; ctx.lineWidth = s*.055;
+    drawSmoothPath(ctx, path, hs);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawSmoothPath(ctx, path, hs) {
+  ctx.beginPath();
+  const [x0,y0] = hexCenter(path[0][0], path[0][1], hs);
+  ctx.moveTo(x0, y0);
+  for (let i = 1; i < path.length; i++) {
+    const [x,y] = hexCenter(path[i][0], path[i][1], hs);
+    ctx.lineTo(x, y);
+  }
+}
+
+// ── MAIN RENDER ───────────────────────────────────────
+function render(targetCtx, hs) {
+  const c = targetCtx || ctx;
+  const s = hs || S.hexSize;
+  const cw = Math.ceil(S.cols * s * 1.5 + s * .5 + MARGIN * 2);
+  const ch = Math.ceil(S.rows * s * SQRT3 + s * SQRT3 * .5 + MARGIN * 2);
+
+  const showLabels = document.getElementById('tog-labels').checked;
+  const showGrid   = document.getElementById('tog-grid').checked;
+  const showTitle  = document.getElementById('tog-title').checked;
+
+  // Parchment background
+  c.fillStyle = '#f0e6ce';
+  c.fillRect(0, 0, cw, ch);
+
+  // Parchment texture simulation (subtle)
+  const pg = c.createLinearGradient(0, 0, cw, ch);
+  pg.addColorStop(0, 'rgba(210,190,140,.08)');
+  pg.addColorStop(.5, 'rgba(240,220,170,.04)');
+  pg.addColorStop(1, 'rgba(180,150,100,.1)');
+  c.fillStyle = pg; c.fillRect(0, 0, cw, ch);
+
+  // Vignette
+  const vg = c.createRadialGradient(cw/2, ch/2, 0, cw/2, ch/2, Math.max(cw,ch)*.65);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,.18)');
+  c.fillStyle = vg; c.fillRect(0, 0, cw, ch);
+
+  // ── Draw hex fills ──
+  for (let row = 0; row < S.rows; row++) {
+    for (let col = 0; col < S.cols; col++) {
+      const [cx,cy] = hexCenter(row, col, s);
+      const t = S.terrain[`${row},${col}`];
+      tracePath(c, cx, cy, s);
+      c.fillStyle = t ? TERRAIN[t].color : '#ede0c4';
+      c.fill();
+      if (t) drawTerrainSym(c, t, cx, cy, s);
+    }
+  }
+
+  // ── Rivers (below roads, below grid) ──
+  S.rivers.forEach(p => drawLinePath(c, p, 'river', false, s));
+
+  // ── Roads ──
+  S.roads.forEach(p => drawLinePath(c, p, 'road', false, s));
+
+  // ── Path in progress ──
+  if (pathIP && pathIP.length > 1) drawLinePath(c, pathIP, pathType, true, s);
+
+  // ── Grid lines ──
+  if (showGrid) {
+    c.strokeStyle = 'rgba(70,45,18,.38)';
+    c.lineWidth = .8;
+    for (let row = 0; row < S.rows; row++) {
+      for (let col = 0; col < S.cols; col++) {
+        const [cx,cy] = hexCenter(row, col, s);
+        tracePath(c, cx, cy, s);
+        c.stroke();
+      }
+    }
+  }
+
+  // ── Labels ──
+  if (showLabels) {
+    c.textAlign = 'center'; c.textBaseline = 'bottom';
+    const fs = Math.max(6, Math.min(11, s * .24));
+    c.font = `${fs}px 'EB Garamond', Georgia, serif`;
+    for (let row = 0; row < S.rows; row++) {
+      for (let col = 0; col < S.cols; col++) {
+        const [cx,cy] = hexCenter(row, col, s);
+        const ly = cy + s * SQRT3 / 2 - 2;
+        c.fillStyle = 'rgba(60,30,10,.72)';
+        c.fillText(hexLabel(row, col), cx, ly);
+      }
+    }
+  }
+
+  // ── Markers ──
+  for (const [key, mk] of Object.entries(S.markers)) {
+    const [r,col] = key.split(',').map(Number);
+    const [cx,cy] = hexCenter(r, col, s);
+    MARKERS[mk].draw(c, cx, cy, s);
+  }
+
+  // ── Hover highlight ──
+  if (hoverHex && !targetCtx) {
+    const [cx,cy] = hexCenter(hoverHex.row, hoverHex.col, s);
+    tracePath(c, cx, cy, s);
+    c.strokeStyle = 'rgba(255,200,70,.85)';
+    c.lineWidth = 2.2;
+    c.stroke();
+    // Path-mode: show waypoint dot
+    if (pathIP) {
+      c.beginPath(); c.arc(cx, cy, s*.12, 0, Math.PI*2);
+      c.fillStyle = (pathType==='river') ? 'rgba(30,100,200,.5)' : 'rgba(160,80,20,.5)';
+      c.fill();
+    }
+  }
+
+  // ── Map title ──
+  if (showTitle) {
+    const title = document.getElementById('title-in').value || 'Untitled';
+    const tfs = Math.max(10, Math.min(18, s * .38));
+    c.font = `${tfs}px 'Cinzel', serif`;
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    // Shadow
+    c.fillStyle = 'rgba(240,220,180,.6)';
+    c.fillText(title, cw/2+1, 5+1);
+    c.fillStyle = 'rgba(55,28,8,.82)';
+    c.fillText(title, cw/2, 5);
+  }
+
+  // ── Scale bar ──
+  drawScaleBar(c, cw, ch, s);
+}
+
+function drawScaleBar(c, cw, ch, s) {
+  const barW = 60, x = cw - MARGIN - barW - 4, y = ch - MARGIN + 8;
+  c.save();
+  c.strokeStyle = 'rgba(55,28,8,.6)'; c.fillStyle = 'rgba(55,28,8,.6)';
+  c.lineWidth = 1.5; c.lineCap = 'butt';
+  c.beginPath();
+  c.moveTo(x, y); c.lineTo(x+barW, y);
+  c.moveTo(x, y-5); c.lineTo(x, y);
+  c.moveTo(x+barW/2, y-3); c.lineTo(x+barW/2, y);
+  c.moveTo(x+barW, y-5); c.lineTo(x+barW, y);
+  c.stroke();
+  c.font = `9px 'EB Garamond', serif`;
+  c.textAlign = 'center'; c.textBaseline = 'bottom';
+  c.fillText('6 mi', x+barW/2, y-6);
+  c.restore();
+}
+
+// ── INIT PALETTE ─────────────────────────────────────
+function initPalette() {
+  const pal = document.getElementById('terrain-pal');
+  pal.innerHTML = '';
+  TERRAIN_KEYS.forEach((k, i) => {
+    const el = document.createElement('div');
+    el.className = `ti${k === S.selTerrain ? ' active' : ''}`;
+    el.id = `ti-${k}`;
+    el.onclick = () => selectTerrain(k);
+    el.title = `${TERRAIN[k].label} (key: ${i+1})`;
+    el.innerHTML = `<div class="tsw" style="background:${TERRAIN[k].color}"></div><span class="tn">${TERRAIN[k].label}</span>`;
+    pal.appendChild(el);
+  });
+}
+
+function selectTerrain(key) {
+  S.selTerrain = key;
+  document.querySelectorAll('.ti').forEach(e => e.classList.remove('active'));
+  const el = document.getElementById(`ti-${key}`);
+  if (el) el.classList.add('active');
+  setTool('paint');
+}
+
+// ── TOOLS ─────────────────────────────────────────────
+function setTool(tool) {
+  S.tool = tool;
+  pathIP = null;
+  document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
+  const b = document.getElementById(`tbtn-${tool}`);
+  if (b) b.classList.add('active');
+  document.getElementById('sec-marker').style.display = (tool==='marker') ? 'block' : 'none';
+  document.getElementById('sec-path').style.display   = (tool==='road'||tool==='river') ? 'block' : 'none';
+  const cursors = { paint:'crosshair', fill:'cell', road:'crosshair', river:'crosshair', marker:'pointer', erase:'not-allowed' };
+  canvas.style.cursor = cursors[tool] || 'crosshair';
+  render();
+}
+
+function setMarker(mk) {
+  S.selMarker = mk;
+  document.querySelectorAll('.mbtn').forEach(b => b.classList.remove('active'));
+  const b = document.getElementById(`mbtn-${mk}`);
+  if (b) b.classList.add('active');
+}
+
+// ── HISTORY ───────────────────────────────────────────
+function snap() {
+  return {
+    terrain: {...S.terrain},
+    markers: {...S.markers},
+    roads:   S.roads.map(p => p.map(h=>[...h])),
+    rivers:  S.rivers.map(p => p.map(h=>[...h])),
+  };
+}
+
+function saveH() {
+  S.history = S.history.slice(0, S.histIdx + 1);
+  S.history.push(snap());
+  S.histIdx++;
+  if (S.history.length > 80) { S.history.shift(); S.histIdx--; }
+}
+
+function restoreSnap(sn) {
+  S.terrain = {...sn.terrain};
+  S.markers = {...sn.markers};
+  S.roads   = sn.roads.map(p => p.map(h=>[...h]));
+  S.rivers  = sn.rivers.map(p => p.map(h=>[...h]));
+}
+
+function undo() {
+  if (S.histIdx <= 0) return;
+  S.histIdx--;
+  restoreSnap(S.history[S.histIdx]);
+  render();
+}
+
+function redo() {
+  if (S.histIdx >= S.history.length - 1) return;
+  S.histIdx++;
+  restoreSnap(S.history[S.histIdx]);
+  render();
+}
+
+// ── FLOOD FILL ────────────────────────────────────────
+function floodFill(sr, sc, newT) {
+  const oldT = S.terrain[`${sr},${sc}`] || null;
+  if (oldT === newT) return;
+  const queue = [[sr, sc]];
+  const vis = new Set([`${sr},${sc}`]);
+  while (queue.length) {
+    const [r, c] = queue.shift();
+    S.terrain[`${r},${c}`] = newT;
+    for (const [nr, nc] of getNeighbors(r, c)) {
+      const nk = `${nr},${nc}`;
+      if (vis.has(nk)) continue;
+      vis.add(nk);
+      const nt = S.terrain[nk] || null;
+      if (nt === oldT) queue.push([nr, nc]);
+    }
+  }
+}
+
+// ── MOUSE EVENTS ──────────────────────────────────────
+canvas.addEventListener('mousedown', e => {
+  e.preventDefault();
+  const h = pixelToHex(e.offsetX, e.offsetY);
+  if (!h) return;
+  const { row, col } = h;
+
+  if (S.tool === 'paint') {
+    saveH(); isPainting = true;
+    S.terrain[`${row},${col}`] = S.selTerrain;
+    render();
+  } else if (S.tool === 'erase') {
+    saveH(); isPainting = true;
+    delete S.terrain[`${row},${col}`];
+    delete S.markers[`${row},${col}`];
+    render();
+  } else if (S.tool === 'fill') {
+    saveH();
+    floodFill(row, col, S.selTerrain);
+    render();
+  } else if (S.tool === 'marker') {
+    saveH();
+    const k = `${row},${col}`;
+    if (S.markers[k] === S.selMarker) delete S.markers[k];
+    else S.markers[k] = S.selMarker;
+    render();
+  } else if (S.tool === 'road' || S.tool === 'river') {
+    pathIP = [[row, col]];
+    pathType = S.tool;
+    render();
+  }
+});
+
+canvas.addEventListener('mousemove', e => {
+  const h = pixelToHex(e.offsetX, e.offsetY);
+  hoverHex = h;
+
+  if (h) {
+    const k = `${h.row},${h.col}`;
+    const t = S.terrain[k];
+    const mk = S.markers[k];
+    document.getElementById('hex-info').textContent =
+      `${hexLabel(h.row, h.col)} · ${t ? TERRAIN[t].label : 'Empty'}${mk ? ' · '+MARKERS[mk].label : ''}`;
+  }
+
+  if (isPainting && h) {
+    const k = `${h.row},${h.col}`;
+    if (S.tool === 'paint') S.terrain[k] = S.selTerrain;
+    else if (S.tool === 'erase') { delete S.terrain[k]; delete S.markers[k]; }
+  }
+
+  if (pathIP && h) {
+    const last = pathIP[pathIP.length - 1];
+    if (last[0] !== h.row || last[1] !== h.col) pathIP.push([h.row, h.col]);
+  }
+
+  render();
+});
+
+canvas.addEventListener('mouseup', () => {
+  isPainting = false;
+  if (pathIP && pathIP.length > 1) {
+    saveH();
+    if (pathType === 'road') S.roads.push(pathIP);
+    else S.rivers.push(pathIP);
+    pathIP = null;
+    render();
+  } else {
+    pathIP = null;
+  }
+});
+
+canvas.addEventListener('mouseleave', () => {
+  hoverHex = null;
+  isPainting = false;
+  if (pathIP && pathIP.length > 1) {
+    saveH();
+    if (pathType === 'road') S.roads.push(pathIP);
+    else S.rivers.push(pathIP);
+  }
+  pathIP = null;
+  render();
+});
+
+canvas.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  pathIP = null;
+  render();
+});
+
+// ── GRID / SIZE CONTROLS ──────────────────────────────
+function calcFitSize() {
+  const wrap = document.getElementById('canvas-wrap');
+  const aw = wrap.clientWidth - 40, ah = wrap.clientHeight - 40;
+  const sW = (aw - MARGIN*2) / (S.cols * 1.5 + .5);
+  const sH = (ah - MARGIN*2) / (S.rows * SQRT3 + SQRT3*.5);
+  return Math.max(18, Math.min(80, Math.floor(Math.min(sW, sH))));
+}
+
+function applyGrid() {
+  const rows = parseInt(document.getElementById('in-rows').value);
+  const cols = parseInt(document.getElementById('in-cols').value);
+  const cs   = parseInt(document.getElementById('in-colstart').value);
+  if (isNaN(rows)||rows<1||rows>26||isNaN(cols)||cols<1||cols>60) return;
+  saveH();
+  S.rows = rows; S.cols = cols; S.colStart = isNaN(cs) ? 100 : cs;
+  S.hexSize = calcFitSize();
+  document.getElementById('in-size').value = S.hexSize;
+  updateCanvasSize();
+  render();
+}
+
+function applySize() {
+  const sz = parseInt(document.getElementById('in-size').value);
+  if (isNaN(sz)||sz<18||sz>110) return;
+  S.hexSize = sz;
+  updateCanvasSize();
+  render();
+}
+
+// ── CLEAR ─────────────────────────────────────────────
+function clearTerrain()  { if (!confirm('Clear all terrain?')) return; saveH(); S.terrain = {}; render(); }
+function clearMarkers()  { if (!confirm('Clear all markers?')) return; saveH(); S.markers = {}; render(); }
+function clearRoads()    { saveH(); S.roads = []; render(); }
+function clearRivers()   { saveH(); S.rivers = []; render(); }
+function clearAll()      { if (!confirm('Clear everything?')) return; saveH(); S.terrain={}; S.markers={}; S.roads=[]; S.rivers=[]; render(); }
+
+// ── EXPORT PNG ────────────────────────────────────────
+function exportPNG(scale) {
+  scale = scale || 1;
+  const hs = S.hexSize * scale;
+  const w = Math.ceil(S.cols * hs * 1.5 + hs * .5 + MARGIN * 2);
+  const h = Math.ceil(S.rows * hs * SQRT3 + hs * SQRT3 * .5 + MARGIN * 2);
+  const off = document.createElement('canvas');
+  off.width = w; off.height = h;
+  const oc = off.getContext('2d');
+  render(oc, hs);
+  const link = document.createElement('a');
+  const title = document.getElementById('title-in').value || 'hexmap';
+  link.download = title.replace(/[^a-z0-9]/gi,'_').toLowerCase() + (scale>1?`_${scale}x`:'')+'.png';
+  link.href = off.toDataURL('image/png');
+  link.click();
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.ctrlKey) {
+    if (e.key==='z') { e.preventDefault(); undo(); }
+    if (e.key==='y') { e.preventDefault(); redo(); }
+    return;
+  }
+  const tk = {'1':'plains','2':'farmlands','3':'woodlands','4':'hills','5':'mountains','6':'barrens','7':'shallowwater','8':'deepwater'};
+  if (tk[e.key]) { selectTerrain(tk[e.key]); return; }
+  const map = { p:'paint', f:'fill', r:'road', v:'river', e:'erase', m:'marker' };
+  if (map[e.key]) setTool(map[e.key]);
+  if (e.key==='Escape') { pathIP = null; render(); }
+});
+
+// Ctrl+scroll to zoom
+document.getElementById('canvas-wrap').addEventListener('wheel', e => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+  const delta = e.deltaY < 0 ? 3 : -3;
+  S.hexSize = Math.max(18, Math.min(110, S.hexSize + delta));
+  document.getElementById('in-size').value = S.hexSize;
+  updateCanvasSize();
+  render();
+}, { passive: false });
+
+// Title input live update
+document.getElementById('title-in').addEventListener('input', () => render());
+
+// ── STARTUP ───────────────────────────────────────────
+function init() {
+  initPalette();
+  // Auto-size to fit the viewport
+  requestAnimationFrame(() => {
+    S.hexSize = calcFitSize();
+    document.getElementById('in-size').value = S.hexSize;
+    updateCanvasSize();
+    saveH();
+    render();
+  });
+}
+
+init();
+</script>
+</body>
+</html>
