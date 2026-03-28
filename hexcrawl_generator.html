@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hexcrawl Generator — B/X Solo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#edecea;--surface:#fff;--surface2:#f6f5f2;
+  --border:#dbd8d0;--border-light:#ece9e2;
+  --text:#1c1917;--text2:#6b6660;--text3:#a09b97;
+  --accent:#1d4ed8;--accent-bg:#dbeafe;
+  --enc:#b91c1c;--enc-bg:#fee2e2;
+  --poi:#14532d;--poi-bg:#dcfce7;
+  --res:#92400e;--res-bg:#fef3c7;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;flex-direction:column;font-size:14px}
+
+/* HEADER */
+header{background:var(--text);color:#fff;height:46px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+header h1{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase}
+.hdr-stats{display:flex;gap:20px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.45)}
+.hdr-stats span strong{color:#fff;font-weight:500}
+.hdr-sep{border-left:1px solid rgba(255,255,255,.15);padding-left:20px}
+
+/* LAYOUT */
+.main{flex:1;display:flex;overflow:hidden;min-height:0}
+.panel-left{width:300px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.panel-center{flex:1;background:var(--surface2);position:relative;overflow:hidden}
+.panel-right{width:300px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+
+.panel-head{padding:10px 14px;border-bottom:1px solid var(--border-light);font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text2);background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.panel-head-action{font-size:9px;color:var(--accent);cursor:pointer;letter-spacing:.05em;text-transform:none;font-weight:400}
+.panel-head-action:hover{text-decoration:underline}
+.panel-body{flex:1;overflow-y:auto;padding:14px}
+.panel-body.no-pad{padding:0}
+
+/* DETAILS */
+.hex-header{margin-bottom:12px}
+.hex-name{font-size:18px;font-weight:700;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+.hex-glyph{font-size:20px;line-height:1}
+.hex-coord{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;margin-right:5px;margin-bottom:10px}
+.badge-enc{background:var(--enc-bg);color:var(--enc)}
+.badge-poi{background:var(--poi-bg);color:var(--poi)}
+.badge-res{background:var(--res-bg);color:var(--res)}
+.badge-none{background:var(--surface2);color:var(--text3);border:1px solid var(--border-light)}
+.sec-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text2);margin-bottom:6px;margin-top:14px}
+.info-block{background:var(--surface2);border:1px solid var(--border-light);border-radius:6px;padding:9px 12px;font-size:12px;line-height:1.6}
+.info-block+.info-block{margin-top:5px}
+.info-block.enc{border-left:3px solid var(--enc);background:var(--enc-bg)}
+.info-block.poi{border-left:3px solid var(--poi);background:var(--poi-bg)}
+.info-block.res{border-left:3px solid var(--res);background:var(--res-bg)}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.kv{background:var(--surface);border:1px solid var(--border-light);border-radius:5px;padding:6px 9px}
+.kv-l{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px}
+.kv-v{font-size:12px;font-weight:500}
+.hook{font-size:11px;font-style:italic;color:var(--text2);padding:8px 10px;border-left:2px solid var(--border);margin-top:8px;line-height:1.5}
+.pill-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.pill{font-size:10px;padding:2px 8px;border-radius:3px;border:1px solid var(--border-light);background:var(--surface2);color:var(--text2)}
+.pill.econ{background:var(--res-bg);border-color:#d97706;color:var(--res)}
+.terrain-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px;font-style:italic}
+
+/* ACTIONS */
+.action-area{border-top:1px solid var(--border-light);padding:10px 12px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.move-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+.btn{width:100%;padding:7px 10px;border-radius:6px;border:none;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .12s,transform .1s;text-align:left}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-move{background:var(--accent);color:#fff;justify-content:center;font-size:11px}
+.btn-move:hover:not(:disabled){background:#1e40af}
+.btn-move.visited{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent)}
+.btn-move.visited:hover{background:#bfdbfe}
+.btn-move.empty{background:transparent;color:var(--text3);border:1px dashed var(--border)}
+.btn-action{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-action:hover:not(:disabled){background:var(--border-light)}
+.btn-tag{font-family:var(--mono);font-size:9px;opacity:.7}
+.btn-full{padding:11px 20px;border-radius:8px;font-size:13px;font-weight:600;background:var(--text);color:#fff;border:none;cursor:pointer;font-family:var(--font);width:100%;transition:background .12s}
+.btn-full:hover{background:#000}
+.move-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+
+/* START */
+#start-screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--surface2);z-index:20}
+.start-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:40px;max-width:380px;width:100%;text-align:center}
+.start-card h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.start-card p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:28px}
+.start-shortcut{margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--text3)}
+kbd{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--mono);font-size:9px}
+
+/* MAP */
+#map-canvas{position:absolute;inset:0;cursor:grab;display:block;width:100%;height:100%}
+#map-canvas:active{cursor:grabbing}
+.map-hint{position:absolute;bottom:10px;left:12px;font-family:var(--mono);font-size:10px;color:var(--text3);pointer-events:none}
+
+/* LOG */
+.log-item{padding:9px 14px;border-bottom:1px solid var(--border-light);font-size:12px;line-height:1.5}
+.log-item.newest{background:#f0f9ff}
+.log-day{font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:2px}
+.log-title{font-weight:500;margin-bottom:1px}
+.log-detail{color:var(--text2);font-size:11px}
+.log-tag{display:inline-block;font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:1px 5px;border-radius:3px;margin-right:4px;vertical-align:middle}
+.tag-move{background:var(--accent-bg);color:var(--accent)}
+.tag-enc{background:var(--enc-bg);color:var(--enc)}
+.tag-poi{background:var(--poi-bg);color:var(--poi)}
+.tag-res{background:var(--res-bg);color:var(--res)}
+.tag-info{background:#f3f4f6;color:#374151}
+.tag-camp{background:#f3e8ff;color:#6b21a8}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:12px;gap:10px;padding:30px;text-align:center}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Hexcrawl Generator — B/X Solo</h1>
+  <div class="hdr-stats">
+    <span>Day&nbsp;<strong id="hdr-day">—</strong></span>
+    <span>Hexes&nbsp;<strong id="hdr-hexes">0</strong></span>
+    <span>Terrain&nbsp;<strong id="hdr-terrain">—</strong></span>
+    <span class="hdr-sep">⛺&nbsp;<strong id="hdr-coord">—</strong></span>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- LEFT -->
+  <div class="panel-left">
+    <div class="panel-head">
+      Current Hex
+      <span class="panel-head-action" onclick="centerOnCurrent()">Recenter map</span>
+    </div>
+    <div class="panel-body" id="hex-details">
+      <div class="empty-state">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        No hex explored yet
+      </div>
+    </div>
+    <div class="action-area" id="actions">
+      <button class="btn-full" onclick="beginCrawl()">Begin the Hexcrawl</button>
+    </div>
+  </div>
+
+  <!-- CENTER: Map -->
+  <div class="panel-center">
+    <div id="start-screen">
+      <div class="start-card">
+        <h2>Hexcrawl Generator</h2>
+        <p>A procedural solo-play tool for B/X overland exploration. Generate hexes as you move — terrain, encounters, points of interest, and resources — with a live map tracking every step.</p>
+        <button class="btn-full" onclick="beginCrawl()">Begin the Hexcrawl</button>
+        <div class="start-shortcut">Pan: drag · Zoom: scroll · Recenter: <kbd>R</kbd></div>
+      </div>
+    </div>
+    <canvas id="map-canvas"></canvas>
+    <div class="map-hint">Drag to pan · Scroll to zoom · <kbd>R</kbd> to recenter</div>
+  </div>
+
+  <!-- RIGHT: Log -->
+  <div class="panel-right">
+    <div class="panel-head">
+      Journey Log
+      <span class="panel-head-action" onclick="clearLog()">Clear</span>
+    </div>
+    <div class="panel-body no-pad" id="log-panel">
+      <div class="empty-state" id="log-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7"/></svg>
+        No journey yet
+      </div>
+      <div id="log-entries"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// DICE
+// ══════════════════════════════════════════════════════
+const rn=n=>Math.floor(Math.random()*n)+1;
+const roll=(n,s)=>{let t=0;for(let i=0;i<n;i++)t+=rn(s);return t;}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const pct=c=>Math.random()*100<c;
+
+// ══════════════════════════════════════════════════════
+// HEX GEOMETRY (pointy-top axial)
+// ══════════════════════════════════════════════════════
+const HEX_SIZE=32;
+const HEX_DIRS=[
+  {q:1,r:-1,label:'NE'},{q:1,r:0,label:'E'},{q:0,r:1,label:'SE'},
+  {q:-1,r:1,label:'SW'},{q:-1,r:0,label:'W'},{q:0,r:-1,label:'NW'},
+];
+function hexToPixel(q,r,size){
+  return{x:size*Math.sqrt(3)*(q+r/2), y:size*1.5*r};
+}
+function hexCorners(cx,cy,size){
+  const pts=[];
+  for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30);pts.push({x:cx+size*Math.cos(a),y:cy+size*Math.sin(a)});}
+  return pts;
+}
+const hk=(q,r)=>`${q},${r}`;
+
+// ══════════════════════════════════════════════════════
+// TABLES
+// ══════════════════════════════════════════════════════
+const TERRAIN=[
+  {name:'Plains',  glyph:'🌾',mapColor:'#fef9c3',mapBorder:'#ca8a04',encThreshold:6,encLabel:'6',
+   desc:'Clear grasslands, gentle hills, open sky. Visibility is excellent; ambushes are rare but marching armies are visible from miles away.'},
+  {name:'Marshes', glyph:'🌿',mapColor:'#ccfbf1',mapBorder:'#0d9488',encThreshold:4,encLabel:'4–6',
+   desc:'Swamp, jungle, or flooded lowland. Movement is halved. Disease is a constant concern. Navigation by stars is unreliable beneath the canopy.'},
+  {name:'Woodlands',glyph:'🌲',mapColor:'#bbf7d0',mapBorder:'#16a34a',encThreshold:5,encLabel:'5–6',
+   desc:'Forest, from sparse copse to deep old-growth. Direction is easily lost; sound travels strangely. The trees remember everything.'},
+  {name:'Water',   glyph:'🌊',mapColor:'#bae6fd',mapBorder:'#0284c7',encThreshold:5,encLabel:'5–6',
+   desc:'Ocean, lake, or river. The surface tells you nothing about what is below. Weather changes everything.'},
+  {name:'Barrens', glyph:'🏜',mapColor:'#fed7aa',mapBorder:'#ea580c',encThreshold:5,encLabel:'5–6',
+   desc:'Tundra, desert, or blasted waste. Water is scarce. Temperature is extreme. The land does not want you here.'},
+  {name:'Highlands',glyph:'⛰',mapColor:'#e2e8f0',mapBorder:'#475569',encThreshold:4,encLabel:'4–6',
+   desc:'Mountains or steep hills. Altitude saps strength. Passes are bottlenecks. What lives here has evolved for it.'},
+];
+
+const ENCOUNTERS=[
+  [{m:'Bandit',n:'2d6',s:'Ambush from tall grass; decoy cart on the road'},{m:'Gnoll',n:'2d6',s:'Raiding party heading toward the nearest settlement'},{m:'Herd Animal',n:'3d6',s:'Grazing; one old bull is eyeing the party'},{m:'Hobgoblin',n:'2d4',s:'Military patrol, banners lowered — this is their territory now'},{m:'Orc',n:'2d6',s:'Warband crossing the open ground at speed'},{m:'Nomad',n:'2d4',s:'Mounted; circling from a distance before approaching'},{m:'Griffon',n:'1d3',s:'Overhead, watching the party\'s horses'},{m:'Roc',n:'1',s:'Shadow falls over the hex — it is hunting, not yet focused'}],
+  [{m:'Giant Leech',n:'1d4',s:'Concealed in a shallow ford the party must cross'},{m:'Lizard Man',n:'2d4',s:'Fishing patrol; territorial, watching the party\'s weapons'},{m:'Crocodile',n:'1d3',s:'Submerged; only eyes visible above the waterline'},{m:'Troglodyte',n:'2d4',s:'Hunting band; stench arrives before they do'},{m:'Giant Toad',n:'1d3',s:'Half-submerged in a reed bed, motionless'},{m:'Insect Swarm',n:'2',s:'Triggered by movement through the thicket'},{m:'Wyvern',n:'1d2',s:'Circling overhead, choosing between the party and a boar carcass'},{m:'Dragon (Black)',n:'1',s:'Moving through the deepest channel — has not noticed the party yet'}],
+  [{m:'Wolf',n:'2d6',s:'Pacing parallel to the party — pack behaviour, sizing up'},{m:'Kobold',n:'2d6',s:'The party walked into their trap; string-triggers everywhere'},{m:'Hobgoblin',n:'2d4',s:'Patrol in good order, following a road they consider theirs'},{m:'Bugbear',n:'1d4',s:'Perfectly silent; 2-in-6 surprise unless the party is actively listening'},{m:'Owlbear',n:'1d2',s:'Nesting season; encountered near cubs'},{m:'Dryad',n:'1d3',s:'At the tree line, watching — will speak if approached calmly'},{m:'Treant',n:'1d3',s:'Thought to be ancient oaks; begins moving when the party is between them'},{m:'Unicorn',n:'1',s:'Visible for a moment through the trees; gone if anyone runs'}],
+  [{m:'Giant Fish',n:'1d4',s:'Beneath the boat or below a fording point'},{m:'Mermen',n:'2d4',s:'Surface to demand explanation — this stretch of water is theirs'},{m:'Nixie',n:'2d4',s:'Visible just below the surface; singing'},{m:'Giant Octopus',n:'1',s:'Tentacle appears first; testing the weight of something wooden'},{m:'Shark',n:'2d4',s:'Circling since blood entered the water two minutes ago'},{m:'Sea Serpent',n:'1',s:'Following the party\'s vessel at a consistent distance'},{m:'Giant Squid',n:'1',s:'Surfaces at night; drawn by lantern light'},{m:'Dragon Turtle',n:'1',s:'The island the party landed on shifts slightly underfoot'}],
+  [{m:'Gnoll',n:'2d4',s:'Raiding band, water-hungry and desperate'},{m:'Nomad',n:'2d4',s:'Mounted, armed; watching from a ridge before approaching'},{m:'Giant Scorpion',n:'1d3',s:'Under a flat rock the party wants to use as shade'},{m:'Manticore',n:'1d2',s:'Gliding in from the sun direction, tail already raised'},{m:'Hill Giant',n:'1d2',s:'Crossing the open ground — has spotted the party from half a mile'},{m:'Basilisk',n:'1d2',s:'Among boulders; petrified figures nearby if the party looks'},{m:'Fire Salamander',n:'1d2',s:'Near volcanic heat; surprised by the party'},{m:'Efreeti',n:'1',s:'Manifesting from a heat shimmer; annoyed by the interruption'}],
+  [{m:'Orc',n:'2d6',s:'Holding a pass; they know the only route'},{m:'Ogre',n:'1d3',s:'Toll-keeper on the mountain road; boulder nearby'},{m:'Gnoll',n:'2d4',s:'Hunting party, skilled at altitude'},{m:'Griffon',n:'1d2',s:'Nesting on a cliff above the only good campsite'},{m:'Wyvern',n:'1d2',s:'Attacking from above; smelled livestock in the pack animals'},{m:'Manticore',n:'1',s:'At the cliff edge, firing tail spikes into the valley below'},{m:'Stone Giant',n:'1d2',s:'Hurling boulders down a slope for reasons of its own'},{m:'Roc',n:'1',s:'Has already taken a mule; is watching the rest of the party'}],
+];
+const SITUATIONS=['hunting','resting','feeding','fighting among themselves','on the move','guarding territory'];
+
+const POI_TYPE=['Settlement','Fortification','Religious','Landmark','Underworld','Lair'];
+const POI_GLYPH=['🏘','🏰','⛩','🗿','🕳','🐉'];
+const POI_SUB=[
+  ['Camp','Cottage','Hamlet','Village','Manor','Town'],
+  ['Outpost','Tower','Garrison','Keep','Barracks','Castle'],
+  ['Altar','Shrine','Chapel','Hermitage','Reliquary','Temple'],
+  ['Cairn','Totem','Obelisk','Pillar','Monolith','Statue'],
+  ['Cellar','Pit','Quarry','Mine','Cave','Dungeon'],
+  ['Beast Lair','Beast Lair','Humanoid Lair','Humanoid Lair','Undead Lair','Demonic Lair'],
+];
+const AGE=['Current — recently built','Recent — slightly aged','Old — worn','Historical — crumbling','Ancient — in ruins','Alien/Unknown — foundations only'];
+const STATUS=['Long abandoned','Recently abandoned','Partially in use','In use','Partially occupied','Occupied'];
+
+const ECONOMY=['Agriculture','Husbandry / Fishery','Commerce','Mining','Crafts','Forestry'];
+const CULTURE=['Semi-nomadic','Religious','Artistic','Scholarly','Martial','Civic'];
+const GOVERNANCE=['No organisation','Warlords','Rich merchants','Council of priests','Noble families','Patriarch'];
+const ATTRACTION=['Memorial','Grove','Walls','Bazaar','Temple','Ruins'];
+const THREAT=['Raids','Weak ruler','New religion','Harsh climate','Political intrigue','Immigration'];
+const SIZE_NAME=['Tiny','Small','Medium','Large','Huge','Gargantuan'];
+const SIZE_FAM=[()=>roll(1,3)*10,()=>roll(1,3)*10,()=>roll(1,6)*10,()=>roll(2,6)*10,()=>roll(3,6)*10,()=>roll(4,6)*10];
+const SVC_LODGING=['Almshouse','Boarding house','Provisioner','Hostel','Inn','Tavern'];
+const SVC_CRAFTS=['Blacksmith','Merchant','Leatherworker','Miller','Potter','Weaver'];
+const SVC_TRANSPORT=['Carter','Messenger','Porter','Saddler','Stable','Boat/Coach hire'];
+const SVC_RELIGIOUS=['Mortuary','Infirmary','Library','Cemetery','School','Basilica'];
+const SVC_ADMIN=['Prison','Court','Watchpost','Tax office','Town hall','Marketplace'];
+const ECON_TABLES={
+  'Agriculture':['Carpenter','Bakery','Farm','Olive farm','Orchard','Vine farm'],
+  'Husbandry':['Cartwright','Cattle ranch','Dairy','Hunter\'s lodge','Livery','Tannery'],
+  'Fishery':['Boatyard','Sailmaker','Smokery','Tradepost','Netmaker','Wharf'],
+  'Forestry':['Falconer\'s hut','Timberyard','Trapper\'s hut','Reed gatherer','Apiary','Cooper'],
+  'Crafts':['Brewery','Papyrus workshop','Glass workshop','Mason\'s lodge','Olive press','Winery'],
+  'Mining':['Clay pit','Quarry','Mine','Foundry','Coal mine','Brickyard'],
+  'Commerce':['Slave market','Goldsmith','Jeweller','Weaponsmith','Armourer','Marketplace'],
+};
+const NPC_TITLES={
+  'No organisation':['Elder','Oldest resident','De facto headman','Village drunk who knows everything'],
+  'Warlords':['Warlord','Warband captain','Champion','War-chief\'s lieutenant'],
+  'Rich merchants':['Merchant prince','Trade factor','Guild master','Caravan lord'],
+  'Council of priests':['High priest','Temple warden','Oracle','Keeper of the rites'],
+  'Noble families':['Lord','Lady','Seneschal','Estate manager'],
+  'Patriarch':['Patriarch','Matriarch','Eldest heir','The Voice'],
+};
+const SETTLEMENT_HOOKS={
+  'Raids':['The raids began three months ago. No one has seen who carries them out.','A child was taken in the last raid. Her father offers everything he has for her return.'],
+  'Weak ruler':['The current lord has not been seen publicly in six weeks.','Power is contested. Two factions both claim the governing seat.'],
+  'New religion':['A new faith arrived eight months ago. Half the settlement has converted.','The old shrine was defaced last month. No one admits to it.'],
+  'Harsh climate':['The weather has been wrong for two years. Crops fail, animals sicken.','A pass has become impassable. The supply route is gone and winter is coming.'],
+  'Political intrigue':['Someone is passing information to the enemy. Everyone suspects their neighbour.','An alliance is being negotiated. The party arrives as witnesses — or as leverage.'],
+  'Immigration':['A wave of refugees arrived last season. The settlement cannot feed them.','New arrivals have brought something with them. No one knows what yet.'],
+};
+const REL_MATERIAL=['Straw','Mud','Wood','Field stone','Brick','Cut stone'];
+const REL_SHAPE=['Triangular','Square','Kite','Cross','Rectangular','Circular'];
+const REL_CEREMONY=['Night','Dusk','Noon','Noon','Morn','Dawn'];
+const REL_OFFERING=['Incense','Grain','Fruit','Wine','Sheep','Cattle'];
+const REL_TREASURE=['J','K','L','C','B','E'];
+const REL_HOOKS=[
+  'The ceremony has not been performed in years. Something has been getting worse ever since.',
+  'The offering was rejected. A sign appeared on the altar that no one can read.',
+  'A pilgrim arrived three days ago and has not left. She says the god told her to wait.',
+  'The last priest died without naming a successor. The faith is drifting.',
+  'Something has moved into the holy site. The faithful still approach — and do not return.',
+  'The site was lost and has just been rediscovered. Two groups claim it.',
+];
+const FORT_STRUCTURE=['Thin wood','Thick wood','Earth rampart','Brick','Soft stone','Hard stone'];
+const FORT_SIZE_NAME=['Tiny','Small','Medium','Large','Huge','Gargantuan'];
+const FORT_TROOPS=[()=>roll(2,6),()=>roll(2,10),()=>roll(1,4)*10,()=>roll(3,6)*10,()=>roll(1,6)*100,()=>roll(2,6)*100];
+const FORT_TROOP_DESC=['A squad — a guard post','A platoon — a frontier outpost','A company — a small garrison','A regiment — a proper garrison','An army division — a major fortress','A full army — a military headquarters'];
+const FORT_HOOKS=[
+  'The garrison has gone quiet. No dispatches in two weeks. The road there is still open.',
+  'A deserter was found at the nearest settlement. He won\'t say what he saw.',
+  'The fortification has been sold — to someone no one has heard of.',
+  'Someone inside is sending out signals at night. No one knows to whom.',
+  'The commanding officer is dead. Two lieutenants each claim succession.',
+  'Supply wagons have been turned back. The garrison is feeding itself somehow.',
+];
+const LAND_MATERIAL=['Earth','Wood','Brick','Stone','Marble','Granite'];
+const LAND_ARTEFACT=['Sword','Weapon or armour','Potion','Scroll','Ring','Wand / Staff / Rod'];
+const LAND_GEM_NAME=['Tiny','Small','Medium','Large','Huge','Gargantuan'];
+const LAND_GEM_VAL=[10,50,100,500,1000,5000];
+const LAND_HOOKS=[
+  'It was not here last year. The ground shows no signs of construction.',
+  'Pilgrims come to this place. What they are praying to is not obvious.',
+  'Someone has been leaving offerings at its base. Recently.',
+  'Local lore says it marks a boundary. What it marks is disputed.',
+  'The artefact at its peak is gone. A gap and two broken brackets remain.',
+  'It is wrong in some way the party cannot immediately identify.',
+];
+const UNDER_LEVEL=[1,2,2,3,3,6];
+const UNDER_NOTES=['Shallow, single room below ground','Open pit, 1–3 levels','Worked quarry, 1–3 levels','Multi-level worked shafts, 2–4 levels','Natural cave system, 2–4 levels','Full dungeon complex, 3–6+ levels'];
+const UNDER_HOOKS=[
+  'Someone bricked up the access point from the inside.',
+  'A smell comes up from below that no one can identify. Animals will not approach.',
+  'Fresh tracks go in. None come out.',
+  'A local child claims to have been inside. Her description is geographically impossible.',
+  'Equipment was found nearby — dropped, not cached. Including a light source, still lit.',
+  'It has a door. The door has a lock. The lock is on the outside.',
+];
+const LAIR_HOOKS=[
+  'The lair is older than anything nearby. It predates the current occupant.',
+  'Something kept in the lair got out. The occupant is looking for it.',
+  'The occupant has been collecting things. Specific things. A pattern is visible.',
+  'Two rival groups both claim this lair. The current occupant is one of them.',
+  'Local people leave offerings outside and call it something. They don\'t know what lives inside.',
+  'The lair is connected to another location by a passage no one has mapped.',
+];
+const WOOD_TYPE=['Cool coniferous','Temperate mixed','Warm temperate moist','Tropical moist evergreen','Tropical moist deciduous','Dry'];
+const WOOD_DENSITY=()=>{const v=rn(6);return v<=2?'Open':v<=5?'Dense':'Very dense';};
+const RIVER_TYPE=()=>{const v=rn(6);return v===1?'Episodic':v<=3?'Periodic':'Permanent';};
+const RIVER_NAV=['Easy','Novice','Intermediate','Advanced','Expert','Extreme'];
+const RIVER_CROSS=()=>{const v=rn(6);return v<=2?'Ford':v<=4?'Bridge':'Ferry';};
+const RES_TYPE=['Plants','Plants','Plants','Animals','Animals','Minerals'];
+const RES_GP=[1,1,1,2,2,3];
+
+function reactionRoll(){
+  const v=roll(2,6);
+  if(v<=2)return'Hostile — attacks immediately';
+  if(v<=5)return'Unfriendly — may attack';
+  if(v<=8)return'Uncertain — cautious';
+  if(v<=11)return'Indifferent — ignores party';
+  return'Friendly — may offer aid';
+}
+function rollServices(count,table){
+  const result=[];const used=new Set();
+  for(let i=0;i<count;i++){let v;let t=0;do{v=rn(6)-1;t++;}while(used.has(v)&&t<20);used.add(v);result.push(table[v]);}
+  return result;
+}
+
+// ══════════════════════════════════════════════════════
+// HEX GENERATION
+// ══════════════════════════════════════════════════════
+function generateHex(q,r){
+  const terrIdx=rn(6)-1;
+  const terr=TERRAIN[terrIdx];
+
+  // Encounter
+  const encRoll=rn(6);
+  let encounter=null;
+  if(encRoll>=terr.encThreshold){
+    const mIdx=rn(8)-1;
+    const mData=ENCOUNTERS[terrIdx][mIdx];
+    encounter={...mData,situation:pick(SITUATIONS),reaction:reactionRoll(),roll:encRoll};
+  }
+
+  // POI
+  const poiRoll=rn(6);
+  let poi=null;
+  if(poiRoll===1) poi=buildPOI(terrIdx);
+
+  // Resources
+  const resIdx=rn(6)-1;
+  const resType=RES_TYPE[resIdx];
+  const resGP=RES_GP[resIdx];
+
+  // Woodland / Water extra
+  let woodland=null,waterRiver=null;
+  if(terrIdx===2) woodland={type:WOOD_TYPE[rn(6)-1],density:WOOD_DENSITY()};
+  if(terrIdx===3&&rn(2)===1) waterRiver={type:RIVER_TYPE(),nav:RIVER_NAV[rn(6)-1],crossing:RIVER_CROSS()};
+
+  return{q,r,terrIdx,terr,encounter,poi,resType,resGP,woodland,waterRiver,visited:true,searched:false,encRoll};
+}
+
+function buildPOI(terrIdx){
+  const typeIdx=rn(6)-1;
+  const subIdx=rn(6)-1;
+  const poi={
+    type:typeIdx,typeName:POI_TYPE[typeIdx],glyph:POI_GLYPH[typeIdx],
+    sub:POI_SUB[typeIdx][subIdx],
+    age:AGE[rn(6)-1],status:STATUS[rn(6)-1],
+  };
+  if(typeIdx===0){
+    const econName=ECONOMY[rn(6)-1];
+    let econTable=econName;
+    if(econName==='Husbandry / Fishery') econTable=rn(2)===1?'Husbandry':'Fishery';
+    const sizeIdx=rn(6)-1;
+    const families=SIZE_FAM[sizeIdx]();
+    const svcRolls=sizeIdx<=1?1:sizeIdx<=3?2:3;
+    const bigEnough=sizeIdx>=4;
+    poi.settlement={
+      econ:econName,econTable,culture:CULTURE[rn(6)-1],
+      gov:GOVERNANCE[rn(6)-1],attraction:ATTRACTION[rn(6)-1],threat:THREAT[rn(6)-1],
+      sizeName:SIZE_NAME[sizeIdx],families,pop:families*5,
+      lodging:rollServices(svcRolls,SVC_LODGING),
+      crafts:rollServices(svcRolls,SVC_CRAFTS),
+      transport:rollServices(svcRolls,SVC_TRANSPORT),
+      religious:bigEnough?rollServices(svcRolls,SVC_RELIGIOUS):[],
+      admin:bigEnough?rollServices(svcRolls,SVC_ADMIN):[],
+      econServices:rollServices(svcRolls,ECON_TABLES[econTable]||ECON_TABLES['Agriculture']),
+      npc:pick(NPC_TITLES[GOVERNANCE[rn(6)-1]]||['Elder']),
+      hook:pick(SETTLEMENT_HOOKS[THREAT[rn(6)-1]]||SETTLEMENT_HOOKS['Raids']),
+    };
+  } else if(typeIdx===1){
+    const si=rn(6)-1;
+    poi.fort={structure:FORT_STRUCTURE[rn(6)-1],sizeName:FORT_SIZE_NAME[si],troops:FORT_TROOPS[si](),troopDesc:FORT_TROOP_DESC[si],hook:pick(FORT_HOOKS)};
+  } else if(typeIdx===2){
+    poi.rel={material:REL_MATERIAL[rn(6)-1],shape:REL_SHAPE[rn(6)-1],ceremony:REL_CEREMONY[rn(6)-1],offering:REL_OFFERING[rn(6)-1],treasure:REL_TREASURE[rn(6)-1],hook:pick(REL_HOOKS)};
+  } else if(typeIdx===3){
+    const gi=rn(6)-1;
+    poi.land={material:LAND_MATERIAL[rn(6)-1],artefact:LAND_ARTEFACT[rn(6)-1],gemName:LAND_GEM_NAME[gi],gemVal:LAND_GEM_VAL[gi],hook:pick(LAND_HOOKS)};
+  } else if(typeIdx===4){
+    const ui=subIdx;
+    poi.under={levels:UNDER_LEVEL[ui]||1,note:UNDER_NOTES[ui]||UNDER_NOTES[0],hook:pick(UNDER_HOOKS)};
+  } else if(typeIdx===5){
+    poi.lair={hook:pick(LAIR_HOOKS)};
+  }
+  return poi;
+}
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+const S={
+  started:false, day:0,
+  hexes:{}, currentKey:null,
+  hexCount:0, logEntries:[],
+  map:{ox:0,oy:0,zoom:1,dragging:false,drag:null},
+};
+
+// ══════════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════════
+function beginCrawl(){
+  if(S.started) return;
+  S.started=true;
+  document.getElementById('start-screen').style.display='none';
+  enterHex(0,0,true);
+  initMapCenter();
+  renderAll();
+}
+
+function initMapCenter(){
+  const cv=document.getElementById('map-canvas');
+  S.map.zoom=1;
+  S.map.ox=cv.offsetWidth/2;
+  S.map.oy=cv.offsetHeight/2;
+}
+
+function enterHex(q,r,isStart){
+  const key=hk(q,r);
+  const isNew=!S.hexes[key];
+  if(isNew){S.hexes[key]=generateHex(q,r);S.hexCount++;}
+  const hex=S.hexes[key];
+  S.currentKey=key;
+  if(!isStart) S.day++;
+
+  // Log movement
+  if(isStart){
+    addLog('move',`Day ${S.day} — Departed`,`Starting at hex (0,0) — ${hex.terr.name}`,'move');
+  } else {
+    addLog('move',`Day ${S.day} — Moved to (${q},${r})`,`Entered ${hex.terr.name}`,'move');
+  }
+
+  // Log results for new hexes
+  if(isNew){
+    if(hex.encounter){
+      addLog('enc',`⚠ Encounter: ${hex.encounter.m}`,`Appearing ${hex.encounter.n} · ${hex.encounter.situation} · ${hex.encounter.reaction}`,'enc');
+    } else {
+      addLog('info',`No encounter`,`Encounter roll: ${hex.encRoll} (need ${hex.terr.encLabel})`,'info');
+    }
+    if(hex.poi){
+      addLog('poi',`◆ POI: ${hex.poi.glyph} ${hex.poi.sub}`,`${hex.poi.typeName} · ${hex.poi.age}`,'poi');
+    }
+    addLog('res',`Resource: ${hex.resType}`,`${hex.resGP} gp / family / season`,'res');
+  }
+
+  // Reveal neighbors (fog-of-war: peek terrain only)
+  HEX_DIRS.forEach(d=>{
+    const nk=hk(q+d.q,r+d.r);
+    if(!S.hexes[nk]){
+      const ti=rn(6)-1;
+      S.hexes[nk]={q:q+d.q,r:r+d.r,terrIdx:ti,terr:TERRAIN[ti],visited:false,scouted:true};
+    }
+  });
+}
+
+function moveDir(dirIdx){
+  const cur=S.hexes[S.currentKey];
+  if(!cur) return;
+  const d=HEX_DIRS[dirIdx];
+  enterHex(cur.q+d.q,cur.r+d.r,false);
+  renderAll();
+  autoPanToHex();
+}
+
+function searchHex(){
+  const hex=S.hexes[S.currentKey];
+  if(!hex||hex.searched) return;
+  hex.searched=true;
+  S.day++;
+  // Re-roll POI if not found initially
+  if(!hex.poi){
+    const poiRoll=rn(6);
+    if(poiRoll===1){
+      hex.poi=buildPOI(hex.terrIdx);
+      addLog('poi',`Day ${S.day} — Search: POI Found!`,`${hex.poi.glyph} ${hex.poi.sub} — ${hex.poi.typeName}`,'poi');
+    } else {
+      addLog('info',`Day ${S.day} — Search: Nothing found`,`Spent a day searching the hex. No hidden features.`,'info');
+    }
+  } else {
+    addLog('info',`Day ${S.day} — Search: Already known`,`POI was found upon entry — nothing more to find.`,'info');
+  }
+  renderAll();
+}
+
+function makeCamp(){
+  S.day++;
+  addLog('camp',`Day ${S.day} — Made Camp`,`The party rests. Spells recover; 1d6+CON HP restored.`,'camp');
+  updateHeader();
+}
+
+// ══════════════════════════════════════════════════════
+// LOGGING
+// ══════════════════════════════════════════════════════
+let lid=0;
+function addLog(type,title,detail,css){
+  S.logEntries.unshift({id:++lid,type,title,detail,css,day:S.day});
+  if(S.logEntries.length>400) S.logEntries.pop();
+  renderLog();
+}
+function clearLog(){S.logEntries=[];renderLog();}
+
+// ══════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════
+function renderAll(){updateHeader();renderHexDetails();renderActions();renderMap();}
+
+function updateHeader(){
+  document.getElementById('hdr-day').textContent=S.day||'—';
+  document.getElementById('hdr-hexes').textContent=S.hexCount;
+  const hex=S.hexes[S.currentKey];
+  document.getElementById('hdr-terrain').textContent=hex?hex.terr.name:'—';
+  document.getElementById('hdr-coord').textContent=hex?`(${hex.q},${hex.r})`:'—';
+}
+
+function renderHexDetails(){
+  const hex=S.hexes[S.currentKey];
+  const el=document.getElementById('hex-details');
+  if(!hex){el.innerHTML=`<div class="empty-state"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>No hex explored</div>`;return;}
+
+  let h=`
+    <div class="hex-header">
+      <div class="hex-name"><span class="hex-glyph">${hex.terr.glyph}</span>${hex.terr.name}</div>
+      <div class="hex-coord">Hex (${hex.q}, ${hex.r}) · Day ${S.day}</div>
+    </div>
+    <div class="terrain-desc">${hex.terr.desc}</div>
+  `;
+
+  // Badges
+  h+=`<div style="margin-bottom:6px">`;
+  if(hex.encounter) h+=`<span class="badge badge-enc">⚠ ${hex.encounter.m}</span>`;
+  else h+=`<span class="badge badge-none">No encounter</span>`;
+  if(hex.poi) h+=`<span class="badge badge-poi">${hex.poi.glyph} ${hex.poi.typeName}</span>`;
+  else h+=`<span class="badge badge-none">No POI</span>`;
+  h+=`</div>`;
+
+  // Encounter
+  if(hex.encounter){
+    const e=hex.encounter;
+    h+=`<div class="sec-label">Encounter</div>
+    <div class="info-block enc">
+      <strong>${e.m}</strong> — Appearing ${e.n}<br>
+      <span style="font-size:11px;color:var(--enc)">${e.s}</span>
+      <div class="kv-grid">
+        <div class="kv"><div class="kv-l">Situation</div><div class="kv-v">${e.situation}</div></div>
+        <div class="kv"><div class="kv-l">Reaction</div><div class="kv-v" style="font-size:11px">${e.reaction}</div></div>
+      </div>
+    </div>`;
+  }
+
+  // POI
+  if(hex.poi){
+    const p=hex.poi;
+    h+=`<div class="sec-label">Point of Interest</div>
+    <div class="info-block poi">
+      <strong>${p.glyph} ${p.sub}</strong> — ${p.typeName}<br>
+      <span style="font-size:11px;color:var(--text2)">${p.age} · ${p.status}</span>
+    </div>`;
+    // POI detail
+    if(p.type===0&&p.settlement){
+      const s=p.settlement;
+      h+=`<div class="kv-grid">
+        <div class="kv"><div class="kv-l">Size</div><div class="kv-v">${s.sizeName}</div></div>
+        <div class="kv"><div class="kv-l">Pop.</div><div class="kv-v">${s.pop.toLocaleString()}</div></div>
+        <div class="kv"><div class="kv-l">Economy</div><div class="kv-v">${s.econ}</div></div>
+        <div class="kv"><div class="kv-l">Culture</div><div class="kv-v">${s.culture}</div></div>
+        <div class="kv"><div class="kv-l">Gov.</div><div class="kv-v">${s.gov}</div></div>
+        <div class="kv"><div class="kv-l">Threat</div><div class="kv-v">${s.threat}</div></div>
+        <div class="kv"><div class="kv-l">Notable</div><div class="kv-v">${s.npc}</div></div>
+        <div class="kv"><div class="kv-l">Attraction</div><div class="kv-v">${s.attraction}</div></div>
+      </div>
+      <div class="sec-label" style="margin-top:10px">Services</div>
+      <div class="pill-wrap">${[...s.lodging,...s.crafts,...s.transport,...s.religious,...s.admin].map(x=>`<span class="pill">${x}</span>`).join('')}</div>
+      <div class="pill-wrap" style="margin-top:4px">${s.econServices.map(x=>`<span class="pill econ">${x}</span>`).join('')}</div>
+      <div class="hook">${s.hook}</div>`;
+    } else if(p.type===1&&p.fort){
+      const f=p.fort;
+      h+=`<div class="kv-grid">
+        <div class="kv"><div class="kv-l">Structure</div><div class="kv-v">${f.structure}</div></div>
+        <div class="kv"><div class="kv-l">Garrison</div><div class="kv-v">${f.sizeName}</div></div>
+        <div class="kv"><div class="kv-l">Troops</div><div class="kv-v">${f.troops.toLocaleString()}</div></div>
+        <div class="kv" style="grid-column:span 2"><div class="kv-l">Classification</div><div class="kv-v">${f.troopDesc}</div></div>
+      </div>
+      <div class="hook">${f.hook}</div>`;
+    } else if(p.type===2&&p.rel){
+      const rel=p.rel;
+      h+=`<div class="kv-grid">
+        <div class="kv"><div class="kv-l">Material</div><div class="kv-v">${rel.material}</div></div>
+        <div class="kv"><div class="kv-l">Shape</div><div class="kv-v">${rel.shape}</div></div>
+        <div class="kv"><div class="kv-l">Ceremony</div><div class="kv-v">${rel.ceremony}</div></div>
+        <div class="kv"><div class="kv-l">Offering</div><div class="kv-v">${rel.offering}</div></div>
+        <div class="kv"><div class="kv-l">Treasure</div><div class="kv-v" style="font-family:var(--mono)">${rel.treasure}</div></div>
+      </div>
+      <div class="hook">${rel.hook}</div>`;
+    } else if(p.type===3&&p.land){
+      const l=p.land;
+      h+=`<div class="kv-grid">
+        <div class="kv"><div class="kv-l">Material</div><div class="kv-v">${l.material}</div></div>
+        <div class="kv"><div class="kv-l">Artefact</div><div class="kv-v">${l.artefact}</div></div>
+        <div class="kv" style="grid-column:span 2"><div class="kv-l">Trophy gem</div><div class="kv-v">${l.gemName} (${l.gemVal.toLocaleString()} gp)</div></div>
+      </div>
+      <div class="hook">${l.hook}</div>`;
+    } else if(p.type===4&&p.under){
+      const u=p.under;
+      h+=`<div class="kv-grid">
+        <div class="kv"><div class="kv-l">Sub-type</div><div class="kv-v">${p.sub}</div></div>
+        <div class="kv"><div class="kv-l">Depth</div><div class="kv-v">${u.levels} level${u.levels>1?'s':''}</div></div>
+        <div class="kv" style="grid-column:span 2"><div class="kv-l">Note</div><div class="kv-v" style="font-size:11px">${u.note}</div></div>
+      </div>
+      <div class="hook">${u.hook}</div>`;
+    } else if(p.type===5&&p.lair){
+      h+=`<div class="hook">${p.lair.hook}</div>`;
+    }
+  }
+
+  // Resources
+  const gpLabel=hex.resGP===1?'Plants':hex.resGP===2?'Animals':'Minerals';
+  const resNote=hex.resType==='Plants'?'Timber, herbs, grain, fibre':hex.resType==='Animals'?'Livestock, game, hides':'Stone, ore, clay, coal';
+  h+=`<div class="sec-label">Resources</div>
+  <div class="info-block res">
+    <strong>${hex.resType}</strong> — ${resNote}<br>
+    <span style="font-family:var(--mono);font-size:11px">${hex.resGP} gp / family / season</span>
+  </div>`;
+
+  // Woodland / Water extras
+  if(hex.woodland){
+    h+=`<div class="kv-grid" style="margin-top:8px">
+      <div class="kv"><div class="kv-l">Forest type</div><div class="kv-v">${hex.woodland.type}</div></div>
+      <div class="kv"><div class="kv-l">Density</div><div class="kv-v">${hex.woodland.density}</div></div>
+    </div>`;
+  }
+  if(hex.waterRiver){
+    const rv=hex.waterRiver;
+    h+=`<div class="kv-grid" style="margin-top:8px">
+      <div class="kv"><div class="kv-l">River type</div><div class="kv-v">${rv.type}</div></div>
+      <div class="kv"><div class="kv-l">Navigability</div><div class="kv-v">${rv.nav}</div></div>
+      <div class="kv" style="grid-column:span 2"><div class="kv-l">Crossing</div><div class="kv-v">${rv.crossing}</div></div>
+    </div>`;
+  }
+
+  el.innerHTML=h;
+}
+
+function renderActions(){
+  const hex=S.hexes[S.currentKey];
+  const el=document.getElementById('actions');
+  if(!hex){el.innerHTML=`<button class="btn-full" onclick="beginCrawl()">Begin the Hexcrawl</button>`;return;}
+
+  let h=`<div class="move-label">Move</div><div class="move-grid">`;
+  const LAYOUT=[
+    {di:5,empty:false},{di:0,empty:false},{di:null,empty:true},
+    {di:4,empty:false},{di:null,empty:true},{di:1,empty:false},
+    {di:null,empty:true},{di:3,empty:false},{di:2,empty:false},
+  ];
+  LAYOUT.forEach(cell=>{
+    if(cell.empty){h+=`<div></div>`;return;}
+    const d=HEX_DIRS[cell.di];
+    const nk=hk(hex.q+d.q,hex.r+d.r);
+    const neighbor=S.hexes[nk];
+    const wasVisited=neighbor&&neighbor.visited;
+    const cls=wasVisited?'btn-move visited':'btn-move';
+    h+=`<button class="${cls}" onclick="moveDir(${cell.di})">${d.label}${wasVisited?` ↩`:''}</button>`;
+  });
+  h+=`</div>`;
+  h+=`<button class="btn btn-action" onclick="searchHex()" ${hex.searched?'disabled':''}><span>Search Hex</span><span class="btn-tag">${hex.searched?'Done':'d6'}</span></button>`;
+  h+=`<button class="btn btn-action" onclick="makeCamp()"><span>Make Camp</span><span class="btn-tag">+1 day</span></button>`;
+  el.innerHTML=h;
+}
+
+function renderLog(){
+  const el=document.getElementById('log-entries');
+  const empty=document.getElementById('log-empty');
+  if(S.logEntries.length===0){empty.style.display='flex';el.innerHTML='';return;}
+  empty.style.display='none';
+  const tm={move:'tag-move',enc:'tag-enc',poi:'tag-poi',res:'tag-res',info:'tag-info',camp:'tag-camp'};
+  el.innerHTML=S.logEntries.map((e,i)=>`
+    <div class="log-item${i===0?' newest':''}">
+      <div class="log-day">Day ${e.day}</div>
+      <div class="log-title"><span class="log-tag ${tm[e.css]||'tag-info'}">${e.type.toUpperCase()}</span>${e.title}</div>
+      ${e.detail?`<div class="log-detail">${e.detail}</div>`:''}
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// MAP
+// ══════════════════════════════════════════════════════
+function autoPanToHex(){
+  const hex=S.hexes[S.currentKey];
+  if(!hex) return;
+  const cv=document.getElementById('map-canvas');
+  const z=S.map.zoom, sz=HEX_SIZE*z;
+  const p=hexToPixel(hex.q,hex.r,sz);
+  const cx=S.map.ox+p.x, cy=S.map.oy+p.y;
+  const margin=80;
+  let ox=S.map.ox, oy=S.map.oy;
+  if(cx<margin) ox+=margin-cx; else if(cx>cv.offsetWidth-margin) ox-=cx-(cv.offsetWidth-margin);
+  if(cy<margin) oy+=margin-cy; else if(cy>cv.offsetHeight-margin) oy-=cy-(cv.offsetHeight-margin);
+  S.map.ox=ox; S.map.oy=oy;
+}
+
+function centerOnCurrent(){
+  const hex=S.hexes[S.currentKey];
+  if(!hex) return;
+  const cv=document.getElementById('map-canvas');
+  const z=S.map.zoom, sz=HEX_SIZE*z;
+  const p=hexToPixel(hex.q,hex.r,sz);
+  S.map.ox=cv.offsetWidth/2-p.x;
+  S.map.oy=cv.offsetHeight/2-p.y;
+  renderMap();
+}
+
+function renderMap(){
+  const cv=document.getElementById('map-canvas');
+  const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#edecea'; ctx.fillRect(0,0,W,H);
+
+  const z=S.map.zoom, sz=HEX_SIZE*z;
+  const ox=S.map.ox, oy=S.map.oy;
+
+  Object.values(S.hexes).forEach(hex=>{
+    const p=hexToPixel(hex.q,hex.r,sz);
+    const cx=ox+p.x, cy=oy+p.y;
+
+    // Cull off-screen
+    if(cx<-sz*2||cx>W+sz*2||cy<-sz*2||cy>H+sz*2) return;
+
+    const isCur=hk(hex.q,hex.r)===S.currentKey;
+    const corners=hexCorners(cx,cy,sz-1.5);
+
+    ctx.beginPath();
+    corners.forEach((c,i)=>i===0?ctx.moveTo(c.x,c.y):ctx.lineTo(c.x,c.y));
+    ctx.closePath();
+
+    // Fill
+    if(!hex.visited){
+      ctx.fillStyle='#e0ddd8';
+    } else if(isCur){
+      ctx.fillStyle='#ffffff';
+    } else {
+      ctx.fillStyle=hex.terr.mapColor;
+    }
+    ctx.fill();
+
+    // Shadow glow on current
+    if(isCur){ctx.shadowColor='rgba(29,78,216,.3)';ctx.shadowBlur=16*z;}
+    ctx.beginPath();
+    corners.forEach((c,i)=>i===0?ctx.moveTo(c.x,c.y):ctx.lineTo(c.x,c.y));
+    ctx.closePath();
+    ctx.strokeStyle=isCur?'#1d4ed8':(hex.visited?hex.terr.mapBorder:'#c8c3ba');
+    ctx.lineWidth=(isCur?2.5:1)*z;
+    ctx.stroke();
+    ctx.shadowBlur=0;
+
+    if(z>0.45&&hex.visited){
+      // Glyph
+      ctx.font=`${Math.max(10,14*z)}px serif`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(hex.terr.glyph,cx,cy-sz*0.15);
+
+      // Coord label
+      ctx.fillStyle=isCur?'#1d4ed8':'#a09b97';
+      ctx.font=`${Math.max(7,8*z)}px DM Mono,monospace`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(`${hex.q},${hex.r}`,cx,cy+sz*0.35);
+
+      // POI marker
+      if(hex.poi){
+        ctx.font=`${Math.max(9,11*z)}px serif`;
+        ctx.textBaseline='top';
+        ctx.fillText(hex.poi.glyph,cx-sz*0.5,cy-sz*0.62);
+      }
+      // Encounter marker
+      if(hex.encounter){
+        ctx.fillStyle='#b91c1c';
+        ctx.beginPath();ctx.arc(cx+sz*0.42,cy-sz*0.5,3.5*z,0,Math.PI*2);ctx.fill();
+      }
+      // Searched tick
+      if(hex.searched&&!hex.poi){
+        ctx.fillStyle='#16a34a'; ctx.font=`${8*z}px sans-serif`;
+        ctx.textAlign='left'; ctx.textBaseline='top';
+        ctx.fillText('✓',cx-sz*0.55,cy-sz*0.62);
+      }
+    } else if(z>0.45&&hex.scouted&&!hex.visited){
+      // Fog: show terrain glyph dimmed
+      ctx.globalAlpha=0.3;
+      ctx.font=`${Math.max(10,14*z)}px serif`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(hex.terr.glyph,cx,cy);
+      ctx.globalAlpha=1;
+    }
+  });
+
+  // Compass
+  drawCompass(ctx,W-38,38,18*Math.min(z,1));
+  // Legend
+  drawLegend(ctx,10,H-10);
+}
+
+function drawCompass(ctx,cx,cy,size){
+  ctx.fillStyle='rgba(255,255,255,.82)';
+  ctx.beginPath();ctx.arc(cx,cy,size+3,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#d8d5cc';ctx.lineWidth=1;ctx.stroke();
+  [{l:'N',a:-Math.PI/2,c:'#1d4ed8'},{l:'S',a:Math.PI/2,c:'#6b6660'},{l:'E',a:0,c:'#6b6660'},{l:'W',a:Math.PI,c:'#6b6660'}].forEach(p=>{
+    ctx.fillStyle=p.c;ctx.font=`bold 9px DM Mono,monospace`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(p.l,cx+Math.cos(p.a)*(size-3),cy+Math.sin(p.a)*(size-3));
+  });
+}
+
+function drawLegend(ctx,x,y){
+  const items=TERRAIN.map(t=>({c:t.mapColor,bc:t.mapBorder,l:t.name}));
+  const iw=66,ih=16,gap=3,pad=6;
+  const totalW=items.length*(iw+gap)-gap+pad*2;
+  const bx=x,by=y-ih-4;
+  ctx.fillStyle='rgba(255,255,255,.80)';
+  ctx.beginPath();ctx.roundRect(bx,by,totalW,ih+pad,4);ctx.fill();
+  ctx.strokeStyle='#d8d5cc';ctx.lineWidth=.5;ctx.stroke();
+  items.forEach((item,i)=>{
+    const ix=bx+pad+i*(iw+gap);
+    const iy=by+pad/2;
+    ctx.fillStyle=item.c;
+    ctx.beginPath();ctx.roundRect(ix,iy,8,ih-pad,2);ctx.fill();
+    ctx.strokeStyle=item.bc;ctx.lineWidth=.8;ctx.stroke();
+    ctx.fillStyle='#6b6660';ctx.font='9px DM Mono,monospace';
+    ctx.textAlign='left';ctx.textBaseline='middle';
+    ctx.fillText(item.l,ix+10,iy+(ih-pad)/2);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// MAP INTERACTION
+// ══════════════════════════════════════════════════════
+function setupMap(){
+  const cv=document.getElementById('map-canvas');
+  const resize=()=>{cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;renderMap();};
+  new ResizeObserver(resize).observe(cv);
+  cv.addEventListener('mousedown',e=>{S.map.dragging=true;S.map.drag={x:e.clientX-S.map.ox,y:e.clientY-S.map.oy};});
+  cv.addEventListener('mousemove',e=>{if(!S.map.dragging)return;S.map.ox=e.clientX-S.map.drag.x;S.map.oy=e.clientY-S.map.drag.y;renderMap();});
+  cv.addEventListener('mouseup',()=>S.map.dragging=false);
+  cv.addEventListener('mouseleave',()=>S.map.dragging=false);
+  cv.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const f=e.deltaY>0?.88:1.14;
+    S.map.zoom=Math.max(.2,Math.min(4,S.map.zoom*f));
+    renderMap();
+  },{passive:false});
+  let tp=null;
+  cv.addEventListener('touchstart',e=>{if(e.touches.length===1){tp={x:e.touches[0].clientX-S.map.ox,y:e.touches[0].clientY-S.map.oy};}});
+  cv.addEventListener('touchmove',e=>{if(e.touches.length===1&&tp){S.map.ox=e.touches[0].clientX-tp.x;S.map.oy=e.touches[0].clientY-tp.y;renderMap();e.preventDefault();}},{passive:false});
+}
+
+document.addEventListener('keydown',e=>{
+  if((e.key==='r'||e.key==='R')&&!e.target.matches('input,textarea')) centerOnCurrent();
+});
+
+window.addEventListener('load',()=>{setupMap();renderLog();});
+</script>
+</body>
+</html>
