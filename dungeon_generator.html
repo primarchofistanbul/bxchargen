@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Procedural Dungeon Generator — B/X Solo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#edecea;
+  --surface:#fff;
+  --surface2:#f6f5f2;
+  --border:#dbd8d0;
+  --border-light:#ece9e2;
+  --text:#1c1917;
+  --text2:#6b6660;
+  --text3:#a09b97;
+  --accent:#1d4ed8;
+  --accent-bg:#dbeafe;
+  --monster:#b91c1c;
+  --monster-bg:#fee2e2;
+  --trap:#92400e;
+  --trap-bg:#fef3c7;
+  --special:#5b21b6;
+  --special-bg:#ede9fe;
+  --empty:#14532d;
+  --empty-bg:#dcfce7;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;flex-direction:column;font-size:14px}
+
+/* ─── HEADER ─── */
+header{
+  background:var(--text);color:#fff;
+  height:46px;padding:0 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+header h1{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase}
+.hdr-stats{display:flex;gap:20px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.45)}
+.hdr-stats span strong{color:#fff;font-weight:500}
+
+/* ─── LAYOUT ─── */
+.main{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* ─── LEFT PANEL ─── */
+.panel-left{
+  width:290px;flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+
+/* ─── CENTER ─── */
+.panel-center{
+  flex:1;background:var(--surface2);
+  position:relative;overflow:hidden;
+}
+
+/* ─── RIGHT PANEL ─── */
+.panel-right{
+  width:300px;flex-shrink:0;
+  background:var(--surface);
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+
+.panel-head{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border-light);
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--text2);
+  background:var(--surface2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-head-action{
+  font-size:9px;color:var(--accent);cursor:pointer;letter-spacing:.05em;
+  text-transform:none;font-weight:400;
+}
+.panel-head-action:hover{text-decoration:underline}
+
+.panel-body{flex:1;overflow-y:auto;padding:14px}
+.panel-body.no-pad{padding:0}
+
+/* ─── ROOM DETAILS ─── */
+.room-header{margin-bottom:12px}
+.room-name{font-size:17px;font-weight:600;margin-bottom:2px}
+.room-meta{font-family:var(--mono);font-size:11px;color:var(--text2)}
+
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:20px;
+  font-size:11px;font-weight:600;margin-bottom:14px;
+}
+.badge-monster{background:var(--monster-bg);color:var(--monster)}
+.badge-trap{background:var(--trap-bg);color:var(--trap)}
+.badge-special{background:var(--special-bg);color:var(--special)}
+.badge-empty{background:var(--empty-bg);color:var(--empty)}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.stat-item{
+  background:var(--surface2);border:1px solid var(--border-light);
+  border-radius:6px;padding:8px 10px;
+}
+.stat-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+.stat-value{font-size:13px;font-weight:500}
+
+.sec-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text2);margin-bottom:7px;margin-top:14px;
+}
+.info-block{
+  background:var(--surface2);border:1px solid var(--border-light);
+  border-radius:6px;padding:10px 12px;font-size:12px;line-height:1.6;
+  color:var(--text);
+}
+.info-block + .info-block{margin-top:6px}
+
+.exit-list{display:flex;flex-direction:column;gap:5px}
+.exit-row{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface2);border:1px solid var(--border-light);
+  border-radius:6px;padding:7px 10px;font-size:12px;
+}
+.exit-dir{font-family:var(--mono);font-size:10px;color:var(--accent);width:58px;flex-shrink:0}
+.exit-info{color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.exit-visited{font-family:var(--mono);font-size:9px;color:var(--text3);flex-shrink:0}
+.exit-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.exit-hint{font-family:var(--mono);font-size:9px;color:#b45309;background:#fef3c7;border-radius:3px;padding:1px 5px;display:inline-block;width:fit-content}
+
+/* ─── ACTIONS ─── */
+.action-area{
+  border-top:1px solid var(--border-light);
+  padding:10px 12px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;
+}
+.btn{
+  width:100%;padding:8px 12px;border-radius:6px;border:none;
+  font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .12s,transform .1s;text-align:left;
+}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-enter{background:var(--accent);color:#fff}
+.btn-enter:hover:not(:disabled){background:#1e40af}
+.btn-action{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-action:hover:not(:disabled){background:var(--border-light)}
+.btn-tag{font-family:var(--mono);font-size:9px;opacity:.7}
+.btn-full{
+  padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;
+  background:var(--text);color:#fff;border:none;cursor:pointer;
+  font-family:var(--font);width:100%;transition:background .12s;
+}
+.btn-full:hover{background:#000}
+
+/* ─── START OVERLAY ─── */
+#start-screen{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:var(--surface2);z-index:20;
+}
+.start-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:40px;max-width:380px;width:100%;text-align:center;
+}
+.start-card h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.start-card p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:28px}
+.start-shortcut{
+  margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--text3);
+}
+kbd{
+  background:var(--surface2);border:1px solid var(--border);border-radius:3px;
+  padding:1px 5px;font-family:var(--mono);font-size:9px;
+}
+
+/* ─── MAP ─── */
+#map-canvas{position:absolute;inset:0;cursor:grab;display:block;width:100%;height:100%}
+#map-canvas:active{cursor:grabbing}
+.map-hint{
+  position:absolute;bottom:10px;left:12px;
+  font-family:var(--mono);font-size:10px;color:var(--text3);
+  pointer-events:none;
+}
+
+/* ─── LOG ─── */
+.log-item{
+  padding:10px 14px;border-bottom:1px solid var(--border-light);
+  font-size:12px;line-height:1.5;
+}
+.log-item.newest{background:#f0f9ff}
+.log-room{font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:3px}
+.log-title{font-weight:500;margin-bottom:2px}
+.log-detail{color:var(--text2);font-size:11px}
+.log-tag{
+  display:inline-block;font-family:var(--mono);font-size:8px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;padding:1px 5px;border-radius:3px;
+  margin-right:5px;vertical-align:middle;
+}
+.tag-enter{background:var(--accent-bg);color:var(--accent)}
+.tag-monster{background:var(--monster-bg);color:var(--monster)}
+.tag-trap{background:var(--trap-bg);color:var(--trap)}
+.tag-special{background:var(--special-bg);color:var(--special)}
+.tag-search{background:#f0fdf4;color:#166534}
+.tag-info{background:#f3f4f6;color:#374151}
+.tag-treasure{background:#fefce8;color:#713f12}
+
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;color:var(--text3);font-size:12px;gap:10px;padding:30px;
+  text-align:center;
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Procedural Dungeon Generator — B/X Solo</h1>
+  <div class="hdr-stats">
+    <span>Level&nbsp;<strong id="hdr-level">—</strong></span>
+    <span>Rooms&nbsp;<strong id="hdr-rooms">0</strong></span>
+    <span>Facing&nbsp;<strong id="hdr-facing">—</strong></span>
+    <span style="border-left:1px solid rgba(255,255,255,.15);padding-left:20px">⏱&nbsp;<strong id="hdr-time">0 min</strong></span>
+  </div>
+</header>
+
+<div class="main">
+  <!-- LEFT: Room details -->
+  <div class="panel-left">
+    <div class="panel-head">
+      Current Chamber
+      <span class="panel-head-action" onclick="centerOnCurrent()">Recenter map</span>
+    </div>
+    <div class="panel-body" id="room-details">
+      <div class="empty-state">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        No dungeon started yet
+      </div>
+    </div>
+    <div class="action-area" id="actions">
+      <button class="btn-full" onclick="beginDungeon()">Enter the Dungeon</button>
+    </div>
+  </div>
+
+  <!-- CENTER: Map -->
+  <div class="panel-center">
+    <div id="start-screen">
+      <div class="start-card">
+        <h2>Dungeon Generator</h2>
+        <p>A procedural solo-play tool for B/X. Generate chambers room by room, track exits, treasure, traps, and shrines — with a live map as you explore.</p>
+        <button class="btn-full" onclick="beginDungeon()">Enter the Dungeon</button>
+        <div class="start-shortcut">Pan map: drag · Zoom: scroll · Recenter: <kbd>R</kbd></div>
+      </div>
+    </div>
+    <canvas id="map-canvas"></canvas>
+    <div class="map-hint">Drag to pan · Scroll to zoom · <kbd>R</kbd> to recenter</div>
+  </div>
+
+  <!-- RIGHT: Log -->
+  <div class="panel-right">
+    <div class="panel-head">
+      Event Log
+      <span class="panel-head-action" onclick="clearLog()">Clear</span>
+    </div>
+    <div class="panel-body no-pad" id="log-panel">
+      <div class="empty-state" id="log-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        No events yet
+      </div>
+      <div id="log-entries"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DICE
+// ══════════════════════════════════════════════════════════════
+const r = n => Math.floor(Math.random()*n)+1;
+const d4=()=>r(4), d6=()=>r(6), d8=()=>r(8), d12=()=>r(12), d20=()=>r(20), d100=()=>r(100);
+const d6x2=()=>d6()+d6();
+
+// ══════════════════════════════════════════════════════════════
+// DIRECTIONS
+// ══════════════════════════════════════════════════════════════
+const DIR={
+  n:{dx:0,dy:-1,opp:'s',left:'w',right:'e',label:'North'},
+  s:{dx:0,dy:1,opp:'n',left:'e',right:'w',label:'South'},
+  e:{dx:1,dy:0,opp:'w',left:'n',right:'s',label:'East'},
+  w:{dx:-1,dy:0,opp:'e',left:'s',right:'n',label:'West'},
+};
+const dirLabel=d=>{if(d==='up')return'Ascent';if(d==='down')return'Descent';return DIR[d]?.label||d};
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+const S={
+  started:false, level:1,
+  rooms:{}, currentKey:null, facing:'n',
+  roomCount:0, logEntries:[], turns:0,
+  map:{ox:0,oy:0,zoom:1,dragging:false,drag:null},
+};
+const rk=(x,y,l)=>`${x},${y},${l}`;
+
+// ══════════════════════════════════════════════════════════════
+// TABLES
+// ══════════════════════════════════════════════════════════════
+function tblSize(roll){
+  if(roll<=2)return{label:'Tiny',walls:4};
+  if(roll<=5)return{label:'Small',walls:8};
+  if(roll<=8)return{label:'Medium',walls:12};
+  if(roll<=10)return{label:'Large',walls:16};
+  if(roll===11)return{label:'Huge',walls:20};
+  return{label:'Gargantuan',walls:24};
+}
+function tblCeiling(roll){
+  if(roll<=2)return"2' or less";
+  if(roll<=5)return"2–4'";
+  if(roll<=8)return"5–7'";
+  if(roll<=10)return"8–12'";
+  if(roll===11)return"13–25'";
+  return"25'+";
+}
+function tblDoors(roll,facing){
+  const f=facing, L=DIR[facing]?.left||'w', R=DIR[facing]?.right||'e';
+  let exits=[],isCorridor=false,isObjective=false;
+  if(roll===2)exits=['up'];
+  else if(roll===3)exits=['down'];
+  else if(roll===4)exits=[];
+  else if(roll<=6)exits=[f,R];
+  else if(roll===7)exits=[f,L];
+  else if(roll<=9){exits=[f];isCorridor=true;}
+  else if(roll<=11)exits=[f,L,R];
+  else isObjective=true;
+  return{exits,isCorridor,isObjective};
+}
+function tblContents(){const r=d6();return r<=2?'monster':r===3?'trap':r===4?'special':'empty';}
+function tblTreasureCheck(type){
+  const rv=d6();
+  if(type==='monster')return rv<=3;
+  if(type==='trap')return rv<=2;
+  if(type==='empty')return rv<=1;
+  return false;
+}
+function tblTreasure(lvl){
+  const tiers=[
+    {sv:()=>d6()*100,         gld:()=>d100()<=50?d6()*10:0,     gPct:5, jPct:2, mPct:2, mc:1},
+    {sv:()=>r(12)*100,        gld:()=>d100()<=50?d6()*100:0,    gPct:10,jPct:5, mPct:8, mc:1},
+    {sv:()=>(d6()+d6())*100,  gld:()=>d100()<=50?r(12)*100:0,   gPct:15,jPct:7, mPct:10,mc:2},
+    {sv:()=>(r(12)+r(12))*100,gld:()=>d100()<=50?(d6()+d6())*10:0,gPct:20,jPct:10,mPct:15,mc:2},
+    {sv:()=>(d6()+d6()+d6())*100,gld:()=>d100()<=50?(d6()+d6())*100:0,gPct:25,jPct:12,mPct:20,mc:3},
+    {sv:()=>(r(12)+r(12)+r(12))*100,gld:()=>d100()<=50?(d6()+d6()+d6())*10:0,gPct:30,jPct:15,mPct:25,mc:3},
+    {sv:()=>d20()*1000,       gld:()=>d100()<=50?(d6()+d6()+d6())*100:0,gPct:35,jPct:17,mPct:30,mc:4},
+  ];
+  const idx=lvl<=1?0:lvl<=3?1:lvl<=6?2:lvl<=8?3:lvl<=10?4:lvl<=12?5:6;
+  const t=tiers[idx];
+  return{
+    silver:t.sv(), gold:t.gld(),
+    gems:d100()<=t.gPct?`${d6()} gem(s)`:null,
+    jewellery:d100()<=t.jPct?`${d6()} piece(s)`:null,
+    magic:d100()<=t.mPct?`${t.mc} magic item(s)`:null,
+  };
+}
+function tblDoorStatus(){
+  const s=['Open','Closed','One-way','Stuck','Locked','Blocked','Sealed','Secret'][d8()-1];
+  const m=['Wood','Wood','Stone','Stone','Metal','Metal'][d6()-1];
+  return{status:s,material:m,lockDiff:s==='Locked'?d4():null};
+}
+function tblTrap(){
+  return{
+    mechanism:['Projectile','Pit','Spray/Flood','Vent','Structural','Magical','Capturing','Alarming'][d8()-1],
+    trigger:['Sound','Light','Contact','Weight/Pressure','Switch/Lever','Active Magic'][d6()-1],
+    difficulty:['Easy','Novice','Intermediate','Advanced','Expert','Extreme'][d6()-1],
+    clue:['Visual','Auditory','Sensory','Olfactory','Perceptional','Ethereal'][d6()-1],
+    location:['Floor','West Wall','East Wall','North Wall','South Wall','Ceiling'][d6()-1],
+  };
+}
+const SHRINES=[
+  "Cryptic shrine — restores all previously cast spells.",
+  "Glimmering shrine — identifies any unknown magic items carried by the party.",
+  "Mystic shrine — grants +1000 XP per dungeon level; all gold but one piece vanishes.",
+  "Secluded shrine — PC learns the layout of this level (but not the room contents).",
+  "Spiritual shrine — grants 100 GP per dungeon level.",
+  "Spooky shrine — all other PCs in the party are fully healed.",
+  "Weird shrine — all weapons on person deal +1 damage for one day.",
+  "Health shrine — doubles current HP for one day.",
+  "Armour shrine — −5 to AC for one day.",
+  "Combat shrine — +5 to hit and +5 to damage for one day.",
+  "Poison shrine — +4 on saves vs poison for one day; no damage if save is made.",
+  "Wand shrine — +4 on saves vs wands for one day; no damage if save is made.",
+  "Stone shrine — +4 on saves vs paralysis for one day; no damage if save is made.",
+  "Fire shrine — +4 on saves vs breath attacks for one day; no damage if save is made.",
+  "Spell shrine — +4 on saves vs spells for one day; no damage if save is made.",
+  "Skill shrine — +2 bonus on all skill checks for one day.",
+  "Recharge shrine — no rest needed for one day.",
+  "Stamina shrine — double the effects of all healing for one day.",
+  "Storm shrine — all PCs and monsters on this level lose half their current HP.",
+  "Wild shrine — roll twice on this table (ignore further 20s).",
+];
+const POOLS=[
+  "Tar pool — burning oil, highly flammable.",
+  "Toxic pool — poisonous liquid; breathing it for 1d4+ turns requires a Save vs Death.",
+  "Water pool — a simple pool of fresh water.",
+  "Holy Water pool — filled with holy water; useful for cleansing holy symbols.",
+  "Warden pool — guarded by a Giant Octopus; attacks if disturbed.",
+  "Reincarnation pool — lays a dead creature within to reincarnate it. Poisonous if drunk. Annual event.",
+  "Life pool — weapons dipped receive +2 to attack rolls against undead.",
+  "Strength pool* — adds 1d4 to Strength when drunk; Save vs Paralysis required. (Single use.)",
+  "Intelligence pool* — adds 1d4 to Intelligence when drunk; Save vs Paralysis required. (Single use.)",
+  "Wisdom pool* — adds 1d4 to Wisdom when drunk; Save vs Paralysis required. (Single use.)",
+  "Dexterity pool* — adds 1d4 to Dexterity when drunk; Save vs Paralysis required. (Single use.)",
+  "Constitution pool* — adds 1d4 to Constitution when drunk; Save vs Paralysis required. (Single use.)",
+  "Charisma pool* — adds 1d4 to Charisma when drunk; Save vs Paralysis required. (Single use.)",
+  "Wealth pool — one dipped object turns to gold; Save vs Paralysis required.",
+  "Resilience pool — bathing adds +1 to all saving throws. Very cold.",
+  "Death's Breath pool — cool, sparkling, pleasing taste — causes 1 damage to any drinker.",
+  "Luminescence pool — water emits light when bottled.",
+  "Darkvision pool — drinker gains darkvision; Save vs Paralysis required.",
+  "Mastery pool — any dipped weapon gains expert-level mastery.",
+  "Heaven's Grace pool — dipped weapons receive +3 to attack rolls vs demons or undead.",
+];
+const SEARCH=[
+  {rv:2, tag:'Den',      text:"A monster found in its own den — very hostile! Roll on the wandering monster table."},
+  {rv:3, tag:'Secret',   text:"You found a secret door (if any). Roll on the Doors table for its details."},
+  {rv:4, tag:'Object',   text:"You found a piece of equipment or an interesting object."},
+  {rv:5, tag:'Trap',     text:"Trap sprung! You activated the trap (if any). Roll on the Trap tables."},
+  {rv:6, tag:'Trap',     text:"Trap sprung! You activated the trap (if any). Roll on the Trap tables."},
+  {rv:7, tag:'Object',   text:"You found a piece of equipment or an interesting object."},
+  {rv:8, tag:'Nothing',  text:"You found nothing of importance."},
+  {rv:9, tag:'Nothing',  text:"You found nothing of importance."},
+  {rv:10,tag:'Furnishing',text:"You found a container of some kind: a shelf, barrel, chest, or similar."},
+  {rv:11,tag:'Furnishing',text:"You found a container of some kind: a shelf, barrel, chest, or similar."},
+  {rv:12,tag:'Furnishing',text:"You found a container of some kind: a shelf, barrel, chest, or similar."},
+];
+function tblSearch(){const rv=d6x2();return SEARCH.find(s=>s.rv===rv)||SEARCH[SEARCH.length-1];}
+function tblCorridor(){
+  return{
+    curve:['Left','Straight','Straight','Straight','Straight','Right'][d6()-1],
+    slope:['Upward','Even','Even','Even','Even','Downward'][d6()-1],
+    width:['Narrowing','Same as previous','Same as previous','Same as previous','Same as previous','Widening'][d6()-1],
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+// ROOM GENERATION
+// ══════════════════════════════════════════════════════════════
+function genVestibule(){
+  const rv=d6();
+  let exits=[], desc='';
+  if(rv<=2){exits=['down'];desc='Descent';}
+  else if(rv===3){exits=['n'];desc='Front';}
+  else if(rv===4){exits=['n','w'];desc='Front, Left';}
+  else if(rv===5){exits=['n','e'];desc='Front, Right';}
+  else{exits=['n','w','e'];desc='Front, Left, Right';}
+
+  const dd={};
+  exits.forEach(e=>{dd[e]=tblDoorStatus();});
+
+  const key=rk(0,0,1);
+  const room={
+    key, x:0, y:0, level:1, num:++S.roomCount,
+    type:'vestibule', label:'Vestibule',
+    size:{label:'Standard',walls:8}, ceiling:"8–12'",
+    contents:{type:'empty'}, exits, doorDetails:dd,
+    hasTreasure:false, treasure:null, trap:null,
+    specialType:null, specialDetail:null,
+    searched:false, searchResult:null,
+    connectedTo:{}, isCorridor:false, corridorDetail:null,
+    isObjective:false, entryDir:null,
+  };
+  S.rooms[key]=room;
+  S.currentKey=key; S.facing='n'; S.level=1;
+  addLog('enter','Vestibule',`Entrance roll: ${rv} — ${desc}`,'enter');
+  return room;
+}
+
+function genChamber(x,y,level,entryDir){
+  const sizeRoll=d6x2(), ceilRoll=d6x2(), doorRoll=d6x2(), contRoll=d6();
+  const size=tblSize(sizeRoll);
+  const ceiling=tblCeiling(ceilRoll);
+  const contType=tblContents();
+  const doorRes=tblDoors(doorRoll, entryDir in DIR ? entryDir : 'n');
+
+  const exits=[...doorRes.exits];
+  const dd={};
+  exits.forEach(e=>{ if(e!=='up'&&e!=='down') dd[e]=tblDoorStatus(); });
+
+  let trap=null, specialType=null, specialDetail=null;
+  let hasTreasure=false, treasure=null;
+
+  if(contType==='trap') trap=tblTrap();
+  else if(contType==='special'){
+    specialType=d6()<=3?'shrine':'pool';
+    if(specialType==='shrine'){const sr=d20();specialDetail=SHRINES[sr-1];}
+    else{const pr=d20();specialDetail=POOLS[pr-1];}
+  }
+
+  // Objective door overrides to shrine/pool
+  if(doorRes.isObjective){
+    specialType=d6()<=3?'shrine':'pool';
+    if(specialType==='shrine'){const sr=d20();specialDetail=SHRINES[sr-1];}
+    else{const pr=d20();specialDetail=POOLS[pr-1];}
+  }
+
+  hasTreasure=tblTreasureCheck(contType);
+  if(hasTreasure) treasure=tblTreasure(level);
+
+  let corridorDetail=null;
+  if(doorRes.isCorridor) corridorDetail=tblCorridor();
+
+  const key=rk(x,y,level);
+  const num=++S.roomCount;
+  const room={
+    key, x, y, level, num,
+    type:'chamber', label:`Room ${num}`,
+    size, ceiling, contents:{type:contType}, exits, doorDetails:dd,
+    hasTreasure, treasure, trap, specialType, specialDetail,
+    searched:false, searchResult:null,
+    connectedTo:{},
+    isCorridor:doorRes.isCorridor, corridorDetail,
+    isObjective:doorRes.isObjective,
+    entryDir,
+    rolls:{size:sizeRoll,ceil:ceilRoll,door:doorRoll,cont:contRoll},
+  };
+  S.rooms[key]=room;
+  return room;
+}
+
+// ══════════════════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════════════════
+function beginDungeon(){
+  if(S.started) return;
+  S.started=true;
+  document.getElementById('start-screen').style.display='none';
+  const room=genVestibule();
+  initMapCenter();
+  renderAll();
+}
+
+function initMapCenter(){
+  const cv=document.getElementById('map-canvas');
+  const CELL=56, RS=40;
+  S.map.zoom=1;
+  S.map.ox=cv.offsetWidth/2 - RS/2;
+  S.map.oy=cv.offsetHeight/2 - RS/2;
+}
+
+function enterDoor(exitDir){
+  const cur=S.rooms[S.currentKey];
+  if(!cur) return;
+
+  if(exitDir==='up'||exitDir==='down'){
+    const newLevel=exitDir==='down'?S.level+1:S.level-1;
+    if(newLevel<1){addLog('info','Already at the surface','Cannot ascend further.','info');return;}
+    S.level=newLevel;
+    const nk=rk(cur.x,cur.y,newLevel);
+    let nr=S.rooms[nk];
+    if(!nr){nr=genChamber(cur.x,cur.y,newLevel,'n');}
+    cur.connectedTo[exitDir]=nk;
+    nr.connectedTo[exitDir==='down'?'up':'down']=S.currentKey;
+    if(!nr.exits.includes(exitDir==='down'?'up':'down'))nr.exits.push(exitDir==='down'?'up':'down');
+    S.currentKey=nk; S.facing='n';
+    addLog('enter',`${exitDir==='down'?'Descended':'Ascended'} to Level ${newLevel}`,`Entered ${nr.label}`,'enter');
+    logRoomAuto(nr);
+  } else {
+    const d=DIR[exitDir];
+    const nx=cur.x+d.dx, ny=cur.y+d.dy;
+    const nk=rk(nx,ny,S.level);
+    let nr=S.rooms[nk];
+    const isNew=!nr;
+    if(!nr) nr=genChamber(nx,ny,S.level,exitDir);
+    // Always ensure the back door exists
+    const backDir=d.opp;
+    if(!nr.exits.includes(backDir)){nr.exits.push(backDir); nr.doorDetails[backDir]=tblDoorStatus();}
+    cur.connectedTo[exitDir]=nk;
+    nr.connectedTo[backDir]=S.currentKey;
+    S.currentKey=nk; S.facing=exitDir;
+    if(isNew){addLog('enter',`Entered ${nr.label}`,`Moving ${d.label}`,'enter'); logRoomAuto(nr);}
+    else addLog('enter',`Returned to ${nr.label}`,`Moving ${d.label}`,'enter');
+    S.turns++;
+    addLog('time',`+10 min`,`Turn ${S.turns} — ${S.turns*10} min elapsed`,'info');
+  }
+  renderAll();
+  autoPanToRoom();
+}
+
+function logRoomAuto(room){
+  const icons={monster:'⚔ Monster',trap:'⚠ Trap',special:'✦ Special',empty:'◯ Empty'};
+  addLog(room.contents.type, icons[room.contents.type]||room.contents.type, `${room.size.label}, ceiling ${room.ceiling}`, room.contents.type);
+  if(room.contents.type==='monster') addLog('info','Roll on monster table','Refer to your wandering monster table for this dungeon.','info');
+  if(room.trap) addLog('trap','Trap present',`${room.trap.mechanism} · ${room.trap.trigger} trigger · ${room.trap.difficulty} · on ${room.trap.location} · Clue: ${room.trap.clue}`,'trap');
+  if(room.specialType) addLog('special',room.specialType==='shrine'?'Shrine found':'Pool found',room.specialDetail,'special');
+  if(room.hasTreasure&&room.treasure){
+    const t=room.treasure;
+    const parts=[`${t.silver} SP`];
+    if(t.gold) parts.push(`${t.gold} GP`);
+    if(t.gems) parts.push(t.gems);
+    if(t.jewellery) parts.push(t.jewellery);
+    if(t.magic) parts.push(t.magic);
+    addLog('treasure','Treasure present',parts.join(' · '),'treasure');
+  }
+  if(room.isObjective) addLog('special','Objective / End chamber','This is the shrine, pool, or objective at the end of this path.','special');
+}
+
+function searchRoom(){
+  const room=S.rooms[S.currentKey];
+  if(!room||room.searched) return;
+  room.searched=true;
+  S.turns++;
+  const res=tblSearch();
+  room.searchResult=res;
+  let extra=res.text;
+  if((res.tag==='Trap')&&!room.trap){room.trap=tblTrap(); extra+=` · Generated: ${room.trap.mechanism}, ${room.trap.trigger}, ${room.trap.difficulty}`;}
+  addLog('search',`Search — ${res.tag}`,extra,'search');
+  addLog('time',`+10 min`,`Turn ${S.turns} — ${S.turns*10} min elapsed`,'info');
+  renderAll();
+}
+
+function usePrayer(){
+  const room=S.rooms[S.currentKey];
+  if(!room||room.specialType!=='shrine') return;
+  const rv=d20();
+  let effect=SHRINES[rv-1];
+  if(rv===20){
+    const a=Math.ceil(Math.random()*19), b=Math.ceil(Math.random()*19);
+    effect=`Wild! Two effects → [${a}] ${SHRINES[a-1]} AND [${b}] ${SHRINES[b-1]}`;
+  }
+  addLog('special',`Prayed at shrine (d20 = ${rv})`,effect,'special');
+}
+
+function usePool(){
+  const room=S.rooms[S.currentKey];
+  if(!room||room.specialType!=='pool') return;
+  const rv=d20();
+  addLog('special',`Examined pool (d20 = ${rv})`,POOLS[rv-1],'pool');
+}
+
+// ══════════════════════════════════════════════════════════════
+// LOGGING
+// ══════════════════════════════════════════════════════════════
+let logId=0;
+function addLog(type,title,detail,css){
+  S.logEntries.unshift({id:++logId,type,title,detail,css,room:S.roomCount});
+  if(S.logEntries.length>300) S.logEntries.pop();
+  renderLog();
+}
+function clearLog(){S.logEntries=[];renderLog();}
+
+// ══════════════════════════════════════════════════════════════
+// RENDERING
+// ══════════════════════════════════════════════════════════════
+function renderAll(){
+  updateHeader();
+  renderRoomDetails();
+  renderActions();
+  renderMap();
+}
+
+function updateHeader(){
+  document.getElementById('hdr-level').textContent=S.level||'—';
+  document.getElementById('hdr-rooms').textContent=S.roomCount;
+  document.getElementById('hdr-facing').textContent=S.facing?(DIR[S.facing]?.label||S.facing):'—';
+  const totalMin=S.turns*10;
+  const h=Math.floor(totalMin/60), m=totalMin%60;
+  document.getElementById('hdr-time').textContent=h>0?`${h}h ${m}min`:`${totalMin} min`;
+}
+
+function renderRoomDetails(){
+  const room=S.rooms[S.currentKey];
+  const el=document.getElementById('room-details');
+  if(!room){
+    el.innerHTML=`<div class="empty-state"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>No dungeon started</div>`;
+    return;
+  }
+  const bc={monster:'badge-monster',trap:'badge-trap',special:'badge-special',empty:'badge-empty'};
+  const bi={monster:'⚔',trap:'⚠',special:'✦',empty:'◯'};
+  const bn={monster:'Monster',trap:'Trap',special:room.specialType?(room.specialType[0].toUpperCase()+room.specialType.slice(1)):'Special',empty:'Empty'};
+  let h=`
+    <div class="room-header">
+      <div class="room-name">${room.label}</div>
+      <div class="room-meta">${room.type==='vestibule'?'Dungeon Entrance':`Level ${room.level} · ${room.isCorridor?'Corridor':'Chamber'}`}</div>
+    </div>
+    <span class="badge ${bc[room.contents.type]}">${bi[room.contents.type]} ${bn[room.contents.type]}</span>
+    <div class="stat-grid">
+      <div class="stat-item"><div class="stat-label">Size</div><div class="stat-value">${room.size.label}</div></div>
+      <div class="stat-item"><div class="stat-label">Ceiling</div><div class="stat-value">${room.ceiling}</div></div>
+      <div class="stat-item"><div class="stat-label">Wall total</div><div class="stat-value" style="font-family:var(--mono);font-size:12px">${room.size.walls} units</div></div>
+      <div class="stat-item"><div class="stat-label">Searched</div><div class="stat-value">${room.searched?'✓ Yes':'—'}</div></div>
+    </div>
+  `;
+
+  if(room.trap){
+    h+=`<div class="sec-label">Trap</div>
+    <div class="info-block">
+      <strong>${room.trap.mechanism}</strong><br>
+      <span style="color:var(--text2);font-size:11px">
+        Trigger: ${room.trap.trigger} · Difficulty: ${room.trap.difficulty}<br>
+        Clue: ${room.trap.clue} · Location: ${room.trap.location}
+      </span>
+    </div>`;
+  }
+  if(room.specialType){
+    h+=`<div class="sec-label">${room.specialType==='shrine'?'Shrine':'Pool'}</div>
+    <div class="info-block" style="font-size:12px">${room.specialDetail}</div>`;
+  }
+  if(room.hasTreasure&&room.treasure){
+    const t=room.treasure;
+    const parts=[`${t.silver} SP`];
+    if(t.gold) parts.push(`${t.gold} GP`);
+    if(t.gems) parts.push(t.gems);
+    if(t.jewellery) parts.push(t.jewellery);
+    if(t.magic) parts.push(t.magic);
+    h+=`<div class="sec-label">Treasure</div>
+    <div class="info-block" style="font-family:var(--mono);font-size:11px">${parts.join(' · ')}</div>`;
+  }
+  if(room.isCorridor&&room.corridorDetail){
+    const c=room.corridorDetail;
+    h+=`<div class="sec-label">Corridor</div>
+    <div class="info-block" style="font-family:var(--mono);font-size:11px">${c.curve} · ${c.slope} · ${c.width}</div>`;
+  }
+  if(room.exits.length>0){
+    h+=`<div class="sec-label">Exits</div><div class="exit-list">`;
+    room.exits.forEach(e=>{
+      const dd=room.doorDetails[e];
+      const target=room.connectedTo[e];
+      const tr=target?S.rooms[target]:null;
+      let hint='';
+      if(dd?.status==='Stuck') hint=`<span class="exit-hint">Can be forced open</span>`;
+      else if(dd?.status==='Locked') hint=`<span class="exit-hint">Lockpicking · Difficulty ${dd.lockDiff}/4 · d4 turns</span>`;
+      h+=`<div class="exit-row">
+        <div class="exit-dir">${dirLabel(e)}</div>
+        <div class="exit-col">
+          <div class="exit-info">${dd?`${dd.status} · ${dd.material}`:'Passage'}</div>
+          ${hint}
+        </div>
+        ${tr?`<div class="exit-visited">→ ${tr.label}</div>`:''}
+      </div>`;
+    });
+    h+=`</div>`;
+  } else {
+    h+=`<div class="sec-label">Exits</div><div class="info-block" style="color:var(--text2)">Dead-end — no further exits.</div>`;
+  }
+  if(room.searched&&room.searchResult){
+    h+=`<div class="sec-label">Search result</div><div class="info-block" style="font-size:12px">${room.searchResult.text}</div>`;
+  }
+  el.innerHTML=h;
+}
+
+function renderActions(){
+  const room=S.rooms[S.currentKey];
+  const el=document.getElementById('actions');
+  if(!room){el.innerHTML=`<button class="btn-full" onclick="beginDungeon()">Enter the Dungeon</button>`;return;}
+
+  let h='';
+  room.exits.forEach(e=>{
+    const target=room.connectedTo[e];
+    const tr=target?S.rooms[target]:null;
+    const label=tr?`Return to ${tr.label}`:`Enter — ${dirLabel(e)}`;
+    h+=`<button class="btn btn-enter" onclick="enterDoor('${e}')"><span>${label}</span><span class="btn-tag">${dirLabel(e)}</span></button>`;
+  });
+  h+=`<button class="btn btn-action" onclick="searchRoom()" ${room.searched?'disabled':''}><span>Search Room</span><span class="btn-tag">${room.searched?'Done':'2d6'}</span></button>`;
+  if(room.specialType==='shrine') h+=`<button class="btn btn-action" onclick="usePrayer()"><span>Pray at Shrine</span><span class="btn-tag">d20</span></button>`;
+  if(room.specialType==='pool')   h+=`<button class="btn btn-action" onclick="usePool()"><span>Examine Pool</span><span class="btn-tag">d20</span></button>`;
+  el.innerHTML=h;
+}
+
+function renderLog(){
+  const el=document.getElementById('log-entries');
+  const empty=document.getElementById('log-empty');
+  if(S.logEntries.length===0){empty.style.display='flex';el.innerHTML='';return;}
+  empty.style.display='none';
+  const tagMap={enter:'tag-enter',monster:'tag-monster',trap:'tag-trap',special:'tag-special',search:'tag-search',treasure:'tag-treasure',info:'tag-info',pool:'tag-special',empty:'tag-info'};
+  el.innerHTML=S.logEntries.map((e,i)=>`
+    <div class="log-item${i===0?' newest':''}">
+      <div class="log-room">Room ${e.room}</div>
+      <div class="log-title"><span class="log-tag ${tagMap[e.css]||'tag-info'}">${e.type.toUpperCase()}</span>${e.title}</div>
+      ${e.detail?`<div class="log-detail">${e.detail}</div>`:''}
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// MAP
+// ══════════════════════════════════════════════════════════════
+const CELL=56, RS=40, CR=5; // cell size, room size, corner radius
+
+function autoPanToRoom(){
+  const room=S.rooms[S.currentKey];
+  if(!room) return;
+  const cv=document.getElementById('map-canvas');
+  const z=S.map.zoom;
+  const cell=CELL*z, rs=RS*z;
+  const rx=S.map.ox+room.x*cell, ry=S.map.oy+room.y*cell;
+  const cw=cv.offsetWidth, ch=cv.offsetHeight;
+  const margin=60;
+  let ox=S.map.ox, oy=S.map.oy;
+  if(rx<margin) ox+=margin-rx;
+  else if(rx+rs>cw-margin) ox-=(rx+rs)-(cw-margin);
+  if(ry<margin) oy+=margin-ry;
+  else if(ry+rs>ch-margin) oy-=(ry+rs)-(ch-margin);
+  S.map.ox=ox; S.map.oy=oy;
+}
+
+function centerOnCurrent(){
+  const room=S.rooms[S.currentKey];
+  if(!room) return;
+  const cv=document.getElementById('map-canvas');
+  const z=S.map.zoom, cell=CELL*z, rs=RS*z;
+  S.map.ox=cv.offsetWidth/2-room.x*cell-rs/2;
+  S.map.oy=cv.offsetHeight/2-room.y*cell-rs/2;
+  renderMap();
+}
+
+function renderMap(){
+  const cv=document.getElementById('map-canvas');
+  const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Background
+  ctx.fillStyle='#edecea'; ctx.fillRect(0,0,W,H);
+
+  const z=S.map.zoom, cell=CELL*z, rs=RS*z, ox=S.map.ox, oy=S.map.oy;
+
+  // Subtle dot grid
+  ctx.fillStyle='#d8d5cc';
+  const gs=cell;
+  const sx=((ox%gs)+gs)%gs, sy=((oy%gs)+gs)%gs;
+  for(let x=sx;x<W;x+=gs) for(let y=sy;y<H;y+=gs){
+    ctx.beginPath(); ctx.arc(x,y,1,0,Math.PI*2); ctx.fill();
+  }
+
+  // Only draw current level rooms
+  const rooms=Object.values(S.rooms).filter(r=>r.level===S.level);
+
+  // Draw connections
+  rooms.forEach(room=>{
+    const rx=ox+room.x*cell, ry=oy+room.y*cell;
+    const cx=rx+rs/2, cy=ry+rs/2;
+    Object.entries(room.connectedTo).forEach(([dir,tk])=>{
+      if(dir==='up'||dir==='down') return;
+      const tr=S.rooms[tk];
+      if(!tr||tr.level!==S.level) return;
+      const tx=ox+tr.x*cell+rs/2, ty=oy+tr.y*cell+rs/2;
+      ctx.strokeStyle='#c8c3ba'; ctx.lineWidth=2*z;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(tx,ty); ctx.stroke();
+    });
+  });
+
+  // Draw rooms
+  const contBg={monster:'#fee2e2',trap:'#fef3c7',special:'#ede9fe',empty:'#f0fdf4'};
+  const contDot={monster:'#b91c1c',trap:'#92400e',special:'#5b21b6',empty:'#14532d'};
+
+  rooms.forEach(room=>{
+    const rx=ox+room.x*cell, ry=oy+room.y*cell;
+    const isCur=room.key===S.currentKey;
+    const cr=CR*z;
+
+    // Corridors: narrow pill shape; rooms: square
+    const isCor=room.isCorridor;
+    const rw=rs, rh=isCor?rs*0.38:rs;
+    const cy_off=isCor?ry+rs*0.31:ry; // vertically center the pill in the cell
+
+    // Shadow for current
+    if(isCur){ctx.shadowColor='rgba(29,78,216,.25)';ctx.shadowBlur=14*z;}
+
+    // Fill
+    ctx.fillStyle=isCur?'#ffffff':(contBg[room.contents.type]||'#fff');
+    if(isCor) ctx.fillStyle=isCur?'#f0f9ff':'#e8f4fd'; // distinct corridor tint
+    rrect(ctx,rx,cy_off,rw,rh,isCor?rh/2:cr); ctx.fill();
+    ctx.shadowBlur=0;
+
+    // Border
+    ctx.strokeStyle=isCur?'#1d4ed8':isCor?'#60a5fa':'#ccc8be';
+    ctx.lineWidth=(isCur?2:1)*z;
+    ctx.setLineDash([]);
+    rrect(ctx,rx,cy_off,rw,rh,isCor?rh/2:cr); ctx.stroke();
+
+    if(z>0.45){
+      // Content dot (rooms only)
+      if(!isCor){
+        ctx.fillStyle=contDot[room.contents.type]||'#888';
+        ctx.beginPath(); ctx.arc(rx+rs/2,ry+rs*.38,3.5*z,0,Math.PI*2); ctx.fill();
+      }
+
+      // Label
+      ctx.fillStyle=isCur?'#1d4ed8':isCor?'#2563eb':'#6b6660';
+      ctx.font=`${Math.max(7,8.5*z)}px DM Mono,monospace`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      const lbl=room.type==='vestibule'?'VBL':isCor?`C${room.num}`:`#${room.num}`;
+      ctx.fillText(lbl,rx+rs/2,cy_off+rh/2);
+
+      // Searched tick
+      if(room.searched){
+        ctx.fillStyle='#16a34a'; ctx.font=`${7*z}px sans-serif`;
+        ctx.textAlign='left'; ctx.textBaseline='top';
+        ctx.fillText('✓',rx+3*z,cy_off+2*z);
+      }
+      // Objective star
+      if(room.isObjective){
+        ctx.fillStyle='#5b21b6'; ctx.font=`bold ${9*z}px sans-serif`;
+        ctx.textAlign='right'; ctx.textBaseline='top';
+        ctx.fillText('★',rx+rs-2*z,cy_off+2*z);
+      }
+      // Vertical connections
+      room.exits.forEach(e=>{
+        if(e==='up'||e==='down'){
+          ctx.fillStyle='#475569'; ctx.font=`${8*z}px DM Mono`;
+          ctx.textAlign='right'; ctx.textBaseline='top';
+          ctx.fillText(e==='down'?'↓':'↑',rx+rs-3*z,cy_off+rh/2-4*z);
+        }
+      });
+    }
+  });
+
+  // Level & compass overlay
+  ctx.fillStyle='rgba(0,0,0,.45)'; ctx.font='10px DM Mono,monospace';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`LEVEL ${S.level}`,10,10);
+  if(rooms.length===0&&S.level>1){ctx.fillText(`No rooms on level ${S.level} yet`,10,26);}
+
+  drawCompass(ctx,W-36,36,18*Math.min(z,1));
+  drawLegend(ctx,10,H-10);
+}
+
+function rrect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+
+function drawCompass(ctx,cx,cy,size){
+  ctx.fillStyle='rgba(255,255,255,.82)';
+  ctx.beginPath(); ctx.arc(cx,cy,size+3,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#d8d5cc'; ctx.lineWidth=1; ctx.stroke();
+  const pts=[{l:'N',a:-Math.PI/2,c:'#1d4ed8'},{l:'S',a:Math.PI/2,c:'#6b6660'},{l:'E',a:0,c:'#6b6660'},{l:'W',a:Math.PI,c:'#6b6660'}];
+  pts.forEach(p=>{
+    ctx.fillStyle=p.c; ctx.font=`bold 9px DM Mono,monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(p.l,cx+Math.cos(p.a)*(size-3),cy+Math.sin(p.a)*(size-3));
+  });
+}
+
+function drawLegend(ctx,x,y){
+  const items=[
+    {c:'#fee2e2',bc:'#b91c1c',l:'Monster'},
+    {c:'#fef3c7',bc:'#92400e',l:'Trap'},
+    {c:'#ede9fe',bc:'#5b21b6',l:'Special'},
+    {c:'#f0fdf4',bc:'#14532d',l:'Empty'},
+  ];
+  const iw=58, ih=16, gap=4, pad=6;
+  const totalW=items.length*(iw+gap)-gap+pad*2;
+  const bx=x, by=y-ih-4;
+  ctx.fillStyle='rgba(255,255,255,.80)';
+  rrect(ctx,bx,by,totalW,ih+pad,4); ctx.fill();
+  ctx.strokeStyle='#d8d5cc'; ctx.lineWidth=.5; ctx.stroke();
+  items.forEach((item,i)=>{
+    const ix=bx+pad+i*(iw+gap);
+    const iy=by+pad/2;
+    ctx.fillStyle=item.c; rrect(ctx,ix,iy,8,ih-pad,2); ctx.fill();
+    ctx.strokeStyle=item.bc; ctx.lineWidth=.8; ctx.stroke();
+    ctx.fillStyle='#6b6660'; ctx.font='9px DM Mono,monospace';
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(item.l,ix+10,iy+ih/2-pad/2);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// MAP INTERACTION
+// ══════════════════════════════════════════════════════════════
+function setupMap(){
+  const cv=document.getElementById('map-canvas');
+  const resize=()=>{cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;renderMap();};
+  new ResizeObserver(resize).observe(cv);
+
+  cv.addEventListener('mousedown',e=>{S.map.dragging=true;S.map.drag={x:e.clientX-S.map.ox,y:e.clientY-S.map.oy};});
+  cv.addEventListener('mousemove',e=>{if(!S.map.dragging)return;S.map.ox=e.clientX-S.map.drag.x;S.map.oy=e.clientY-S.map.drag.y;renderMap();});
+  cv.addEventListener('mouseup',()=>S.map.dragging=false);
+  cv.addEventListener('mouseleave',()=>S.map.dragging=false);
+  cv.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const f=e.deltaY>0?.88:1.14;
+    S.map.zoom=Math.max(.25,Math.min(4,S.map.zoom*f));
+    renderMap();
+  },{passive:false});
+
+  // Touch
+  let tp=null;
+  cv.addEventListener('touchstart',e=>{if(e.touches.length===1){tp={x:e.touches[0].clientX-S.map.ox,y:e.touches[0].clientY-S.map.oy};}});
+  cv.addEventListener('touchmove',e=>{if(e.touches.length===1&&tp){S.map.ox=e.touches[0].clientX-tp.x;S.map.oy=e.touches[0].clientY-tp.y;renderMap();e.preventDefault();}},{passive:false});
+}
+
+document.addEventListener('keydown',e=>{
+  if((e.key==='r'||e.key==='R')&&!e.target.matches('input,textarea')) centerOnCurrent();
+});
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  setupMap();
+  renderLog();
+});
+</script>
+</body>
+</html>
