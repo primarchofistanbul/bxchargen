@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B/X D&amp;D — Spell Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#111;--ink2:#333;--muted:#666;--rule:#ccc;--rule2:#e8e8e8;
+  --bg:#fff;--bg2:#f7f7f7;--bg3:#f0f0f0;
+  --red:#c0102a;--red-bg:#fdf2f4;
+  --mono:'Share Tech Mono',monospace;
+  --lv1:#777;--lv2:#2a6e3a;--lv3:#8a5a00;--lv4:#7a2c00;--lv5:#c0102a;--lv6:#6a0010;
+  --mu:#1a3560;--clr:#5a3800;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Libre Baskerville',Georgia,serif;font-size:14px;line-height:1.65}
+.wrapper{max-width:1100px;margin:0 auto;padding:0 20px 80px}
+
+/* HEADER */
+.site-header{border-bottom:3px solid var(--ink);padding:36px 0 24px;margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.header-left h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3.5vw,2.2rem);font-weight:900;letter-spacing:-0.02em;line-height:1.05}
+.header-left .subtitle{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.btn{font-family:'Playfair Display',serif;font-size:0.8rem;font-weight:700;letter-spacing:0.04em;padding:9px 22px;cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--bg);transition:background 0.15s,color 0.15s;white-space:nowrap;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--red);border-color:var(--red)}
+.btn.outline{background:transparent;color:var(--ink)}
+.btn.outline:hover{background:var(--ink);color:var(--bg)}
+
+/* SEARCH + FILTERS */
+.search-bar{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+.search-input{font-family:'Libre Baskerville',serif;font-size:0.88rem;padding:9px 14px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);flex:1;min-width:200px;outline:none}
+.search-input:focus{border-color:var(--red)}
+.search-input::placeholder{color:var(--muted)}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.filter-label{font-size:0.71rem;color:var(--muted);white-space:nowrap}
+.filter-group{display:flex;gap:4px;flex-wrap:wrap}
+.filter-btn{font-family:'Playfair Display',serif;font-size:0.67rem;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--rule);background:var(--bg2);color:var(--muted);cursor:pointer;transition:all 0.12s}
+.filter-btn:hover,.filter-btn.active{border-color:var(--ink);color:var(--ink);background:var(--bg3)}
+.filter-btn.fmu.active{border-color:var(--mu);color:var(--mu)}
+.filter-btn.fclr.active{border-color:var(--clr);color:var(--clr)}
+.filter-btn.fl1.active{border-color:var(--lv1);color:var(--lv1)}
+.filter-btn.fl2.active{border-color:var(--lv2);color:var(--lv2)}
+.filter-btn.fl3.active{border-color:var(--lv3);color:var(--lv3)}
+.filter-btn.fl4.active{border-color:var(--lv4);color:var(--lv4)}
+.filter-btn.fl5.active{border-color:var(--lv5);color:var(--lv5)}
+.filter-btn.fl6.active{border-color:var(--lv6);color:var(--lv6);font-weight:bold}
+.filter-divider{width:1px;background:var(--rule);align-self:stretch;margin:0 4px}
+.result-count{font-size:0.75rem;color:var(--muted);white-space:nowrap;margin-left:auto}
+
+/* LEGEND */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;padding:10px 14px;background:var(--bg2);border:1px solid var(--rule);font-size:0.74rem;align-items:center}
+.legend-label{font-family:'Playfair Display',serif;font-size:0.64rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.leg-item{display:flex;align-items:center;gap:5px}
+
+/* TAGS */
+.class-tag{font-family:var(--mono);font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;padding:2px 5px;border:1px solid;white-space:nowrap}
+.class-tag.mu{color:var(--mu);border-color:var(--mu);background:#f0f3f9}
+.class-tag.clr{color:var(--clr);border-color:var(--clr);background:#faf6ee}
+.level-tag{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.08em;padding:2px 6px;border:1px solid currentColor;white-space:nowrap}
+.lv1{color:var(--lv1)}.lv2{color:var(--lv2)}.lv3{color:var(--lv3)}
+.lv4{color:var(--lv4)}.lv5{color:var(--lv5)}.lv6{color:var(--lv6);font-weight:bold}
+
+/* CATEGORIES */
+.category{margin-bottom:52px}
+.cat-header{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;padding-bottom:10px;border-bottom:3px solid var(--ink)}
+.cat-number{font-family:'Playfair Display',serif;font-size:0.7rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--red)}
+.cat-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900}
+.cat-subtitle{font-size:0.74rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-style:italic}
+.cat-tip{font-size:0.8rem;color:var(--muted);font-style:italic;line-height:1.55;margin-bottom:20px;padding:10px 14px;border-left:3px solid var(--rule);background:var(--bg2)}
+.cat-tip strong{color:var(--ink);font-style:normal}
+.subcat{margin-bottom:28px}
+.subcat-title{font-family:'Playfair Display',serif;font-size:0.7rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--red);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.subcat-title::after{content:'';flex:1;height:1px;background:var(--rule2)}
+.level-note{font-size:0.73rem;color:var(--muted);font-style:italic;margin-bottom:10px;padding:5px 10px;background:var(--bg2);border-left:2px solid var(--rule2)}
+
+/* SPELL CARDS */
+.spell-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:7px}
+.spell-card{border:1px solid var(--rule2);background:var(--bg);padding:11px 13px;transition:border-color 0.12s,background 0.12s;cursor:pointer}
+.spell-card:hover{border-color:var(--ink);background:var(--bg2)}
+.spell-card.expanded{border-color:var(--ink);background:var(--bg2)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.spell-name{font-family:'Playfair Display',serif;font-size:0.97rem;font-weight:700;line-height:1.2;flex:1}
+.card-tags{display:flex;gap:4px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.card-stats{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.stat-item{font-size:0.73rem;color:var(--muted)}
+.stat-item strong{font-family:var(--mono);color:var(--ink);font-size:0.78rem}
+.card-detail{display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--rule2)}
+.spell-card.expanded .card-detail{display:block}
+.detail-row{display:flex;gap:8px;margin-bottom:5px;font-size:0.79rem;align-items:baseline}
+.detail-label{font-family:'Playfair Display',serif;font-size:0.63rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);min-width:52px;flex-shrink:0}
+.detail-val{color:var(--ink2);line-height:1.45}
+.effect-text{color:var(--ink2)}
+.reverse-text{color:var(--red);font-style:italic}
+.newbie-tip{margin-top:8px;padding:6px 9px;background:var(--bg3);border-left:2px solid var(--red);font-size:0.74rem;color:var(--muted);line-height:1.45;font-style:italic}
+.newbie-tip strong{color:var(--ink);font-style:normal}
+.spell-card.hidden{display:none}
+
+/* PRINT */
+@media print{.search-bar,.filter-row,.header-right{display:none!important}.spell-card{page-break-inside:avoid;border:1px solid #ccc}.card-detail{display:block!important}}
+@media(max-width:600px){.spell-grid{grid-template-columns:1fr}.site-header{flex-direction:column}.header-right{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<header class="site-header">
+  <div class="header-left">
+    <h1>B/X Spell Reference</h1>
+    <div class="subtitle">Moldvay Basic + Cook/Marsh Expert · OSE Compatible · 110 Spells</div>
+  </div>
+  <div class="header-right">
+    <button class="btn outline" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
+
+<div class="search-bar">
+  <input class="search-input" type="text" id="search" placeholder="Search spells…" oninput="filterAll()">
+  <span class="result-count" id="result-count">110 spells</span>
+</div>
+<div class="filter-row">
+  <span class="filter-label">Class:</span>
+  <div class="filter-group">
+    <button class="filter-btn fmu" onclick="toggleFilter('class','mu',this)">Magic-User</button>
+    <button class="filter-btn fclr" onclick="toggleFilter('class','clr',this)">Cleric</button>
+  </div>
+  <div class="filter-divider"></div>
+  <span class="filter-label">Level:</span>
+  <div class="filter-group">
+    <button class="filter-btn fl1" onclick="toggleFilter('level','1',this)">1</button>
+    <button class="filter-btn fl2" onclick="toggleFilter('level','2',this)">2</button>
+    <button class="filter-btn fl3" onclick="toggleFilter('level','3',this)">3</button>
+    <button class="filter-btn fl4" onclick="toggleFilter('level','4',this)">4</button>
+    <button class="filter-btn fl5" onclick="toggleFilter('level','5',this)">5</button>
+    <button class="filter-btn fl6" onclick="toggleFilter('level','6',this)">6 (MU only)</button>
+  </div>
+  <button class="filter-btn" onclick="clearFilters()" style="margin-left:3px">✕ Clear</button>
+</div>
+
+<div class="legend">
+  <span class="legend-label">Class:</span>
+  <span class="leg-item"><span class="class-tag mu">MU</span> Magic-User (arcane, from spellbook)</span>
+  <span class="leg-item"><span class="class-tag clr">CLR</span> Cleric (divine, prayed each day)</span>
+  <span class="legend-label" style="margin-left:8px">Level:</span>
+  <span class="leg-item"><span class="level-tag lv1">L1</span></span>
+  <span class="leg-item"><span class="level-tag lv2">L2</span></span>
+  <span class="leg-item"><span class="level-tag lv3">L3</span></span>
+  <span class="leg-item"><span class="level-tag lv4">L4</span></span>
+  <span class="leg-item"><span class="level-tag lv5">L5</span></span>
+  <span class="leg-item"><span class="level-tag lv6">L6</span> MU only</span>
+  <span style="font-size:0.71rem;color:var(--muted);margin-left:auto;font-style:italic">Click any card to expand</span>
+</div>
+
+<div id="spell-list">
+
+<!-- CATEGORY I: MAGIC-USER -->
+<div class="category" id="cat-mu">
+  <div class="cat-header">
+    <span class="cat-number">Category I</span>
+    <span class="cat-title">Magic-User Spells</span>
+    <span class="cat-subtitle">Levels 1–6 · 72 Spells</span>
+  </div>
+  <div class="cat-tip">
+    <strong>How MU spells work:</strong> A Magic-User begins with a spellbook containing 2 starting spells (plus Read Magic). New spells must be found as loot or copied from other books — there is no automatic list. The MU memorises any combination of known spells up to their daily slots, then expends them on casting. At Basic level (1–3), MUs cast Level 1–2 spells. Expert (4–14) opens Levels 3–6. <strong>The scarcity of spells is a core design feature, not a flaw.</strong>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 1 — 12 Spells</div>
+    <div class="level-note">Available from Level 1 (1 slot). Most reliable spells in the MU's arsenal — utility and encounter-control. <em>Sleep</em> alone can define low-level play.</div>
+    <div class="spell-grid" id="grid-mu-1"></div>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 2 — 12 Spells</div>
+    <div class="level-note">Available from Level 3 (1 slot). Utility expands dramatically. Invisibility and Web redefine tactical options.</div>
+    <div class="spell-grid" id="grid-mu-2"></div>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 3 — 12 Spells</div>
+    <div class="level-note">Available from Level 5. Fireball and Lightning Bolt arrive. Fly opens vertical play entirely.</div>
+    <div class="spell-grid" id="grid-mu-3"></div>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 4 — 12 Spells</div>
+    <div class="level-note">Available from Level 7. Permanent transformation, large-scale terrain effects, and battlefield mastery.</div>
+    <div class="spell-grid" id="grid-mu-4"></div>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 5 — 12 Spells</div>
+    <div class="level-note">Available from Level 9. High-risk, high-reward spells. Teleport and Conjure Elemental define high-level MU play.</div>
+    <div class="spell-grid" id="grid-mu-5"></div>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 6 — 12 Spells</div>
+    <div class="level-note">Available from Level 11. Campaign-scale powers. Disintegrate, Death Spell, and Geas operate beyond combat.</div>
+    <div class="spell-grid" id="grid-mu-6"></div>
+  </div>
+</div>
+
+<!-- CATEGORY II: CLERIC -->
+<div class="category" id="cat-clr">
+  <div class="cat-header">
+    <span class="cat-number">Category II</span>
+    <span class="cat-title">Cleric Spells</span>
+    <span class="cat-subtitle">Levels 1–5 · 38 Spells</span>
+  </div>
+  <div class="cat-tip">
+    <strong>How Cleric spells work:</strong> A Cleric prays for any spells from the <em>full</em> available list each morning — they are not limited to known spells. A 1st-level Cleric has no spell slots (spells begin at 2nd level). <strong>Reversed spells</strong> (italicised in the effect) require a Chaotic alignment or referee permission for Lawful Clerics. The Cleric's breadth of utility — healing, protection, information, and reversal options — makes them the most flexible low-level caster.
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 1 — 8 Spells</div>
+    <div class="level-note">Available from Level 2 (1 slot). Healing, protection, and elemental resistance form the foundation.</div>
+    <div class="spell-grid" id="grid-clr-1"></div>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 2 — 8 Spells</div>
+    <div class="level-note">Available from Level 3. Bless is a mass combat buff. Silence and Hold Person give the Cleric offensive reach.</div>
+    <div class="spell-grid" id="grid-clr-2"></div>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 3 — 7 Spells</div>
+    <div class="level-note">Available from Level 5. Cure Disease is the Mummy Rot lifeline. Speak with Dead opens investigation. Remove Curse arrives one level earlier than the MU version.</div>
+    <div class="spell-grid" id="grid-clr-3"></div>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 4 — 7 Spells</div>
+    <div class="level-note">Available from Level 7. Neutralize Poison is a time-critical death-reversal. Create Water solves wilderness supply.</div>
+    <div class="spell-grid" id="grid-clr-4"></div>
+  </div>
+
+  <div class="subcat"><div class="subcat-title">Level 5 — 8 Spells</div>
+    <div class="level-note">Available from Level 9. Raise Dead and Word of Recall define the high-level Cleric. Commune and Dispel Evil are campaign-scale tools.</div>
+    <div class="spell-grid" id="grid-clr-5"></div>
+  </div>
+</div>
+
+</div><!-- /spell-list -->
+</div><!-- /wrapper -->
+
+<script>
+const S=[
+/* ============================================================
+   MAGIC-USER LEVEL 1
+============================================================ */
+{n:'Charm Person',cl:'mu',lv:1,rg:"120'",du:'Until dispelled',ar:'1 person',sv:'Spells',
+ ef:'Target humanoid (up to human-sized) treats caster as a trusted friend. Charmed creature is not controlled — it acts as a loyal friend would. Target may repeat saving throws over time (frequency based on Int score).',
+ rv:null,
+ tp:'Not mind control. The charmed creature won\'t jump into a pit for you but will "watch that corridor while we rest." Ask for cooperation, not suicide missions. Repeated saves over months erode the effect organically.'},
+
+{n:'Detect Magic',cl:'mu',lv:1,rg:'0',du:'20 min',ar:"60' ahead",sv:null,
+ ef:'Caster perceives a magical aura on enchanted items, creatures, or areas within 60\'. Does not reveal the type or nature of the magic.',
+ rv:null,
+ tp:'Cast before touching any found treasure. Reveals enchanted items, active spells, and cursed objects. Does not identify what the magic does — that requires Read Magic or careful experimentation.'},
+
+{n:'Floating Disc',cl:'mu',lv:1,rg:"6'",du:'6 turns',ar:'Follows caster',sv:null,
+ ef:"Creates a slightly concave 3'-diameter disc of force hovering 3\" off the ground. Carries up to 5,000 coins (500 lbs). Follows the caster automatically within 6'. Vanishes at end of duration.",
+ rv:null,
+ tp:'The dungeon logistics solution. Haul treasure without encumbrance penalties. Time the duration — it vanishes mid-expedition if you cast it early. A 6-turn window is often enough for a single room-to-exit run.'},
+
+{n:'Hold Portal',cl:'mu',lv:1,rg:"10'",du:'2d6 turns',ar:'1 door/gate',sv:null,
+ ef:"Holds a door, gate, or similar portal shut as though locked and barred. Monsters with 3+ more HD than the caster can break through in 1 round.",
+ rv:null,
+ tp:'Buys crucial time during a retreat. Stack with Wizard Lock for a combined seal. The HD caveat means it\'s a delay, not a stop, against powerful creatures — plan your escape accordingly.'},
+
+{n:'Light',cl:'mu',lv:1,rg:"60'",du:'12 turns',ar:"30' radius globe",sv:'Spells (if aimed at eyes)',
+ ef:"Creates a bright mobile light. If cast directly on a creature's eyes, the target is blinded for the duration (save vs. Spells negates).",
+ rv:null,
+ tp:'Dual-use: torch replacement or combat debuff. Blinding a foe costs it its attacks effectively. Attach the light to a stone or a shield for a mobile lantern, or fire it at an enemy\'s face in a crisis.'},
+
+{n:'Magic Missile',cl:'mu',lv:1,rg:"150'",du:'Instant',ar:'1 creature',sv:'None',
+ ef:"Automatically hits (no attack roll). Deals 1d6+1 damage. One missile per casting at Basic level.",
+ rv:null,
+ tp:'The only guaranteed hit in B/X. Use when everything else has missed three rounds running, or against a flying, invisible, or heavily armoured target that nothing else can reach. Save it for when ordinary attacks fail.'},
+
+{n:'Protection from Evil',cl:'mu',lv:1,rg:'0',du:'12 turns',ar:'Caster',sv:null,
+ ef:'+1 to all saving throws and AC against evil creatures. Conjured and summoned creatures cannot physically touch the caster — an absolute barrier.',
+ rv:null,
+ tp:'The barrier against summoned monsters is unbreakable — no save overrides it. Cast before any encounter with undead, summoned creatures, or demons. Best Level 1 defensive buff in the game.'},
+
+{n:'Read Languages',cl:'mu',lv:1,rg:'0',du:'2 turns',ar:'Caster',sv:null,
+ ef:'Allows the caster to read any written language, including treasure maps, coded messages, ancient inscriptions, and foreign scripts.',
+ rv:null,
+ tp:'The "I can read this scroll" spell. Every dungeon the referee bothers to place written clues makes this potentially mission-critical. Also works on treasure map ciphers and door warnings that save lives.'},
+
+{n:'Read Magic',cl:'mu',lv:1,rg:'0',du:'1 turn',ar:'Caster',sv:null,
+ ef:'Allows reading of magical writings — spells, scrolls, and spellbook entries. Required to transcribe scrolls into a spellbook or add spells from a found spellbook.',
+ rv:null,
+ tp:'The prerequisite for all spellcasting growth. Without this, found scrolls are useless parchment. Always keep one copy memorised when exploring new areas with scroll or spellbook potential.'},
+
+{n:'Shield',cl:'mu',lv:1,rg:'0',du:'2 turns',ar:'Caster',sv:null,
+ ef:'Creates an invisible force barrier. AC 2 vs. missile attacks; AC 4 vs. all other attacks. Better than any mundane armour a MU could ordinarily wear.',
+ rv:null,
+ tp:'Turns the MU\'s glass jaw survivable for two critical turns. Pair with Mirror Image for layered defence. Cast before descending into a confirmed combat zone, not after the first arrow hits.'},
+
+{n:'Sleep',cl:'mu',lv:1,rg:"240'",du:'4d4 turns',ar:'2d8 HD of creatures',sv:'None',
+ ef:"Puts creatures to sleep with no saving throw. Affects 2d8 HD of creatures starting with the lowest HD first. Only affects creatures up to 4+1 HD. Sleeping creatures can be coup-de-graced automatically.",
+ rv:null,
+ tp:'The most powerful Level 1 spell. One casting can end an encounter entirely. Aim at the lowest-HD creatures first — their HD fills the quota, leaving the bigger threat standing. Waking a sleeper requires an action.'},
+
+{n:'Ventriloquism',cl:'mu',lv:1,rg:"60'",du:'2 turns',ar:'Any point in range',sv:null,
+ ef:'Caster throws their voice to any location within range, creating the convincing illusion of a voice from that point.',
+ rv:null,
+ tp:'Infinite creative uses: lure guards away, fake a prisoner escape, make a locked door "speak." The ultimate distraction tool in any language the caster knows. Limited only by the player\'s imagination.'},
+
+/* ============================================================
+   MAGIC-USER LEVEL 2
+============================================================ */
+{n:'Continual Light',cl:'mu',lv:2,rg:"120'",du:'Permanent',ar:"30' radius globe",sv:'Spells (if aimed at eyes)',
+ ef:"Creates a permanent, daylight-bright globe of light. Can be cast on an object to create a portable light source. If cast at a creature's eyes, blinds permanently on a failed save.",
+ rv:null,
+ tp:'Ends torch management forever. Create light-stones for each party member. The blinding use is a one-shot permanent debuff — devastating if it lands. A blinded opponent is effectively removed from meaningful combat.'},
+
+{n:'Detect Evil',cl:'mu',lv:2,rg:"60'",du:'2 turns',ar:"60' ahead",sv:null,
+ ef:"Detects evil intentions in creatures, or magical evil emanating from items or areas, within range.",
+ rv:null,
+ tp:'Detects evil intent, not merely Chaotic alignment. A neutral assassin hired for an evil purpose may ping. Confirms that something is evil without identifying who or what — use it to narrow suspicion, not to convict.'},
+
+{n:'Detect Invisible',cl:'mu',lv:2,rg:"10' per level",du:'6 turns',ar:'Caster',sv:null,
+ ef:'Caster perceives invisible creatures and objects as a faint translucent shimmer.',
+ rv:null,
+ tp:'The counter to Invisibility, invisible stalkers, and enemy MUs hiding behind their spell. Cast when the party suspects an invisible threat is manoeuvring. Also reveals invisible watchers before speaking freely in a room.'},
+
+{n:'ESP',cl:'mu',lv:2,rg:"60'",du:'12 turns',ar:'1 creature',sv:null,
+ ef:"Reads the surface thoughts of one creature. Takes 1 turn to lock on. Blocked by 2\" of solid stone or any lead. Mindless creatures reveal nothing.",
+ rv:null,
+ tp:'The diplomatic intelligence tool. Confirm whether an NPC is genuinely friendly or concealing an agenda. Interrogate prisoners without intimidation. Note lead-lined rooms — they exist because something wants to hide its thoughts.'},
+
+{n:'Invisibility',cl:'mu',lv:2,rg:"240'",du:'Permanent until broken',ar:'1 creature or object',sv:null,
+ ef:'Target becomes invisible. Effect ends immediately if the target attacks or casts a spell.',
+ rv:null,
+ tp:'The most versatile Level 2 spell. Scouting, escape, ambush setup, theft, and negotiation — all viable. The attack-breaks-it condition creates genuine tactical decisions. Objects turned invisible stay that way permanently until dispelled.'},
+
+{n:'Knock',cl:'mu',lv:2,rg:"60'",du:'Instant',ar:'1 door/lock/portal',sv:null,
+ ef:'Opens any mundanely or magically locked door, chest, or portal. Also opens Wizard Locked doors.',
+ rv:null,
+ tp:'The thief\'s nightmare alternative. Wizard Locks, heavy bars, mundane padlocks — all trivial. No noise (unlike forcing), no failure chance (unlike the thief skill). One spell slot often saves far more time than it costs.'},
+
+{n:'Levitate',cl:'mu',lv:2,rg:'0',du:'6 turns + 1/level',ar:'Caster',sv:null,
+ ef:"Caster can move vertically at 20'/round. Cannot move horizontally under the spell's power alone — must push off walls or use a rope.",
+ rv:null,
+ tp:'Ceiling access changes dungeon topology entirely. Float up to scout, drop down on elevated foes, escape by rising out of reach. The horizontal limitation is a puzzle, not a wall — throw a rope down to the party below.'},
+
+{n:'Locate Object',cl:'mu',lv:2,rg:'0',du:'2 turns',ar:"60'+10' per level",sv:null,
+ ef:"Senses the direction of a specific object the caster has a clear mental image of. Cannot locate living creatures. Blocked by lead.",
+ rv:null,
+ tp:'For quest items and treasure: know exactly what you\'re searching for. If you\'ve seen the object before, you can find it. The range is modest — useful in a dungeon complex, less so across a kingdom.'},
+
+{n:'Mirror Image',cl:'mu',lv:2,rg:'0',du:'6 turns',ar:'Caster',sv:null,
+ ef:'Creates 1d4 illusory duplicates of the caster. Attackers hit a random target including the real caster. A hit destroys that image.',
+ rv:null,
+ tp:'Transforms MU survivability in melee. With 4 images the chance of hitting the real caster is 1-in-5. Especially effective against single powerful foes who burn images one by one. Pair with Shield for layered defence.'},
+
+{n:'Phantasmal Force',cl:'mu',lv:2,rg:"240'",du:'Concentration',ar:"20'×20' area",sv:'Special (Int check if disbelieved)',
+ ef:"Creates a convincing visual illusion of anything the caster imagines. No sound. Disappears if physically touched or successfully disbelieved. Creatures that do not suspect an illusion get no saving throw.",
+ rv:null,
+ tp:'Bounded only by creativity. Illusory wall of fire, bridge over a pit, a second army arriving on the hill — all valid. Keep the illusion simple and consistent. Direct the scene mentally while concentrating.'},
+
+{n:'Web',cl:'mu',lv:2,rg:"10'",du:'48 turns',ar:"10'×10'×20' volume",sv:'STR check to escape each turn',
+ ef:"Creates thick, sticky webs filling the target volume. Trapped creatures must force their way out each turn. Fire destroys webs but deals 1d6 damage to anyone within.",
+ rv:null,
+ tp:'Area control at Level 2. A room full of webs is an ambush zone. With fire-using allies, devastating. Creatures cannot retreat through webs, giving archers a stationary target. The 48-turn duration means it\u2019s still there for wandering monsters.'},
+
+{n:'Wizard Lock',cl:'mu',lv:2,rg:"10'",du:'Permanent',ar:'1 door/chest/portal',sv:null,
+ ef:'Magically and permanently locks a door or chest. Only the caster, a Magic-User 3+ levels higher, or a Knock spell can open it.',
+ rv:null,
+ tp:'The long-term door seal. Protect a base, lock off explored sections, or slow pursuit. Unlike Hold Portal it is not time-limited. Multiple Wizard Locks on a single door require separate Knock casts to open.'},
+
+/* ============================================================
+   MAGIC-USER LEVEL 3
+============================================================ */
+{n:'Clairvoyance',cl:'mu',lv:3,rg:"60'",du:'12 turns',ar:'Known remote location',sv:null,
+ ef:"Caster sees remotely as if present at a known location within 60'. Blocked by 2\" of solid stone or any lead.",
+ rv:null,
+ tp:'Reconnaissance without physical risk. Scout the next room, assess the boss\'s lair, verify if a corridor is clear. Blocked by lead-lined rooms — which is itself a strong hint that something important is in there.'},
+
+{n:'Clairaudience',cl:'mu',lv:3,rg:"60'",du:'12 turns',ar:'Known remote location',sv:null,
+ ef:"Caster hears sounds at a distant known location as if present there. Blocked by 2\" of stone or lead.",
+ rv:null,
+ tp:'The eavesdropping spell. Listen through walls, monitor NPC conversations, hear a monster patrol before it arrives. Pairs with Clairvoyance for full remote surveillance without the caster moving at all.'},
+
+{n:'Dispel Magic',cl:'mu',lv:3,rg:"120'",du:'Instant',ar:"30'×30' area",sv:'Special',
+ ef:"Cancels ongoing magical effects in the area. Chance of success against higher-level magic = caster level ÷ creator's level. Works on enchanted items, areas, and creature-affecting spells.",
+ rv:null,
+ tp:'The answer to almost every magical problem. Dispels Charm, Hold, Wizard Lock, ongoing areas, even Continual Light. Against a higher-level caster the formula matters: a Level 5 MU has a 5-in-9 chance vs. a Level 9 effect.'},
+
+{n:'Fireball',cl:'mu',lv:3,rg:"240'",du:'Instant',ar:'20\' radius sphere',sv:'Spells (half damage)',
+ ef:"Deals 1d6 per caster level fire damage to all in the radius. Expands to fill 33,000 cubic feet — in enclosed spaces, it bounces back past the point of origin.",
+ rv:null,
+ tp:'The defining mid-level combat spell. In a 10×10×10\' room, it rebounds onto the party. Always calculate cubic footage before casting. Outdoors in a clear area: fire freely. In a corridor: think twice.'},
+
+{n:'Fly',cl:'mu',lv:3,rg:'0',du:'1d6 turns + 1/level (secret)',ar:'Caster',sv:null,
+ ef:"Caster flies at 120'/turn (360'/turn outdoors). Duration is rolled secretly by the referee — the caster does not know exactly how long it will last.",
+ rv:null,
+ tp:'The ultimate utility. Bypasses terrain, enables aerial combat, skips entire dungeon sections. The secret duration creates genuine tension — don\'t fly out over open ocean without an escape plan. Overconfidence kills high-level MUs.'},
+
+{n:'Hold Person',cl:'mu',lv:3,rg:"120'",du:'9 turns',ar:'1–4 persons',sv:'Spells',
+ ef:"Holds 1 to 4 human-sized humanoids rigid, unable to move or speak. Targeting multiple gives each target +1 to save per additional target beyond the first.",
+ rv:null,
+ tp:'Locks down humanoid foes entirely. Held creatures can be executed (coup de grace). Target enemy Clerics first — they can\'t cast while held. Targeting four enemies is tempting but gives each a +3 save bonus; weigh accordingly.'},
+
+{n:'Infravision',cl:'mu',lv:3,rg:'0',du:'1 day',ar:'1 creature',sv:null,
+ ef:"Grants the target infravision (seeing heat sources in darkness) to 60' for a full day.",
+ rv:null,
+ tp:'Removes torch dependency for one creature per casting for an entire expedition. Grant it to the party scout the morning before entering the dungeon. Humans and halflings become as capable in darkness as dwarves and elves.'},
+
+{n:'Invisibility 10\u2019 Radius',cl:'mu',lv:3,rg:'0',du:'Permanent until broken',ar:"10' radius around caster",sv:null,
+ ef:"All creatures within 10' of the caster become invisible. Any creature that attacks or casts a spell becomes visible immediately.",
+ rv:null,
+ tp:'Group stealth. An entire party moving silently past a guard room. Plan the formation before casting — once anyone acts aggressively they become visible. Best used to bypass encounters entirely rather than enabling combat.'},
+
+{n:'Lightning Bolt',cl:'mu',lv:3,rg:"180'",du:'Instant',ar:"60' line (bounces to 120' if blocked)",sv:'Spells (half damage)',
+ ef:"Deals 1d6 per caster level lightning damage in a 60' line. If the bolt hits a wall before 60', it bounces back toward the caster to complete 120' total.",
+ rv:null,
+ tp:'Like Fireball but linear. In a corridor it\'s devastating — and the bounce means the party can be hit if the angle is wrong. Measure twice outdoors, cast once indoors. A straight 60\' of clear enemies is the ideal.'},
+
+{n:'Protection from Evil 10\u2019 Radius',cl:'mu',lv:3,rg:'0',du:'12 turns',ar:"10' radius around caster",sv:null,
+ ef:"All creatures within 10' of the caster receive +1 to AC and saving throws vs. evil creatures. Conjured and summoned creatures cannot enter the radius.",
+ rv:null,
+ tp:'The group version of the Level 1 spell. The absolute conjured-creature barrier extends to the entire party inside the radius. Cast before any encounter involving undead, demons, or summoned beings.'},
+
+{n:'Protection from Normal Missiles',cl:'mu',lv:3,rg:'0',du:'12 turns',ar:'Caster',sv:null,
+ ef:'Caster becomes immune to all non-magical projectiles: arrows, crossbow bolts, sling stones, javelins, and thrown weapons.',
+ rv:null,
+ tp:'Allows the MU to ignore an army of archers entirely. Against a force where missile fire dominates, this changes the encounter entirely. Does not protect against magical projectiles, siege engines, or giant-thrown boulders.'},
+
+{n:'Water Breathing',cl:'mu',lv:3,rg:"30'",du:'1 day',ar:'1 creature',sv:null,
+ ef:'Target can breathe underwater as easily as air for one full day.',
+ rv:null,
+ tp:'Unlocks underwater adventure. Remember all other limitations still apply — movement, combat in water, vision underwater. Cast on the whole party for a single day of undersea or flooded-dungeon exploration.'},
+
+/* ============================================================
+   MAGIC-USER LEVEL 4
+============================================================ */
+{n:'Charm Monster',cl:'mu',lv:4,rg:"120'",du:'Until dispelled',ar:'1 monster (or 3d6 HD if ≤3 HD)',sv:'Spells',
+ ef:"As Charm Person but affects any creature type. Against creatures of 3 HD or lower, may affect 3d6 HD worth of targets.",
+ rv:null,
+ tp:'Recruit a powerful monster ally. A charmed dragon, giant, or basilisk obeys as a loyal friend — not a slave, but a trusted companion. Best used on isolated, powerful individuals. The charmed creature retains its personality.'},
+
+{n:'Confusion',cl:'mu',lv:4,rg:"120'",du:'12 rounds',ar:"2d8 HD of creatures in 20'×20'",sv:'Spells',
+ ef:"Each confused creature rolls 1d6 each round: 1–2 attack nearest creature; 3–4 stand confused; 5–6 flee or act normally.",
+ rv:null,
+ tp:'Mass disruption — but it affects both sides. Aim well away from the party. A confused group attacks each other as often as the party. Enormous against goblin hordes. The chaos is beautiful and unpredictable.'},
+
+{n:'Dimension Door',cl:'mu',lv:4,rg:"10'",du:'Instant',ar:'Caster only',sv:null,
+ ef:"Instantly teleports the caster up to 360' to any precisely imagined location. No error chance. Cannot take passengers.",
+ rv:null,
+ tp:'Precision escape or infiltration. Unlike Teleport, there is no chance of mishap. Invaluable for escaping a grapple, bypassing a locked area, or exiting a surrounded position. The 360\' range keeps it tactical rather than strategic.'},
+
+{n:'Growth of Plants',cl:'mu',lv:4,rg:'0',du:'Permanent',ar:"300'×300'",sv:null,
+ ef:'Causes all plants in the area to grow to impenetrable thickness. Requires Dispel Magic to reverse.',
+ rv:null,
+ tp:'Permanent terrain denial at massive scale. Close off dungeon wings, block hex approaches to a stronghold, seal a canyon trail. Works best where vegetation already exists. Permanent until dispelled.'},
+
+{n:'Hallucinatory Terrain',cl:'mu',lv:4,rg:"240'",du:'Until physically touched',ar:"240'×240'",sv:null,
+ ef:'Makes an area of terrain appear to be completely different terrain. The illusion lasts until a creature physically contacts it.',
+ rv:null,
+ tp:'Large-scale strategic deception that outlasts the encounter. Hide a camp, make a cliff look like a road, disguise a fortress as open grassland. Only physical contact breaks it — a scout approaching on foot will see through it.'},
+
+{n:'Massmorph',cl:'mu',lv:4,rg:"240'",du:'Until dispelled',ar:'Up to 100 man-sized creatures',sv:null,
+ ef:'Makes up to 100 man-sized creatures appear to be trees or other natural terrain features. Affected creatures must remain stationary.',
+ rv:null,
+ tp:'The ultimate ambush setup. An entire army hidden as a forest — very few methods pierce it. Dispel when combat begins for a devastating surprise round. Works only where trees are plausible; a treeless plain is suspicious.'},
+
+{n:'Polymorph Others',cl:'mu',lv:4,rg:"60'",du:'Permanent',ar:'1 creature',sv:'Spells',
+ ef:"Transforms a creature into a different species. The target's mind gradually shifts to match its new form over time.",
+ rv:null,
+ tp:'Permanent removal of a dangerous foe — worse than death for the target\'s original self. A dragon polymorphed into a frog gradually forgets it was ever a dragon. A high-risk approach to neutralising apex threats without killing them.'},
+
+{n:'Polymorph Self',cl:'mu',lv:4,rg:'0',du:'6 turns + 1/level',ar:'Caster',sv:null,
+ ef:'Caster assumes the physical form of any creature. Gains movement modes and AC of new form but not special attacks, breath weapons, or magical abilities.',
+ rv:null,
+ tp:'Disguise, movement, and physical defence from any creature. Transform into a bat to fly, a fish to swim, a giant for intimidation. The MU still uses their own combat abilities — no fire breath, no venom, just the body.'},
+
+{n:'Remove Curse',cl:'mu',lv:4,rg:"30'",du:'Permanent',ar:'1 creature or object',sv:null,
+ ef:'Removes any curse from a creature or item. Allows a cursed item (sword, shield, etc.) to be removed and discarded.',
+ rv:null,
+ tp:'The unlock key for cursed items. Without this, a Cursed Sword −2 stays in someone\'s hand permanently. One of the most party-essential utility spells at mid-level. Note: Clerics get this one full level tier earlier.'},
+
+{n:'Wall of Fire',cl:'mu',lv:4,rg:"60'",du:'Concentration',ar:'Up to 1,200 sq ft',sv:'Spells (or auto damage)',
+ ef:"Creates a curtain of roaring fire up to 1,200 sq ft. Creatures passing through take 1d6 + 1/level fire damage. Undead take double damage.",
+ rv:null,
+ tp:'Area denial with exceptional anti-undead utility. Force enemies to choose between staying in place and taking damage to cross through. Drop it behind the party during a retreat to cover the escape from a horde of undead.'},
+
+{n:'Wall of Ice',cl:'mu',lv:4,rg:"120'",du:'12 turns',ar:'Up to 1,200 sq ft',sv:'Special',
+ ef:"Creates a wall of ice 6\" thick. Can be shattered — creatures adjacent take 1d6/caster level damage. Fire-using creatures cannot cross.",
+ rv:null,
+ tp:'Battlefield control with offensive potential when broken. Channel enemies into kill zones or block passages. Fire creatures are doubly impaired. A shattering wall punishes creatures trying to force through it.'},
+
+{n:'Wizard Eye',cl:'mu',lv:4,rg:"240'",du:'6 turns',ar:'Invisible remote sensor',sv:null,
+ ef:"Creates an invisible floating eye the caster sees through. Moves at 120'/turn. Cannot pass through solid surfaces. Caster must concentrate to move it.",
+ rv:null,
+ tp:'Dungeon reconnaissance without physical risk. Scout the next room, count foes, assess the boss chamber, identify traps. The eye is invisible but can be spotted by creatures with Detect Invisible. Invisible does not mean intangible.'},
+
+/* ============================================================
+   MAGIC-USER LEVEL 5
+============================================================ */
+{n:'Animate Dead',cl:'mu',lv:5,rg:"60'",du:'Permanent',ar:'1d6 undead per caster level',sv:null,
+ ef:'Animates dead bodies as skeletons or zombies permanently under the caster\'s command.',
+ rv:null,
+ tp:'Free followers — but they need precise commands. Undead cannot think, cannot communicate, and will attack the nearest thing if ordered imprecisely. Atmospherically significant. What does it mean for the setting that this spell exists?'},
+
+{n:'Cloudkill',cl:'mu',lv:5,rg:'0',du:'6 turns',ar:"30'×30' moving cloud",sv:'Death (5–6 HD only)',
+ ef:"Poisonous cloud drifts 60'/round away from the caster. Creatures ≤4 HD: instant death, no save. Creatures 5–6 HD: save vs. Death or die. Creatures 7+ HD: unaffected.",
+ rv:null,
+ tp:'Kills entire low-HD hordes instantly. Direct it strategically — it drifts and does not discriminate. Completely useless against high-HD foes. A cloud that drifts with the wind can become a liability to the party.'},
+
+{n:'Conjure Elemental',cl:'mu',lv:5,rg:"240'",du:'Concentration',ar:'1 elemental (8, 12, or 16 HD)',sv:null,
+ ef:'Summons a Fire, Air, Earth, or Water elemental of chosen power tier. If concentration breaks for any reason, the elemental turns on the caster.',
+ rv:null,
+ tp:'The single most dangerous spell to cast in B/X. An 8 HD elemental is devastating — but the instant concentration breaks, it becomes your worst enemy. Never cast near a combat that might land a hit on you. Have a Dispel Magic ready.'},
+
+{n:'Contact Outer Plane',cl:'mu',lv:5,rg:'0',du:'Special',ar:'Caster',sv:'Special (insanity)',
+ ef:'Caster contacts an outer-planar entity for 1 yes/no question per 2 caster levels. Higher planes = more accurate but greater risk of temporary insanity. Risk increases with plane distance.',
+ rv:null,
+ tp:'The oracle spell. Answers are truthful but binary. Prepare specific, binary questions in advance: "Is the traitor in this room?" not "Who is the traitor?" Higher planes give near-perfect answers — at the cost of the caster\'s mind.'},
+
+{n:'Feeblemind',cl:'mu',lv:5,rg:"240'",du:'Permanent',ar:'1 creature',sv:'Spells (−4 penalty)',
+ ef:'Reduces the target\'s Intelligence to 2 (animal level). Arcane casters save at an additional −4 penalty. Restoration magic required to reverse.',
+ rv:null,
+ tp:'The most feared MU vs. MU spell. Permanently neutralises an enemy Magic-User or Elf — the target can no longer think abstractly, cast spells, or communicate meaningfully. Worse than kill: they survive as a helpless animal.'},
+
+{n:'Hold Monster',cl:'mu',lv:5,rg:"120'",du:'9 turns',ar:'1–4 monsters',sv:'Spells',
+ ef:'As Hold Person but affects any creature type regardless of size, nature, or intelligence.',
+ rv:null,
+ tp:'Hold Person\'s bigger sibling. Works on everything — giants, demons, dragons, and beasts. Lock down the scariest thing in the room. Held creatures can be executed. The premier "win the fight" spell at Level 5.'},
+
+{n:'Magic Jar',cl:'mu',lv:5,rg:"30' per level",du:'Special',ar:'1 creature',sv:'Spells',
+ ef:"Caster's life force moves into a gem or crystal. From there, the caster may attempt to possess creatures within range. If expelled from a possessed body, the life force returns to the gem. If the gem is destroyed while the life force is inside, the caster dies.",
+ rv:null,
+ tp:'The most terrifying Level 5 spell. Success means controlling a much more powerful body temporarily. Failure means being trapped in a gem while the real body lies comatose nearby. Have someone guard that gem with their life — permanently.'},
+
+{n:'Pass-Wall',cl:'mu',lv:5,rg:"30'",du:'3 turns',ar:"10'×5'×10' passage",sv:null,
+ ef:"Creates a passage through up to 10' of rock or wood. Closes at end of duration. The referee determines what happens to anything in the passage when it closes.",
+ rv:null,
+ tp:'Bypass the wall, not the door. Create routes where none exist. Infiltrate a keep, escape a surrounded position, shortcut dungeon sections. Plan the return route — the passage closes in 3 turns.'},
+
+{n:'Telekinesis',cl:'mu',lv:5,rg:"120'",du:'6 rounds',ar:'Up to 200 lbs + 50/level',sv:'Spells (if resisting)',
+ ef:"Moves objects or creatures at 20'/round. Weight limit increases with caster level. Creatures may resist with a save.",
+ rv:null,
+ tp:'Environmental weapon and puzzle solver. Move traps at a distance, retrieve items without touching them, push enemies off ledges. The weight and speed make it a utility tool rather than reliable combat. Use it creatively.'},
+
+{n:'Teleport',cl:'mu',lv:5,rg:'0',du:'Instant',ar:'Caster + 250 lbs',sv:'Special (accuracy check)',
+ ef:'Instantly transports to any known location. Accuracy depends on familiarity: very familiar = safe; well known = small risk of arriving high or low; unfamiliar = significant chance of a fatal misjudgement.',
+ rv:null,
+ tp:'The most dangerous spell in the book. Arriving inside solid matter is instant death. Only teleport to locations you know intimately. The power to travel anywhere instantly is balanced against the irreversible consequence of a bad roll.'},
+
+{n:'Transmute Rock to Mud',cl:'mu',lv:5,rg:"120'",du:'3d6 days, then reverts',ar:"30'×30' area",sv:null,
+ ef:'Converts stone to thick mud. Reversed: instantly converts mud to stone, trapping anything within. Natural mud reverts to stone after 3d6 days.',
+ rv:'Mud to Stone',
+ tp:'The siege breaker. Drop a wall section, create a moat, trap an army in mud. Reversed, it turns a mud-trapped enemy into a permanent statue. Arguably the most creative environmental spell in B/X.'},
+
+{n:'Wall of Stone',cl:'mu',lv:5,rg:"60'",du:'Permanent',ar:'Up to 1,000 sq ft',sv:null,
+ ef:"Creates a permanent wall of solid stone, 2\" thick per caster level.",
+ rv:null,
+ tp:'Permanent battlefield reshaping. Close off dungeon wings, trap enemies, build structures mid-adventure. Unlike Wall of Ice, nothing natural dissolves it — only Disintegrate or sustained pickaxe work. Geo-engineer the fight.'},
+
+/* ============================================================
+   MAGIC-USER LEVEL 6
+============================================================ */
+{n:'Anti-Magic Shell',cl:'mu',lv:6,rg:'0',du:'12 turns',ar:"10' radius around caster",sv:null,
+ ef:"No magic can cross the barrier in either direction. The caster cannot cast spells from inside; incoming magic is blocked entirely.",
+ rv:null,
+ tp:'Complete magical immunity at the cost of personal spellcasting. Invaluable when facing a purely magical enemy — a Spectre, a Golem, or a room of magical traps. The caster can still move, fight, and use physical items inside the shell.'},
+
+{n:'Control Weather',cl:'mu',lv:6,rg:'0',du:'Concentration',ar:'Large outdoor region',sv:null,
+ ef:'Changes weather conditions across a large area: blizzard, fog, calm, violent storm, extreme heat, or extreme cold.',
+ rv:null,
+ tp:'Wilderness and naval power at campaign scale. Summon blizzards to stop an army, clear a sea route, strand a fleet in fog, end a drought. Nearly useless underground. Most impactful in hexcrawl and domain-level play.'},
+
+{n:'Death Spell',cl:'mu',lv:6,rg:"240'",du:'Instant',ar:"30'×30' area",sv:'None',
+ ef:'Kills up to 2d8 creatures with 8 HD or fewer in the area. No saving throw. Creatures of 9+ HD are immune.',
+ rv:null,
+ tp:'Area mass execution with no save — more reliable than Cloudkill at mid-HD levels. A 2d8 kill radius against creatures below 9 HD changes any large encounter fundamentally. The spell that makes mass combat feel different.'},
+
+{n:'Disintegrate',cl:'mu',lv:6,rg:"60'",du:'Instant',ar:'1 creature or object',sv:'Death',
+ ef:'Turns the target to dust. Creatures: save vs. Death or die. Objects: disintegrated automatically with no save.',
+ rv:null,
+ tp:'The one-hit kill and the door-opener. Use on objects to bypass locks, walls, and barriers — they disintegrate without a save. No remains means no Resurrection or Raise Dead. The most final spell in the game.'},
+
+{n:'Geas',cl:'mu',lv:6,rg:"30'",du:'Permanent',ar:'1 creature',sv:null,
+ ef:'Compels the target to perform (or refrain from) a specific task. Violating the Geas causes increasing sickness and eventual death. Cannot be Dispelled — only completed, or revoked by the caster or divine intervention.',
+ rv:null,
+ tp:'Divine authority through arcane means. More powerful than Charm — violation is fatal. Clear, specific tasks work best: "Deliver this message." Vague compulsions invite edge cases. The ultimate diplomatic and oath-enforcement tool.'},
+
+{n:'Invisible Stalker',cl:'mu',lv:6,rg:"10'",du:'Until task complete',ar:'1 Stalker (8 HD)',sv:null,
+ ef:"Summons an Invisible Stalker to complete one specific task. If given a vague or complex task, the Stalker interprets it adversarially and in the fastest possible manner.",
+ rv:null,
+ tp:'Hire a nearly unstoppable assassin. Simple, concrete instructions: "Kill the Baron." Never: "Protect me from my enemies." Ambiguous missions are completed in ways that damage the caster\'s interests. Clarity is survival.'},
+
+{n:'Lower Water',cl:'mu',lv:6,rg:"240'",du:'10 turns',ar:'Large body of water',sv:null,
+ ef:'Reduces the depth of a body of water by half. Reversed: raises the water level.',
+ rv:'Raise Water',
+ tp:'Naval and underwater utility. Expose hidden sea floors, reveal underwater dungeons, make river fords trivial, ground enemy ships. The reversed form can flood a fortress or drown subterranean areas. Campaign-scale environmental control.'},
+
+{n:'Move Earth',cl:'mu',lv:6,rg:"240'",du:'6 turns',ar:'Massive area',sv:null,
+ ef:"Reshapes natural earth (not stone) in a large area. Movement is slow — large-scale changes take minutes to hours.",
+ rv:null,
+ tp:'The ultimate terrain manipulation. Build fortifications, fill valleys, dam rivers, bury enemies in slow-moving landslides. Operates on the time scale of siege warfare. A strategic spell, not a tactical one — it requires planning.'},
+
+{n:'Part Water',cl:'mu',lv:6,rg:"120'",du:'6 turns',ar:'Water corridor',sv:null,
+ ef:'Parts a body of water to create a safe walking corridor. Reveals the floor of the parted area.',
+ rv:null,
+ tp:'The Moses spell. Expose lake floors for sunken dungeons, enable river crossings under fire, rearrange naval battles. Also temporarily removes water-breathing enemies from their element. Pairs well with underwater exploration.'},
+
+{n:'Projected Image',cl:'mu',lv:6,rg:"240'",du:'6 turns',ar:'Duplicate of caster',sv:null,
+ ef:"Creates a perfect illusory duplicate of the caster. All spells appear to originate from the image. The real caster is safe while the image draws all attacks.",
+ rv:null,
+ tp:'The ultimate decoy. Spells still function, apparently from the image. Every attack targets the duplicate. The real caster operates freely while appearing to be in mortal danger. Pierced by Detect Invisible or True Seeing.'},
+
+{n:'Reincarnation',cl:'mu',lv:6,rg:"10'",du:'Permanent',ar:'1 dead creature',sv:null,
+ ef:"Returns a dead character to life in a randomly determined new physical form — which may be human, demihuman, or even a monster type.",
+ rv:null,
+ tp:'The other resurrection option. The result is random — the character returns, but as what? A fighter reincarnated as a gnoll must navigate that reality. Can result in a new species with different abilities and social complications.'},
+
+{n:'Stone to Flesh',cl:'mu',lv:6,rg:"120'",du:'Permanent',ar:'1 creature or object',sv:'Turn to Stone (reversed)',
+ ef:'Converts stone to flesh, restoring a petrified creature. Reversed: turns flesh to stone permanently (save vs. Turn to Stone negates).',
+ rv:'Flesh to Stone (petrification)',
+ tp:'The Medusa and Basilisk aftermath fixer. Restore petrified party members at any time — no timer. Reversed is a permanent petrification with no age limit. Also creates edible food from stone in a desperate survival emergency.'},
+
+/* ============================================================
+   CLERIC LEVEL 1
+============================================================ */
+{n:'Cure Light Wounds',cl:'clr',lv:1,rg:'Touch',du:'Permanent',ar:'1 creature',sv:null,
+ ef:'Heals 1d6+1 HP. Reversed (Cause Light Wounds): deals 1d6+1 damage on a successful touch attack.',
+ rv:'Cause Light Wounds',
+ tp:'The healing economy\'s base coin. Prepare multiple copies for extended expeditions. The reversed form is a genuine melee weapon — useful against undead, who typically cannot save against Cleric touch attacks.'},
+
+{n:'Detect Evil',cl:'clr',lv:1,rg:"120'",du:'6 turns',ar:"120' ahead",sv:null,
+ ef:"Detects evil intentions, magically evil objects, or creatures of evil alignment within range. Does not identify the specific source.",
+ rv:null,
+ tp:'Longer range and duration than the MU version. Useful for evaluating NPC intentions before trusting them. Also detects magically cursed or evil-aligned items before the party handles them.'},
+
+{n:'Detect Magic',cl:'clr',lv:1,rg:'0',du:'2 turns',ar:"60' ahead",sv:null,
+ ef:"Perceives magical auras on items, creatures, and areas within 60'.",
+ rv:null,
+ tp:'Evaluate found treasure before handling it. Clerics should prepare this when exploring areas with high treasure density or known enchantments. Identifies that magic is present, not what it does.'},
+
+{n:'Light',cl:'clr',lv:1,rg:"120'",du:'12 turns',ar:"30' radius globe",sv:'Spells (if aimed at eyes)',
+ ef:"Creates a hovering sphere of bright light. If cast at a creature's eyes, blinds on a failed save for the duration.",
+ rv:null,
+ tp:'Same dual-use spell as the MU version. Note the Cleric\'s longer range (120\' vs. MU\'s 60\'). Cast on a shield for mobile illumination, or directly at an enemy\'s eyes in a crisis.'},
+
+{n:'Protection from Evil',cl:'clr',lv:1,rg:'0',du:'12 turns',ar:'Caster',sv:null,
+ ef:'+1 to AC and saving throws vs. evil creatures. Summoned and conjured creatures cannot physically touch the caster — an absolute barrier.',
+ rv:null,
+ tp:'Standard pre-combat buff for any encounter involving undead, demons, or summoned beings. The absolute barrier against conjured creatures cannot be broken by any save or roll. Always worth preparing.'},
+
+{n:'Purify Food and Water',cl:'clr',lv:1,rg:"10'",du:'Permanent',ar:"One day's food and water",sv:null,
+ ef:'Makes spoiled, poisoned, or magically contaminated food and water safe to consume. Reversed: ruins and contaminates food and water.',
+ rv:'Putrefy Food and Water',
+ tp:'The hexcrawl survival spell. Eliminates waterborne disease, poisoned provisions, and food scarcity in the wilderness. The reversed form is an interesting sabotage option against an enemy camp\'s supply stores.'},
+
+{n:'Remove Fear',cl:'clr',lv:1,rg:'Touch',du:'2 turns',ar:'1 creature/level',sv:null,
+ ef:'Removes all fear effects from targets. Reversed (Cause Fear): target must save vs. Spells or flee for 2 turns.',
+ rv:'Cause Fear',
+ tp:'Critical after encounters with fear-causing creatures: dragons, banshees, spectres. Reversed is soft crowd control — removes a foe from combat without damage. Fleeing enemies may return or alert others.'},
+
+{n:'Resist Cold',cl:'clr',lv:1,rg:'Touch',du:'6 turns',ar:'1 creature/level',sv:null,
+ ef:'Target is immune to normal (non-magical) cold. Against magical cold: +2 to saves, and damage is halved if the save is made.',
+ rv:null,
+ tp:'The cold-weather survival and white dragon counter. Cast on frontline fighters before entering a cold-based encounter. Also mitigates blizzard conditions in mountain hexcrawls. Its pair, Resist Fire, covers the other primary element.'},
+
+/* ============================================================
+   CLERIC LEVEL 2
+============================================================ */
+{n:'Bless',cl:'clr',lv:2,rg:'0',du:'6 turns',ar:"All allies within 60'",sv:null,
+ ef:'+1 to attack rolls and morale checks for all affected allies. Reversed (Curse): −1 to attack rolls and morale.',
+ rv:'Curse',
+ tp:'The best mass combat buff. +1 to every attack roll for the entire party across a 6-round fight is enormous cumulative value. Cast before initiative. Reversed degrades enemy morale — use it against weak-morale foes like Goblins to trigger a rout.'},
+
+{n:'Find Traps',cl:'clr',lv:2,rg:'0',du:'2 turns',ar:"30' radius",sv:null,
+ ef:'Reveals all traps — mechanical and magical — within range. Does not identify their nature or disable them.',
+ rv:null,
+ tp:'Detection only — the thief still does the disabling. But knowing exactly where traps are before probing changes the entire approach. Indispensable in trap-heavy dungeon levels. Tell the thief: "There\'s something at the door." Then let them work.'},
+
+{n:'Hold Person',cl:'clr',lv:2,rg:"180'",du:'9 turns',ar:'1–4 persons',sv:'Spells',
+ ef:'Identical to MU Hold Person but available to Clerics at Level 2.',
+ rv:null,
+ tp:'Clerics get this a full effective level earlier than MUs. Lock down armoured enemy warriors that ranged attacks struggle with. Invaluable vs. enemy clerics and heavy fighters. A held foe can be executed.'},
+
+{n:'Know Alignment',cl:'clr',lv:2,rg:"10'",du:'1 round',ar:'1 creature or object',sv:null,
+ ef:'Reveals the alignment (Lawful, Neutral, or Chaotic) of one creature or object.',
+ rv:null,
+ tp:'Confirms whether an NPC is lying about their loyalties. Also identifies Chaotic or cursed items before equipping them. Essential in social encounters with hidden agendas. The answer is alignment only — not motivation, history, or intent.'},
+
+{n:'Resist Fire',cl:'clr',lv:2,rg:'Touch',du:'6 turns',ar:'1 creature/level',sv:null,
+ ef:'Target is immune to normal (non-magical) fire. Against magical fire: +2 to saves, and damage is halved if the save is made.',
+ rv:null,
+ tp:'The dragon fire mitigation spell. Cast on the frontline fighter before entering a fire drake\'s lair. Also handles Fireball splash damage on a party member caught in the blast. Resist Cold and Resist Fire together give elemental protection for the whole party.'},
+
+{n:'Silence 15\u2019 Radius',cl:'clr',lv:2,rg:"180'",du:'12 turns',ar:"15' radius",sv:null,
+ ef:"No sound can enter or exit the area. Spellcasting within the area is impossible (verbal components are required).",
+ rv:null,
+ tp:'The anti-spellcaster tool. Cast it on the enemy Magic-User to shut down their casting entirely. A Cleric inside the silence cannot cast either — but casting Silence on an opponent from outside leaves the Cleric free. Excellent long-range shut-down.'},
+
+{n:'Snake Charm',cl:'clr',lv:2,rg:"60'",du:'1d4+1 turns',ar:'Snakes (HD ≤ Cleric level)',sv:null,
+ ef:"Charms snakes so they do not attack. Total HD of snakes charmed cannot exceed the Cleric's level.",
+ rv:null,
+ tp:'Situational — but in serpent-heavy environments (jungle hexes, ancient temples, snake cult dungeons) extraordinarily powerful. Effectively removes an entire encounter group from combat with no saving throw.'},
+
+{n:'Speak with Animals',cl:'clr',lv:2,rg:"30'",du:'6 turns',ar:'1 normal animal',sv:null,
+ ef:'Cleric communicates with a normal animal. Animals are not compelled to cooperate — they must be treated respectfully.',
+ rv:null,
+ tp:'Intelligence from a unique perspective. Animals report what they\'ve sensed in the recent past. A dungeon rat knows which rooms are safe. A bird saw which direction the bandits fled. Negotiation applies — animals have preferences.'},
+
+/* ============================================================
+   CLERIC LEVEL 3
+============================================================ */
+{n:'Continual Light',cl:'clr',lv:3,rg:"120'",du:'Permanent',ar:"30' radius globe",sv:'Spells (if aimed at eyes)',
+ ef:"Creates a permanent, daylight-bright globe of light on an object. If cast at a creature's eyes, blinds permanently on a failed save.",
+ rv:null,
+ tp:'Same as MU Continual Light but available one level tier earlier. Ends torch management permanently. Create portable light-stones for the whole party. The blinding use is a devastating one-shot debuff.'},
+
+{n:'Cure Blindness',cl:'clr',lv:3,rg:'Touch',du:'Permanent',ar:'1 creature',sv:null,
+ ef:'Permanently cures blindness, whether caused by magic, monster ability, or mundane injury.',
+ rv:null,
+ tp:'The Medusa and Basilisk aftermath fixer. Without this, a permanently blinded character is effectively out of combat indefinitely. Keep one prepared whenever gaze-attack creatures are expected in the area.'},
+
+{n:'Cure Disease',cl:'clr',lv:3,rg:'Touch',du:'Permanent',ar:'1 creature',sv:null,
+ ef:"Cures any disease. This includes Mummy Rot, lycanthropy (if cast within 3 days of infection), and magically induced afflictions.",
+ rv:null,
+ tp:'The single most important non-healing Cleric spell in the mid-game. Mummy Rot prevents natural healing and halves magical healing effectiveness. Early-stage lycanthropy is reversible — the clock on a werewolf bite starts immediately.'},
+
+{n:'Growth of Animals',cl:'clr',lv:3,rg:"120'",du:'12 turns',ar:'1d6 normal animals',sv:null,
+ ef:"Doubles the size, HD, and damage of affected normal animals.",
+ rv:null,
+ tp:'Create giant allies from ordinary fauna. A horse becomes a war-destrier equivalent; a dog becomes bear-class. In wilderness settings where animals are present, this creates powerful allies from mundane environmental resources.'},
+
+{n:'Locate Object',cl:'clr',lv:3,rg:'0',du:'2 turns',ar:"120'+10' per level",sv:null,
+ ef:"Senses the direction of a specific known object. Longer range than the MU version. Cannot locate living creatures.",
+ rv:null,
+ tp:'The quest-item finder with greater range than the MU version. Know exactly what you\'re searching for. Essential for MacGuffin retrieval scenarios and finding kidnapped NPCs who are carrying a specific item.'},
+
+{n:'Remove Curse',cl:'clr',lv:3,rg:"30'",du:'Permanent',ar:'1 creature or object',sv:null,
+ ef:"Removes any curse from a creature or item. Allows cursed items to be removed and discarded.",
+ rv:null,
+ tp:'Clerics get this at Level 3 — a full level tier earlier than MUs. A key class advantage. Remove a cursed sword from a fighter\'s hand, lift a geas, free an NPC from a magical compulsion. Often more urgently needed than any combat spell.'},
+
+{n:'Speak with Dead',cl:'clr',lv:3,rg:"10'",du:'3 questions',ar:'1 corpse',sv:null,
+ ef:'Allows the Cleric to ask three questions of a dead creature. The more recently deceased, the more coherent the answers. The dead know only what they knew in life.',
+ rv:null,
+ tp:'The ultimate dungeon investigation tool. "What killed you? Where did you hide the key? Who was your employer?" Dead men answer truthfully with knowledge they had in life — and only that. Prepare your three questions in advance.'},
+
+/* ============================================================
+   CLERIC LEVEL 4
+============================================================ */
+{n:'Create Water',cl:'clr',lv:4,rg:"10'",du:'Permanent',ar:'Up to 50 gallons',sv:null,
+ ef:'Creates pure, drinkable water sufficient for 12 people and their mounts for a full day. Reversed: destroys an equivalent volume of water.',
+ rv:'Destroy Water',
+ tp:'The wilderness water supply solution. Desert hexcrawls cease to be survival struggles for a Cleric\'s party. The reversed form denies an enemy camp its water supply — useful in siege or sabotage scenarios.'},
+
+{n:'Cure Serious Wounds',cl:'clr',lv:4,rg:'Touch',du:'Permanent',ar:'1 creature',sv:null,
+ ef:'Heals 2d6+2 HP. Reversed (Cause Serious Wounds): deals 2d6+2 damage on a touch attack.',
+ rv:'Cause Serious Wounds',
+ tp:'The superior healing option. More than double the output of Cure Light Wounds. Keep one prepared for the aftermath of major combats when CLW won\'t put anyone back in fighting condition. Reversed on undead is devastating.'},
+
+{n:'Neutralize Poison',cl:'clr',lv:4,rg:'Touch',du:'Permanent',ar:'1 creature or object',sv:null,
+ ef:"Neutralises any poison. If cast the same round a creature dies from poison, the creature may survive. Also detoxifies poisoned objects and substances.",
+ rv:null,
+ tp:'The time-critical lifesaver. A character dies of poison — cast this immediately and they survive. Not next round: this round. Also renders poisoned traps and weapons permanently inert. The moment this matters, nothing else matters more.'},
+
+{n:'Protection from Evil 10\u2019 Radius',cl:'clr',lv:4,rg:'0',du:'12 turns',ar:"10' radius around caster",sv:null,
+ ef:"All within 10' receive +1 AC and saving throws vs. evil creatures. Conjured and summoned creatures cannot enter the radius.",
+ rv:null,
+ tp:'Party-wide protection. Every party member within 10\' benefits from the buff and the absolute conjured-creature barrier. Cast before demon, undead, or summoned creature encounters. The radius moves with the Cleric.'},
+
+{n:'Speak with Plants',cl:'clr',lv:4,rg:"30'",du:'3 turns',ar:'Plants in range',sv:null,
+ ef:"Cleric can communicate with plants and request them to move or manipulate their physical form (within their capability).",
+ rv:null,
+ tp:'Plants remember everything that has passed through them. A forest has witnessed decades of travellers — ask who went north last week. Command vines to restrain enemies, roots to trip foes, branches to block a path.'},
+
+{n:'Sticks to Snakes',cl:'clr',lv:4,rg:"60'",du:'6 turns',ar:'Up to 2d8 sticks',sv:null,
+ ef:'Transforms sticks into snakes. Each has a 50% chance of being venomous. Snakes revert to sticks at spell\'s end.',
+ rv:null,
+ tp:'Create an instant snake force from environmental debris. Half are venomous — determined randomly per snake. Useful wherever sticks exist (dungeon debris, firewood, spear shafts). A chaotic area-denial option requiring environmental awareness.'},
+
+{n:'Tongues',cl:'clr',lv:4,rg:'0',du:'1 turn',ar:'Caster',sv:null,
+ ef:'Caster can speak and understand all languages for the duration.',
+ rv:null,
+ tp:'The diplomatic solution to all language barriers. Opens negotiation with any monster encounter. Understand the enemy\'s commands and communications in real time. Essential for Clerics running faction-heavy or domain-level campaigns.'},
+
+/* ============================================================
+   CLERIC LEVEL 5
+============================================================ */
+{n:'Commune',cl:'clr',lv:5,rg:'0',du:'3 questions',ar:'Caster',sv:null,
+ ef:"The Cleric contacts their deity for up to 3 yes/no questions. Answers are truthful. Available once per week.",
+ rv:null,
+ tp:'The oracle — but binary only. Narrow your questions carefully: "Is the traitor in this room?" not "Who is the traitor?" Prepare questions in advance. The once-per-week limit makes each use significant and deliberate.'},
+
+{n:'Create Food',cl:'clr',lv:5,rg:'0',du:'Permanent',ar:"Food for 12 people and mounts",sv:null,
+ ef:"Creates enough food for 12 people and their mounts for one full day.",
+ rv:null,
+ tp:'Combined with Create Water: the Cleric\'s party never needs to manage supply in the wilderness again. Campaign-changing at high levels. Also invaluable for sieges — both for the defenders inside and for breaking them out.'},
+
+{n:'Dispel Evil',cl:'clr',lv:5,rg:'0',du:'1 round/level',ar:'1 evil or summoned creature',sv:'Spells',
+ ef:'Forces an evil or summoned creature to flee or be destroyed. Save vs. Spells or destroyed instantly; on save, the creature must immediately flee.',
+ rv:null,
+ tp:'The Cleric\'s supreme exorcism — more reliable against evil entities than Dispel Magic. Can destroy a demon outright or banish a summoned creature. The "win immediately" spell against evil outsiders and summoned horrors.'},
+
+{n:'Insect Plague',cl:'clr',lv:5,rg:"480'",du:'1 day',ar:"60'×60' cloud",sv:null,
+ ef:"Summons a vast swarm of stinging insects. Creatures of 2 HD or lower are forced to flee. Spellcasting within the swarm is impossible.",
+ rv:null,
+ tp:'Mass area denial at extraordinary range. Creatures of 2 HD or below simply cannot enter. Prevents all spellcasting throughout. A day\'s duration makes it a strategic tool — use it to lock down an area while the party works elsewhere.'},
+
+{n:'Quest',cl:'clr',lv:5,rg:"30'",du:'Permanent',ar:'1 creature',sv:null,
+ ef:'Compels the target to complete a specific task. Failure causes increasing sickness and death. Cannot be Dispelled — only completed or revoked by the Cleric or divine authority.',
+ rv:null,
+ tp:'Divine authority as a game mechanic. Bind an NPC to a sacred obligation. Violation is fatal and inexorable. Clearer and more severe than Geas about the divine backing. The ultimate oath-enforcement tool available to mortal beings.'},
+
+{n:'Raise Dead',cl:'clr',lv:5,rg:"60'",du:'Permanent',ar:'1 dead creature',sv:'Constitution check',
+ ef:"Returns a dead creature to life. Must be cast within a number of days equal to the Cleric's level after death. Demihumans (dwarf, elf, halfling) cannot be raised. Target must pass a Constitution check or die again.",
+ rv:null,
+ tp:'The death reversal — but there is a clock and a risk. Set the timer the moment a PC dies. The Constitution check after raising adds meaningful tension. The demihuman restriction is core to B/X\'s design. This is why the party needs a Cleric.'},
+
+{n:'True Seeing',cl:'clr',lv:5,rg:'Touch',du:'1 turn',ar:'1 creature',sv:null,
+ ef:"Target sees all things as they truly are: illusions dissolved, polymorphed creatures revealed, invisible beings visible, secret doors apparent, and alignment auras visible.",
+ rv:null,
+ tp:'Everything hidden becomes transparent. The answer to Invisibility, Polymorph, all illusion magic, disguise, and secret passages simultaneously. The most comprehensive vision spell in the game. Use before trusting anything.'},
+
+{n:'Word of Recall',cl:'clr',lv:5,rg:'0',du:'Instant',ar:'Caster + 250 lbs',sv:null,
+ ef:"Instantly transports the Cleric (and held items) to a pre-designated sanctuary — a holy location chosen and prepared in advance.",
+ rv:null,
+ tp:'The emergency exit with zero error risk. Set the sanctuary before the dungeon. Cannot bring the whole party — this is the Cleric\'s personal escape hatch. Irreplaceable when an expedition goes catastrophically wrong and survival is the only goal.'},
+];
+
+/* ============================================================
+   RENDER ENGINE
+============================================================ */
+const LV_LABEL={1:'Level 1',2:'Level 2',3:'Level 3',4:'Level 4',5:'Level 5',6:'Level 6'};
+
+function buildCard(s){
+  const lvCls='lv'+s.lv;
+  const clLabel=s.cl==='mu'?'MU':'CLR';
+  const rvHtml=s.rv?`<div class="detail-row"><span class="detail-label">Reversed</span><span class="detail-val reverse-text">${s.rv}</span></div>`:'';
+  const svHtml=s.sv?`<span class="stat-item">Save <strong>${s.sv}</strong></span>`:'';
+  return `<div class="spell-card" data-name="${s.n.toLowerCase()}" data-class="${s.cl}" data-level="${s.lv}" onclick="this.classList.toggle('expanded')">
+<div class="card-top"><div class="spell-name">${s.n}</div><div class="card-tags"><span class="class-tag ${s.cl}">${clLabel}</span><span class="level-tag ${lvCls}">${LV_LABEL[s.lv]}</span></div></div>
+<div class="card-stats"><span class="stat-item">Range <strong>${s.rg}</strong></span><span class="stat-item">Duration <strong>${s.du}</strong></span><span class="stat-item">Area/Target <strong>${s.ar}</strong></span>${svHtml}</div>
+<div class="card-detail">
+  <div class="detail-row"><span class="detail-label">Effect</span><span class="detail-val effect-text">${s.ef}</span></div>
+  ${rvHtml}
+  <div class="newbie-tip">📖 <strong>Referee note:</strong> ${s.tp}</div>
+</div>
+</div>`;
+}
+
+function renderAll(){
+  // Group by class + level
+  const grids={};
+  S.forEach(s=>{
+    const key=`${s.cl}-${s.lv}`;
+    if(!grids[key])grids[key]=[];
+    grids[key].push(s);
+  });
+  for(const[key,spells] of Object.entries(grids)){
+    const el=document.getElementById('grid-'+key);
+    if(el)el.innerHTML=spells.map(buildCard).join('');
+  }
+  updateCount();
+}
+
+/* ============================================================
+   FILTER LOGIC
+============================================================ */
+const activeFilters={class:new Set(),level:new Set()};
+
+function toggleFilter(type,val,btn){
+  if(activeFilters[type].has(val)){activeFilters[type].delete(val);btn.classList.remove('active');}
+  else{activeFilters[type].add(val);btn.classList.add('active');}
+  filterAll();
+}
+
+function clearFilters(){
+  activeFilters.class.clear();activeFilters.level.clear();
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('search').value='';
+  filterAll();
+}
+
+function filterAll(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  document.querySelectorAll('.spell-card').forEach(c=>{
+    const nameMatch=c.dataset.name.includes(q);
+    const classOk=activeFilters.class.size===0||activeFilters.class.has(c.dataset.class);
+    const levelOk=activeFilters.level.size===0||activeFilters.level.has(c.dataset.level);
+    c.classList.toggle('hidden',!(nameMatch&&classOk&&levelOk));
+  });
+  // Hide empty subcats and categories
+  document.querySelectorAll('.subcat').forEach(s=>{
+    s.style.display=[...s.querySelectorAll('.spell-card')].some(c=>!c.classList.contains('hidden'))?'':'none';
+  });
+  document.querySelectorAll('.category').forEach(c=>{
+    c.style.display=[...c.querySelectorAll('.spell-card')].some(m=>!m.classList.contains('hidden'))?'':'none';
+  });
+  updateCount();
+}
+
+function updateCount(){
+  const total=document.querySelectorAll('.spell-card').length;
+  const vis=[...document.querySelectorAll('.spell-card')].filter(c=>!c.classList.contains('hidden')).length;
+  const el=document.getElementById('result-count');
+  if(el)el.textContent=vis<total?`${vis} of ${total} shown`:`${total} spells`;
+}
+
+renderAll();
+</script>
+</body>
+</html>
